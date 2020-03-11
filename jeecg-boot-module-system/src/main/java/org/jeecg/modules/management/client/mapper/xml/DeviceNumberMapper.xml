@@ -6,11 +6,13 @@
 		DELETE 
 		FROM  tb_device_number 
 		WHERE
-			 client_id = #{mainId} 	</delete>
+			 client_id = #{mainId} 
+	</delete>
 	
 	<select id="selectByMainId" parameterType="java.lang.String" resultType="org.jeecg.modules.management.client.entity.DeviceNumber">
 		SELECT * 
 		FROM  tb_device_number
 		WHERE
-			 client_id = #{mainId} 	</select>
+			 client_id = #{mainId} 
+	</select>
 </mapper>

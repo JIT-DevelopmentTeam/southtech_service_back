@@ -4,6 +4,7 @@ import java.io.Serializable;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import org.jeecg.common.aspect.annotation.Dict;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -55,15 +56,15 @@ public class DeviceNumber implements Serializable {
 	/**描述*/
 	@Excel(name = "描述", width = 15)
 	private java.lang.String description;
-	/**数量*/
-	@Excel(name = "数量", width = 15)
-	private java.lang.Double quantity;
-	/**ERP客户编号*/
-	@Excel(name = "ERP客户编号", width = 15)
-	private java.lang.String erpClientNum;
+    /**保质期至*/
+    @Excel(name = "保质期至", width = 15)
+    private java.util.Date qgp;
+    /**保质期至*/
+    @Excel(name = "签约时间", width = 15)
+    private java.util.Date signing;
 	/**时间戳*/
 	@Excel(name = "时间戳", width = 15)
-	private java.lang.Integer modifyTime;
+	private java.sql.Timestamp modifyTime;
 	/**所属客户*/
 	private java.lang.String clientId;
 }

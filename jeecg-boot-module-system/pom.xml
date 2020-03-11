@@ -35,8 +35,22 @@
 			<groupId>org.jeecgframework.boot</groupId>
 			<artifactId>jeecg-boot-base-common</artifactId>
 		</dependency>
+
+        <dependency>
+            <groupId>com.taobao.sdk</groupId>
+            <artifactId>taobao-sdk</artifactId>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/taobao-sdk-java-auto_1479188381469-20200219.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>com.taobao.sdk</groupId>
+            <artifactId>taobao-sdk-source</artifactId>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/taobao-sdk-java-auto_1479188381469-20200219-source.jar</systemPath>
+        </dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>

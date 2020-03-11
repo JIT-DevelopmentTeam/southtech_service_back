@@ -45,16 +45,12 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
+      <a-button @click="synchronizeClient" v-has="'client:synchronize'" type="primary" icon="cloud-download">同步客户</a-button>
+      <a-button @click="synchronizeDeviceNumber" v-has="'deviceNumber:synchronize'" type="primary" icon="cloud-download">同步设备编号</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('客户信息')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
-      <a-dropdown v-if="selectedRowKeys.length > 0">
-        <a-menu slot="overlay">
-          <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
-        </a-menu>
-        <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /></a-button>
-      </a-dropdown>
     </div>
 
     <!-- table区域-begin -->
@@ -73,7 +69,8 @@
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
-        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type:'radio'}"
+        :customRow="clickThenSelect"
         @change="handleTableChange">
 
         <template slot="htmlSlot" slot-scope="text">
@@ -115,6 +112,15 @@
       </a-table>
     </div>
 
+    <a-tabs defaultActiveKey="1">
+      <a-tab-pane tab="联系人信息" key="1" >
+        <contact-list :mainId="selectedMainId" />
+      </a-tab-pane>
+      <a-tab-pane tab="设备编号" key="2" forceRender>
+        <device-number-list :mainId="selectedMainId" />
+      </a-tab-pane>
+    </a-tabs>
+
     <client-modal ref="modalForm" @ok="modalFormOk"></client-modal>
   </a-card>
 </template>
@@ -123,6 +129,9 @@
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import ClientModal from './modules/ClientModal'
+  import { getAction } from '@/api/manage'
+  import ContactList from './ContactList'
+  import DeviceNumberList from './DeviceNumberList'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
@@ -131,6 +140,8 @@
     mixins:[JeecgListMixin],
     components: {
       JDictSelectTag,
+      ContactList,
+      DeviceNumberList,
       ClientModal
     },
     data () {
@@ -138,16 +149,6 @@
         description: '客户信息管理页面',
         // 表头
         columns: [
-          {
-            title: '#',
-            dataIndex: '',
-            key:'rowIndex',
-            width:60,
-            align:"center",
-            customRender:function (t,r,index) {
-              return parseInt(index)+1;
-            }
-          },
           {
             title:'编码',
             align:"center",
@@ -181,26 +182,6 @@
                 return filterMultiDictText(this.dictOptions['sourceId'], text+"")
               }
             }
-          },
-          {
-            title:'省',
-            align:"center",
-            dataIndex: 'province'
-          },
-          {
-            title:'市',
-            align:"center",
-            dataIndex: 'city'
-          },
-          {
-            title:'区',
-            align:"center",
-            dataIndex: 'area'
-          },
-          {
-            title:'镇',
-            align:"center",
-            dataIndex: 'community'
           },
           {
             title:'所属用户',
@@ -247,6 +228,11 @@
             dataIndex: 'registeredCapital'
           },
           {
+            title:'建档时间',
+            align:"center",
+            dataIndex: 'createTime'
+          },
+          {
             title: '操作',
             dataIndex: 'action',
             align:"center",
@@ -258,7 +244,9 @@
           delete: "/client/client/delete",
           deleteBatch: "/client/client/deleteBatch",
           exportXlsUrl: "/client/client/exportXls",
-          importExcelUrl: "client/client/importExcel",
+          importExcelUrl: "/client/client/importExcel",
+          synchronizeClient:'/client/client/synchronizeClient',
+          synchronizeDeviceNumber: '/client/client/synchronizeDeviceNumber'
         },
         dictOptions:{
          type:[],
@@ -266,6 +254,19 @@
          industry:[],
          property:[],
         },
+        /* 分页参数 */
+        ipagination:{
+          current: 1,
+          pageSize: 5,
+          pageSizeOptions: ['5', '10', '50'],
+          showTotal: (total, range) => {
+            return range[0] + "-" + range[1] + " 共" + total + "条"
+          },
+          showQuickJumper: true,
+          showSizeChanger: true,
+          total: 0
+        },
+        selectedMainId:''
 
       }
     },
@@ -296,8 +297,85 @@
             this.$set(this.dictOptions, 'property', res.result)
           }
         })
+      },
+      clickThenSelect(record) {
+        return {
+          on: {
+            click: () => {
+              this.onSelectChange(record.id.split(","), [record]);
+            }
+          }
+        }
+      },
+      onClearSelected() {
+        this.selectedRowKeys = [];
+        this.selectionRows = [];
+        this.selectedMainId=''
+      },
+      onSelectChange(selectedRowKeys, selectionRows) {
+        this.selectedMainId=selectedRowKeys[0]
+        this.selectedRowKeys = selectedRowKeys;
+        this.selectionRows = selectionRows;
+      },
+      loadData(arg) {
+        if(!this.url.list){
+          this.$message.error("请设置url.list属性!")
+          return
+        }
+        //加载数据 若传入参数1则加载第一页的内容
+        if (arg === 1) {
+          this.ipagination.current = 1;
+        }
+        this.onClearSelected()
+        var params = this.getQueryParams();//查询条件
+        this.loading = true;
+        getAction(this.url.list, params).then((res) => {
+          if (res.success) {
+            this.dataSource = res.result.records;
+            this.ipagination.total = res.result.total;
+          }
+          if(res.code===510){
+            this.$message.warning(res.message)
+          }
+          this.loading = false;
+        })
+      },
+      synchronizeClient() {
+        this.$confirm({
+          title:'同步客户',
+          content: `同步客户需要时间,您确定要同步吗?`,
+            onOk: () => {
+              this.loading = true;
+              getAction(this.url.synchronizeClient,null).then((res) => {
+                if (res.success) {
+                  this.$message.success(res.message);
+                  this.loadData();
+                } else {
+                  this.$message.error(res.message);
+                }
+                this.loading = false;
+              });
+            }
+        });
+      },
+      synchronizeDeviceNumber() {
+        this.$confirm({
+          title:'同步设备编号',
+          content:'同步设备编号需要时间,您确定要同步吗?(注:同步前请确认已同步客户信息!)',
+          onOk:() => {
+            this.loading = true;
+            getAction(this.url.synchronizeDeviceNumber,null).then((res) => {
+              if (res.success) {
+                this.$message.success(res.message);
+                this.loadData();
+              } else {
+                this.$message.console.error(res.message);
+              }
+              this.loading = true;
+            });
+          }
+        });
       }
-       
     }
   }
 </script>

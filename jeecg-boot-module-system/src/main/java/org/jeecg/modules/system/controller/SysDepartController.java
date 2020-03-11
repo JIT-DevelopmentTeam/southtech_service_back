@@ -10,6 +10,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.dingtalk.api.DefaultDingTalkClient;
+import com.dingtalk.api.DingTalkClient;
+import com.dingtalk.api.request.OapiDepartmentListRequest;
+import com.dingtalk.api.response.OapiDepartmentListResponse;
+import com.taobao.api.ApiException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.jeecg.common.api.vo.Result;
@@ -17,10 +22,13 @@ import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.system.vo.LoginUser;
+import org.jeecg.common.util.RedisUtil;
+import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.system.entity.SysDepart;
 import org.jeecg.modules.system.model.DepartIdModel;
 import org.jeecg.modules.system.model.SysDepartTreeModel;
 import org.jeecg.modules.system.service.ISysDepartService;
+import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.system.util.FindsDepartsChildrenUtil;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
@@ -57,6 +65,12 @@ public class SysDepartController {
 
 	@Autowired
 	private ISysDepartService sysDepartService;
+
+    @Autowired
+    private ISysUserService sysUserService;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
 	/**
 	 * 查询数据 查出所有部门,并以树结构数据格式响应给前端
@@ -337,4 +351,33 @@ public class SysDepartController {
         }
         return Result.error("文件导入失败！");
     }
+
+    /**
+     * 同步钉钉部门和员工
+     * @return
+     */
+    @RequestMapping(value = "/synchronize",method = RequestMethod.GET)
+    public Result<?> synchronize() {
+        try {
+            DingTalkClient client = new DefaultDingTalkClient(DingTalkConstant.DEPART_LIST_URL);
+            OapiDepartmentListRequest request = new OapiDepartmentListRequest();
+            request.setHttpMethod("GET");
+            OapiDepartmentListResponse response = client.execute(request, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
+            List<OapiDepartmentListResponse.Department> departmentList = response.getDepartment();
+            // 排序钉钉部门列表
+            Collections.sort(departmentList, Comparator.comparing(OapiDepartmentListResponse.Department::getParentid));
+
+            // 新增
+            for (OapiDepartmentListResponse.Department department : departmentList) {
+                boolean isAdd = true;
+
+            }
+        } catch (ApiException e) {
+            e.printStackTrace();
+            log.error("同步钉钉数据出错!");
+            return Result.error("同步出错,请联系管理员!");
+        }
+        return Result.ok("同步成功!");
+    }
+
 }
