@@ -4,6 +4,7 @@ import java.io.Serializable;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import org.jeecg.common.aspect.annotation.Dict;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -48,6 +49,7 @@ public class Contact implements Serializable {
 	private java.lang.String name;
 	/**性别*/
 	@Excel(name = "性别", width = 15)
+    @Dict(dicCode = "contact_sex")
 	private java.lang.String sex;
 	/**部门*/
 	@Excel(name = "部门", width = 15)

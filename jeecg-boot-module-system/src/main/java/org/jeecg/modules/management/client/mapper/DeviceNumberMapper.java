@@ -16,4 +16,5 @@ public interface DeviceNumberMapper extends BaseMapper<DeviceNumber> {
 	public boolean deleteByMainId(@Param("mainId") String mainId);
     
 	public List<DeviceNumber> selectByMainId(@Param("mainId") String mainId);
+
 }

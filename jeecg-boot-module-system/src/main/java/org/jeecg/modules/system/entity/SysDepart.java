@@ -88,6 +88,8 @@ public class SysDepart implements Serializable {
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
+	// 企业通讯录id
+	private java.lang.String enterpriseId;
 	
 	/**
 	 * 重写equals方法

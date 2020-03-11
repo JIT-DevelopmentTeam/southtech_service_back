@@ -4,6 +4,7 @@ import org.jeecg.modules.management.client.entity.Contact;
 import org.jeecg.modules.management.client.entity.DeviceNumber;
 import org.jeecg.modules.management.client.entity.Client;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -17,18 +18,6 @@ import java.util.List;
 public interface IClientService extends IService<Client> {
 
 	/**
-	 * 添加一对多
-	 * 
-	 */
-	public void saveMain(Client client,List<Contact> contactList,List<DeviceNumber> deviceNumberList) ;
-	
-	/**
-	 * 修改一对多
-	 * 
-	 */
-	public void updateMain(Client client,List<Contact> contactList,List<DeviceNumber> deviceNumberList);
-	
-	/**
 	 * 删除一对多
 	 */
 	public void delMain (String id);
@@ -37,5 +26,6 @@ public interface IClientService extends IService<Client> {
 	 * 批量删除一对多
 	 */
 	public void delBatchMain (Collection<? extends Serializable> idList);
-	
+
+
 }

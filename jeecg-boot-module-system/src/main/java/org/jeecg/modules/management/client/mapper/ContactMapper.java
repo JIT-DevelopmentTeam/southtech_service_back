@@ -16,4 +16,5 @@ public interface ContactMapper extends BaseMapper<Contact> {
 	public boolean deleteByMainId(@Param("mainId") String mainId);
     
 	public List<Contact> selectByMainId(@Param("mainId") String mainId);
+
 }
