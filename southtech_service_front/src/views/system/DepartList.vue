@@ -44,11 +44,11 @@
               @expand="onExpand"/>
                 </span>
                 <!--新增右键点击事件,和增加添加和删除功能-->
-                <a-menu slot="overlay">
+                <!-- <a-menu slot="overlay">
                   <a-menu-item @click="handleAdd(3)" key="1">添加</a-menu-item>
                   <a-menu-item @click="handleDelete" key="2">删除</a-menu-item>
                   <a-menu-item @click="closeDrop" key="3">取消</a-menu-item>
-                </a-menu>
+                </a-menu> -->
               </a-dropdown>
             </template>
           </a-col>
