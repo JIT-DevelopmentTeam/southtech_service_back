@@ -279,14 +279,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
 	@Override
 	@Transactional
-	public void addUserWithDepart(SysUser user, String selectedParts) {
+	public void addUserWithDepart(SysUser user, Map<String,Integer> departsMap) {
 //		this.save(user);  //保存角色的时候已经添加过一次了
-		if(oConvertUtils.isNotEmpty(selectedParts)) {
-			String[] arr = selectedParts.split(",");
-			for (String deaprtId : arr) {
-				SysUserDepart userDeaprt = new SysUserDepart(user.getId(), deaprtId);
-				sysUserDepartMapper.insert(userDeaprt);
-			}
+		if(oConvertUtils.isNotEmpty(departsMap)) {
+            for (String departId : departsMap.keySet()) {
+                Integer isLeader = departsMap.get(departId);
+                SysUserDepart userDepart = new SysUserDepart(user.getId(), departId, isLeader);
+                sysUserDepartMapper.insert(userDepart);
+            }
 		}
 	}
 
@@ -294,16 +294,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	@Override
 	@Transactional
 	@CacheEvict(value={CacheConstant.SYS_USERS_CACHE}, allEntries=true)
-	public void editUserWithDepart(SysUser user, String departs) {
+	public void editUserWithDepart(SysUser user, Map<String,Integer> departsMap) {
 		this.updateById(user);  //更新角色的时候已经更新了一次了，可以再跟新一次
 		//先删后加
 		sysUserDepartMapper.delete(new QueryWrapper<SysUserDepart>().lambda().eq(SysUserDepart::getUserId, user.getId()));
-		if(oConvertUtils.isNotEmpty(departs)) {
-			String[] arr = departs.split(",");
-			for (String departId : arr) {
-				SysUserDepart userDepart = new SysUserDepart(user.getId(), departId);
-				sysUserDepartMapper.insert(userDepart);
-			}
+		if(oConvertUtils.isNotEmpty(departsMap)) {
+            for (String departId : departsMap.keySet()) {
+                Integer isLeader = departsMap.get(departId);
+                SysUserDepart userDepart = new SysUserDepart(user.getId(), departId, isLeader);
+                sysUserDepartMapper.insert(userDepart);
+            }
 		}
 	}
 

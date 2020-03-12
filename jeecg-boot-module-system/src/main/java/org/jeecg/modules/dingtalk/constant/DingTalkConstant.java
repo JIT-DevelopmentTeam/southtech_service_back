@@ -24,4 +24,9 @@ public class DingTalkConstant {
     // 部门列表url
     public static final String DEPART_LIST_URL = "https://oapi.dingtalk.com/department/list";
 
+    public static final String USER_SIMPLELIST_URL = "https://oapi.dingtalk.com/user/simplelist";
+
+    // 获取用户详情
+    public static final String USER_DETAIL_URL = "https://oapi.dingtalk.com/user/get";
+
 }

@@ -13,6 +13,7 @@ import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.util.HttpHelper;
 import org.jeecg.common.util.RedisUtil;
+import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.management.erp.erpinterface.ERPInterfaceConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -334,7 +335,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
                 QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<>();
                 clientQueryWrapper.eq("number",data.getString("custNo"));
                 Client client = clientService.getOne(clientQueryWrapper);
-                if (ObjectUtil.isNotEmpty(client)) {
+                if (oConvertUtils.isNotEmpty(client)) {
                     DeviceNumber deviceNumber = new DeviceNumber();
                     deviceNumber.setNumber(data.getString("number"));
                     deviceNumber.setName(data.getString("name"));
