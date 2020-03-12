@@ -21,7 +21,7 @@ public class HttpHelper {
         CloseableHttpResponse response = null;
         CloseableHttpClient httpClient = HttpClients.createDefault();
         RequestConfig requestConfig = RequestConfig.custom().
-                setSocketTimeout(2000).setConnectTimeout(2000).build();
+                setSocketTimeout(9000).setConnectTimeout(9000).build();
         httpGet.setConfig(requestConfig);
 
         try {
