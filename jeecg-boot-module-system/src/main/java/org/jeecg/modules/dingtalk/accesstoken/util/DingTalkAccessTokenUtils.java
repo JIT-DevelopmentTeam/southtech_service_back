@@ -9,6 +9,7 @@ import com.taobao.api.ApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.SpringContextUtils;
+import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 
 /**
@@ -33,7 +34,7 @@ public class DingTalkAccessTokenUtils {
             request.setHttpMethod("GET");
             OapiGettokenResponse response = client.execute(request);
             if (response.getErrcode() == 0) {
-                if (ObjectUtil.isEmpty(redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY))) {
+                if (oConvertUtils.isEmpty(redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY))) {
                     redisUtil.set(DingTalkConstant.ACCESS_TOKEN_KEY,response.getAccessToken(),response.getExpiresIn());
                 } else {
                     if (!redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString().equals(response.getAccessToken())) {

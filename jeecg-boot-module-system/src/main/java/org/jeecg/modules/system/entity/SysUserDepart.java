@@ -19,15 +19,20 @@ public class SysUserDepart implements Serializable {
 	private String userId;
 	/**部门id*/
 	private String depId;
-	public SysUserDepart(String id, String userId, String depId) {
+	/**是否部门主管*/
+	private Integer isLeader;
+
+	public SysUserDepart(String id, String userId, String depId,Integer isLeader) {
 		super();
 		this.id = id;
 		this.userId = userId;
 		this.depId = depId;
+		this.isLeader = isLeader;
 	}
 
-	public SysUserDepart(String id, String departId) {
+	public SysUserDepart(String id, String departId,Integer isLeader) {
 		this.userId = id;
 		this.depId = departId;
+		this.isLeader = isLeader;
 	}
 }

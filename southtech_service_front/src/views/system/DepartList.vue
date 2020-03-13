@@ -5,14 +5,14 @@
 
         <!-- 按钮操作区域 -->
         <a-row style="margin-left: 14px">
-          <a-button @click="handleAdd(2)" type="primary">添加子部门</a-button>
-          <a-button @click="handleAdd(1)" type="primary">添加一级部门</a-button>
+          <!-- <a-button @click="handleAdd(2)" type="primary">添加子部门</a-button>
+          <a-button @click="handleAdd(1)" type="primary">添加一级部门</a-button> -->
            <a-button @click="synchronize" type="primary" icon="cloud-download">同步</a-button>
           <!-- <a-button type="primary" icon="download" @click="handleExportXls('部门信息')">导出</a-button>
           <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
             <a-button type="primary" icon="import">导入</a-button>
           </a-upload> -->
-          <a-button title="删除多条数据" @click="batchDel" type="default">批量删除</a-button>
+          <!-- <a-button title="删除多条数据" @click="batchDel" type="default">批量删除</a-button> -->
           <!--<a-button @click="refresh" type="default" icon="reload" :loading="loading">刷新</a-button>-->
         </a-row>
         <div style="background: #fff;padding-left:16px;height: 100%; margin-top: 5px">
@@ -44,11 +44,11 @@
               @expand="onExpand"/>
                 </span>
                 <!--新增右键点击事件,和增加添加和删除功能-->
-                <a-menu slot="overlay">
+                <!-- <a-menu slot="overlay">
                   <a-menu-item @click="handleAdd(3)" key="1">添加</a-menu-item>
                   <a-menu-item @click="handleDelete" key="2">删除</a-menu-item>
                   <a-menu-item @click="closeDrop" key="3">取消</a-menu-item>
-                </a-menu>
+                </a-menu> -->
               </a-dropdown>
             </template>
           </a-col>
@@ -556,7 +556,6 @@
           title:'同步',
           content: `同步信息需要时间,您确定要同步部门和员工信息吗?`,
             onOk: () => {
-              this.loading = true;
               getAction(this.url.synchronize,null).then((res) => {
                 if (res.success) {
                   this.$message.success(res.message);
@@ -564,7 +563,6 @@
                 } else {
                   this.$message.error(res.message);
                 }
-                this.loading = false;
               });
             }
         });

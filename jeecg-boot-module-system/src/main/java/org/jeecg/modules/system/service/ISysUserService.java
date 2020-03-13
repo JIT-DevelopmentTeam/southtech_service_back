@@ -1,6 +1,7 @@
 package org.jeecg.modules.system.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -160,16 +161,16 @@ public interface ISysUserService extends IService<SysUser> {
 	/**
 	 * 添加用户和用户部门关系
 	 * @param user
-	 * @param selectedParts
+	 * @param departsMap (key:部门id;value:是否为主管)
 	 */
-	void addUserWithDepart(SysUser user, String selectedParts);
+	void addUserWithDepart(SysUser user, Map<String,Integer> departsMap);
 
 	/**
 	 * 编辑用户和用户部门关系
 	 * @param user
-	 * @param departs
+	 * @param departsMap (key:部门id;value:是否为主管)
 	 */
-	void editUserWithDepart(SysUser user, String departs);
+	void editUserWithDepart(SysUser user, Map<String,Integer> departsMap);
 	
 	/**
 	   * 校验用户是否有效

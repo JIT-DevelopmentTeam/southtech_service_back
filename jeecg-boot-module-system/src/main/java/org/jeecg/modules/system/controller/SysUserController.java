@@ -126,7 +126,7 @@ public class SysUserController {
 			user.setStatus(1);
 			user.setDelFlag("0");
 			sysUserService.addUserWithRole(user, selectedRoles);
-            sysUserService.addUserWithDepart(user, selectedDeparts);
+            // sysUserService.addUserWithDepart(user, selectedDeparts);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -151,7 +151,7 @@ public class SysUserController {
 				String roles = jsonObject.getString("selectedroles");
                 String departs = jsonObject.getString("selecteddeparts");
 				sysUserService.editUserWithRole(user, roles);
-                sysUserService.editUserWithDepart(user, departs);
+                //sysUserService.editUserWithDepart(user, departs);
 				result.success("修改成功!");
 			}
 		} catch (Exception e) {
@@ -365,7 +365,6 @@ public class SysUserController {
      * 导出excel
      *
      * @param request
-     * @param response
      */
     @RequestMapping(value = "/exportXls")
     public ModelAndView exportXls(SysUser sysUser,HttpServletRequest request) {
@@ -639,13 +638,13 @@ public class SysUserController {
         try {
             String sysDepId = sysDepartUsersVO.getDepId();
             for(String sysUserId:sysDepartUsersVO.getUserIdList()) {
-                SysUserDepart sysUserDepart = new SysUserDepart(null,sysUserId,sysDepId);
+                /*SysUserDepart sysUserDepart = new SysUserDepart(null,sysUserId,sysDepId);
                 QueryWrapper<SysUserDepart> queryWrapper = new QueryWrapper<SysUserDepart>();
                 queryWrapper.eq("dep_id", sysDepId).eq("user_id",sysUserId);
                 SysUserDepart one = sysUserDepartService.getOne(queryWrapper);
                 if(one==null){
                     sysUserDepartService.save(sysUserDepart);
-                }
+                }*/
             }
             result.setMessage("添加成功!");
             result.setSuccess(true);

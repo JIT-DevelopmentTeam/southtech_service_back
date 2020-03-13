@@ -39,7 +39,7 @@ public class SysDepartServiceImpl extends ServiceImpl<SysDepartMapper, SysDepart
 	/**
 	 * queryTreeList 对应 queryTreeList 查询所有的部门数据,以树结构形式响应给前端
 	 */
-	@Cacheable(value = CacheConstant.SYS_DEPARTS_CACHE)
+	// @Cacheable(value = CacheConstant.SYS_DEPARTS_CACHE)
 	@Override
 	public List<SysDepartTreeModel> queryTreeList() {
 		LambdaQueryWrapper<SysDepart> query = new LambdaQueryWrapper<SysDepart>();
