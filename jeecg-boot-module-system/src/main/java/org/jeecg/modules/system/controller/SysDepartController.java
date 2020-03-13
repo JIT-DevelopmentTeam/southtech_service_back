@@ -29,10 +29,7 @@ import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.system.vo.LoginUser;
-import org.jeecg.common.util.FillRuleUtil;
-import org.jeecg.common.util.PasswordUtil;
-import org.jeecg.common.util.RedisUtil;
-import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.common.util.*;
 import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.system.entity.SysDepart;
 import org.jeecg.modules.system.entity.SysUser;
@@ -371,29 +368,6 @@ public class SysDepartController {
     public Result<?> synchronize() {
         String accessToken = redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString();
         try {
-            // 清除部门
-            QueryWrapper<SysDepart> departQueryWrapper = new QueryWrapper<>();
-            departQueryWrapper.notIn("id","southtech");
-            List<SysDepart> departList = sysDepartService.list(departQueryWrapper);
-            if (!departList.isEmpty()) {
-                List<String> deleteIdsList = new ArrayList<>();
-                for (SysDepart depart : departList) {
-                    deleteIdsList.add(depart.getId());
-                }
-                sysDepartService.deleteBatchWithChildren(deleteIdsList);
-            }
-            // 清除员工
-            /*QueryWrapper<SysUser> userQueryWrapper = new QueryWrapper<>();
-            userQueryWrapper.notIn("username","admin");
-            List<SysUser> delectUserList = sysUserService.list(userQueryWrapper);
-            if (!delectUserList.isEmpty()) {
-                StringBuffer delectIds = new StringBuffer();
-                for (SysUser delectUser : delectUserList) {
-                    delectIds.append(delectUser.getId()+",");
-                }
-                delectIds = delectIds.deleteCharAt(delectIds.length()-1);
-                sysUserService.deleteBatchUsers(delectIds.toString());
-            }*/
             // 同步部门
             DingTalkClient departmentClient = new DefaultDingTalkClient(DingTalkConstant.DEPART_LIST_URL);
             OapiDepartmentListRequest departmentRequest = new OapiDepartmentListRequest();
@@ -403,6 +377,30 @@ public class SysDepartController {
             List<OapiDepartmentListResponse.Department> departmentList = departmentResponse.getDepartment();
             if (departmentList.isEmpty()) {
                 return Result.error("同步失败,企业应用暂无部门数据!");
+            } else {
+                // 清除部门
+                QueryWrapper<SysDepart> departQueryWrapper = new QueryWrapper<>();
+                departQueryWrapper.notIn("id","southtech");
+                List<SysDepart> departList = sysDepartService.list(departQueryWrapper);
+                if (!departList.isEmpty()) {
+                    List<String> deleteIdsList = new ArrayList<>();
+                    for (SysDepart depart : departList) {
+                        deleteIdsList.add(depart.getId());
+                    }
+                    sysDepartService.deleteBatchWithChildren(deleteIdsList);
+                }
+                // 清除员工
+                QueryWrapper<SysUser> userQueryWrapper = new QueryWrapper<>();
+                userQueryWrapper.notIn("username","admin");
+                List<SysUser> delectUserList = sysUserService.list(userQueryWrapper);
+                if (!delectUserList.isEmpty()) {
+                    StringBuffer delectIds = new StringBuffer();
+                    for (SysUser delectUser : delectUserList) {
+                        delectIds.append(delectUser.getId()+",");
+                    }
+                    delectIds = delectIds.deleteCharAt(delectIds.length()-1);
+                    sysUserService.deleteBatchUsers(delectIds.toString());
+                }
             }
             if ("1".equals(departmentList.get(0).getId().toString())) {
                 departmentList.remove(0);
@@ -449,10 +447,12 @@ public class SysDepartController {
                             departsMap.put(departId.toString(),0);
                         }
                     }
-                    SysUser editUser = sysUserService.getById(dingTalkUser.getUserid());
+                    QueryWrapper<SysUser> userQueryWrapper = new QueryWrapper<>();
+                    userQueryWrapper.eq("username",userDetailResponse.getJobnumber());
+                    SysUser editUser = sysUserService.getOne(userQueryWrapper);
                     if (oConvertUtils.isEmpty(editUser)) {
                         SysUser addUser = new SysUser();
-                        addUser.setId(userDetailResponse.getUserid());
+                        addUser.setId(UUIDGenerator.generate());
                         addUser.setUsername(userDetailResponse.getJobnumber());
                         addUser.setRealname(userDetailResponse.getName());
                         addUser.setSex(0);
