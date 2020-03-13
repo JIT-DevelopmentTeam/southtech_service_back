@@ -1,15 +1,13 @@
 <template>
   <a-card :bordered="false">
-    <a-row>
+    <a-row :gutter="15">
       <!-- 左侧树 -->
       <a-col :span="5">
         <a-tree
           showLine
           :treeData="treeData"
-          :expandedKeys="[expandedKeys[0]]"
           :selectedKeys="selectedKeys"
-          :style="{'height':'500px','border-right':'2px solid #c1c1c1','overflow-y':'auto'}"
-          @expand="onExpand"
+          :style="{'height':'590px','border-right':'2px solid #c1c1c1','overflow-y':'auto'}"
           @select="this.onSelect"
         >
         </a-tree>
@@ -21,7 +19,26 @@
         <div class="table-page-search-wrapper">
           <a-form layout="inline" @keyup.enter.native="searchQuery">
             <a-row :gutter="24">
-
+              <a-col :md="6" :sm="8">
+                <a-form-item label="名称">
+                  <a-input placeholder="请输入名称" v-model="queryParam.name"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col :md="6" :sm="8">
+                <a-form-item label="规格">
+                  <a-input placeholder="请输入规格" v-model="queryParam.model"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col :md="6" :sm="8">
+                <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
+                  <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
+                  <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
+                  <a @click="handleToggleSearch" style="margin-left: 8px">
+                    {{ toggleSearchStatus ? '收起' : '展开' }}
+                    <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
+                  </a>
+                </span>
+              </a-col>
             </a-row>
           </a-form>
         </div>
@@ -111,6 +128,7 @@
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import ItemModal from './modules/ItemModal'
+  import { getAction } from '@/api/manage'
 
   export default {
     name: "ItemList",
@@ -122,43 +140,8 @@
       return {
         description: '物料管理页面',
         //数据集
-        treeData: [{
-          title: '第一页',
-          key: '0-0',
-          children: [{
-            title: '1页',
-            key: '0-0-0',
-            imgUrl:'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2735633715,2749454924&fm=27&gp=0.jpg'
-          }, {
-            title: '2页',
-            key: '0-0-1',
-            imgUrl:'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3967239004,1951414302&fm=27&gp=0.jpg'
-          }]
-        },{
-          title: '第二页',
-          key: '0-1',
-          children: [{
-            title: '1页',
-            key: '0-1-0',
-            imgUrl:'https://ss0.bdstatic.com/6Ox1bjeh1BF3odCf/it/u=3660968530,985748925&fm=191&app=48&size=h300&n=0&g=4n&f=JPEG?sec=1853310920&t=5e64af964be378c6c2a3b0acc65dfe24'
-          }, {
-            title: '2页',
-            key: '0-1-1',
-            imgUrl:'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=889120611,3801177793&fm=27&gp=0.jpg'
-          }]
-        },{
-          title: '第三页',
-          key: '0-2',
-          children: [{
-            title: '1页',
-            key: '0-2-0',
-            imgUrl:'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2445468140,2491956848&fm=27&gp=0.jpg'
-          }]
-        }],
-        expandedKeys:[],
+        treeData: [],
         selectedKeys:[],
-        imgList:[],
-        sort:0,
         // 表头
         columns: [
           {
@@ -202,11 +185,6 @@
             dataIndex: 'ikfperiod'
           },
           {
-            title:'modifyTime',
-            align:"center",
-            dataIndex: 'modifytime'
-          },
-          {
             title: '操作',
             dataIndex: 'action',
             align:"center",
@@ -217,15 +195,20 @@
         ],
         url: {
           list: "/item/item/list",
+          treeList: "/itemclass/itemClass/childList",
           delete: "/item/item/delete",
           deleteBatch: "/item/item/deleteBatch",
           exportXlsUrl: "/item/item/exportXls",
           importExcelUrl: "item/item/importExcel",
+          syncUrl: "/item/item/sync"
         },
         dictOptions:{
         },
         tableScroll:{x :7*147+50}
       }
+    },
+    created() {
+      this.loadTree();
     },
     computed: {
       importExcelUrl: function(){
@@ -233,25 +216,64 @@
       }
     },
     methods: {
+      getChild(obj, parentId, dataList) {
+        var childList = dataList.filter(e => e.pid == parentId);
+        var children = [];
+        for (let i = 0; i < childList.length; i++) {
+          var child = {};
+          child.title = childList[i].name;
+          child.key = childList[i].number;
+          var childAllNode = this.getChild(child, childList[i].id, dataList)
+          children.push(childAllNode);
+        }
+        obj.children = children;
+        return obj;
+      },
       initDictConfig(){
       },
-      onExpand (expandedKeys) {
-        this.expandedKeys = [];
-        if(expandedKeys !== null && expandedKeys !== ''){
-          this.expandedKeys[0] = expandedKeys[1];
-        }
-      },
       onSelect (selectedKeys, info) {
-        for(var i=0;i<this.imgList.length;i++){
-          if(this.imgList[i].key === selectedKeys[0]){
-            this.sort = this.imgList[i].sort;
-            this.setValue(this.imgList[i]);
-            break;
+        this.queryParam.number = selectedKeys[0];
+        this.loadData();
+      },
+      loadTree() {
+        getAction(this.url.treeList).then(res => {
+          var dataList = res.result;
+          var parentList = dataList.filter(e => e.pid == 0);
+          var resultList = [];
+          for (let i = 0; i < parentList.length; i++) {
+            let obj = {};
+            obj.title = parentList[i].name;
+            obj.key = parentList[i].number;
+            var allNode = this.getChild(obj, parentList[i].id, dataList);
+            resultList.push(allNode);
           }
-        }
+          this.treeData = resultList;
+        })
       },
       sync () {
-
+        this.$confirm({
+          title:'同步物料信息',
+          content: `同步需要时间,您确定要同步吗?`,
+          onOk: () => {
+            this.loading = true;
+            getAction(this.url.syncUrl)
+              .then(res => {
+                if (res.success) {
+                  this.$message.success(res.message);
+                  this.loadData();
+                } else {
+                  this.$message.error(res.message);
+                }
+              })
+              .catch(err => {
+                console.log("--->", err);
+                this.$message.error("请求超时");
+              })
+              .finally(() => {
+                this.loading = false;
+              })
+          }
+        })
       }
     }
   }
