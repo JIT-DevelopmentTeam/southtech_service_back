@@ -14,7 +14,7 @@
       </a-col>
 
       <!--右侧列表-->
-      <a-col :span="19" >
+      <a-col :span="19">
         <!-- 查询区域 -->
         <div class="table-page-search-wrapper">
           <a-form layout="inline" @keyup.enter.native="searchQuery">
@@ -53,16 +53,22 @@
           </a-upload>-->
           <a-dropdown v-if="selectedRowKeys.length > 0">
             <a-menu slot="overlay">
-              <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
+              <a-menu-item key="1" @click="batchDel">
+                <a-icon type="delete"/>
+                删除
+              </a-menu-item>
             </a-menu>
-            <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /></a-button>
+            <a-button style="margin-left: 8px"> 批量操作
+              <a-icon type="down"/>
+            </a-button>
           </a-dropdown>
         </div>
 
         <!-- table区域-begin -->
         <div>
           <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
-            <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{ selectedRowKeys.length }}</a>项
+            <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{
+            selectedRowKeys.length }}</a>项
             <a style="margin-left: 24px" @click="onClearSelected">清空</a>
           </div>
 
@@ -84,7 +90,8 @@
             </template>
             <template slot="imgSlot" slot-scope="text">
               <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
-              <img v-else :src="getImgView(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
+              <img v-else :src="getImgView(text)" height="25px" alt="图片不存在"
+                   style="max-width:80px;font-size: 12px;font-style: italic;"/>
             </template>
             <template slot="fileSlot" slot-scope="text">
               <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
@@ -102,9 +109,9 @@
             <span slot="action" slot-scope="text, record">
           <a @click="handleEdit(record)">编辑</a>
 
-          <a-divider type="vertical" />
+          <a-divider type="vertical"/>
           <a-dropdown>
-            <a class="ant-dropdown-link">更多 <a-icon type="down" /></a>
+            <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>
             <a-menu slot="overlay">
               <a-menu-item>
                 <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
@@ -126,71 +133,71 @@
 
 <script>
 
-  import { JeecgListMixin } from '@/mixins/JeecgListMixin'
+  import {JeecgListMixin} from '@/mixins/JeecgListMixin'
   import ItemModal from './modules/ItemModal'
-  import { getAction } from '@/api/manage'
+  import {getAction} from '@/api/manage'
 
   export default {
     name: "ItemList",
-    mixins:[JeecgListMixin],
+    mixins: [JeecgListMixin],
     components: {
       ItemModal
     },
-    data () {
+    data() {
       return {
         description: '物料管理页面',
         //数据集
         treeData: [],
-        selectedKeys:[],
+        selectedKeys: [],
         // 表头
         columns: [
           {
             title: '#',
             dataIndex: '',
-            key:'rowIndex',
-            width:60,
-            align:"center",
-            customRender:function (t,r,index) {
-              return parseInt(index)+1;
+            key: 'rowIndex',
+            width: 60,
+            align: "center",
+            customRender: function (t, r, index) {
+              return parseInt(index) + 1;
             }
           },
           {
-            title:'物料名称',
-            align:"center",
+            title: '物料名称',
+            align: "center",
             dataIndex: 'name'
           },
           {
-            title:'物料编码',
-            align:"center",
+            title: '物料编码',
+            align: "center",
             dataIndex: 'number'
           },
           {
-            title:'规格型号',
-            align:"center",
+            title: '规格型号',
+            align: "center",
             dataIndex: 'model'
           },
           {
-            title:'计量单位',
-            align:"center",
+            title: '计量单位',
+            align: "center",
             dataIndex: 'uname'
           },
           {
-            title:'所在仓位',
-            align:"center",
+            title: '所在仓位',
+            align: "center",
             dataIndex: 'sname'
           },
           {
-            title:'保修期',
-            align:"center",
+            title: '保修期',
+            align: "center",
             dataIndex: 'ikfperiod'
           },
           {
             title: '操作',
             dataIndex: 'action',
-            align:"center",
-            fixed:"right",
-            width:147,
-            scopedSlots: { customRender: 'action' }
+            align: "center",
+            fixed: "right",
+            width: 147,
+            scopedSlots: {customRender: 'action'}
           }
         ],
         url: {
@@ -202,16 +209,15 @@
           importExcelUrl: "item/item/importExcel",
           syncUrl: "/item/item/sync"
         },
-        dictOptions:{
-        },
-        tableScroll:{x :7*147+50}
+        dictOptions: {},
+        tableScroll: {x: 7 * 147 + 50}
       }
     },
     created() {
       this.loadTree();
     },
     computed: {
-      importExcelUrl: function(){
+      importExcelUrl: function () {
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
       }
     },
@@ -229,9 +235,9 @@
         obj.children = children;
         return obj;
       },
-      initDictConfig(){
+      initDictConfig() {
       },
-      onSelect (selectedKeys, info) {
+      onSelect(selectedKeys, info) {
         this.queryParam.number = selectedKeys[0];
         this.loadData();
       },
@@ -250,9 +256,9 @@
           this.treeData = resultList;
         })
       },
-      sync () {
+      sync() {
         this.$confirm({
-          title:'同步物料信息',
+          title: '同步物料信息',
           content: `同步需要时间,您确定要同步吗?`,
           onOk: () => {
             this.loading = true;
