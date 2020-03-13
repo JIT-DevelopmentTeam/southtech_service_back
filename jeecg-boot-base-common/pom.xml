@@ -5,12 +5,13 @@
 	<artifactId>jeecg-boot-base-common</artifactId>
 	<version>2.1.3</version>
 
+
 	<parent>
 		<groupId>org.jeecgframework.boot</groupId>
 		<artifactId>jeecg-boot-parent</artifactId>
 		<version>2.1.3</version>
 	</parent>
-	
+
 	<repositories>
 		<repository>
 			<id>aliyun</id>
@@ -29,5 +30,5 @@
 			</snapshots>
 		</repository>
 	</repositories>
-	
+
 </project>
