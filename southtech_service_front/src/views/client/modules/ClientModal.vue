@@ -263,7 +263,6 @@
               longitude:res.result.longitude,
               latitude:res.result.latitude
             });
-            // TODO 设置经纬度 res.result
           }
         });
       }

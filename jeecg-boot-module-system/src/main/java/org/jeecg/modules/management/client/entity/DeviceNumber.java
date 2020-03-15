@@ -58,9 +58,13 @@ public class DeviceNumber implements Serializable {
 	private java.lang.String description;
     /**保质期*/
     @Excel(name = "保质期", width = 15)
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     private java.util.Date qgp;
     /**保质期至*/
     @Excel(name = "签约日期", width = 15)
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     private java.util.Date signing;
 	/**时间戳*/
 	@Excel(name = "时间戳", width = 15)

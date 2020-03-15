@@ -106,7 +106,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'createBy','createTime','updateBy','updateTime','sysOrgCode','number','name','type','description','quantity','erpClientNum','modifyTime','clientId'))
+          this.form.setFieldsValue(pick(this.model,'createBy','createTime','updateBy','updateTime','sysOrgCode','number','name','type','description','qgp','signing','clientId'))
         })
       },
       close () {
@@ -129,7 +129,6 @@
                method = 'put';
             }
             let formData = Object.assign(this.model, values);
-            formData['clientId'] = this.mainId
             console.log("表单提交数据",formData)
             httpAction(httpurl,formData,method).then((res)=>{
               if(res.success){
@@ -150,7 +149,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'createBy','createTime','updateBy','updateTime','sysOrgCode','number','name','type','description','quantity','erpClientNum','modifyTime','clientId'))
+        this.form.setFieldsValue(pick(row,'createBy','createTime','updateBy','updateTime','sysOrgCode','number','name','type','description','qgp','signing','clientId'))
       },
 
 

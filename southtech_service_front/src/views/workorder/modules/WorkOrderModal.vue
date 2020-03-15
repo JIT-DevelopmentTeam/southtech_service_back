@@ -22,7 +22,7 @@
           </a-col>
           <a-col :lg="8">
             <a-form-item label="类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-                <j-dict-select-tag type="list" v-decorator="['type',validatorRules.type]" :trigger-change="true" dictCode="work_order_type" placeholder="请选择类型"/>
+                <j-dict-select-tag @change="setWorkOrderType" type="list" v-decorator="['type',validatorRules.type]" :trigger-change="true" dictCode="work_order_type" placeholder="请选择类型"/>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -31,7 +31,7 @@
                 placeholder="请选择客户"
                 v-decorator="['clientId',validatorRules.clientId]"
                 dict="tb_client,name,id"
-                @change="selectClient($event)"
+                @change="selectClient"
                 :async="true">
               </j-search-select-tag>
             </a-form-item>
@@ -80,7 +80,7 @@
               <a-row type="flex" style="margin-bottom:10px" :gutter="16">
                 <a-col :span="3">设备编号</a-col>
                 <a-col :span="4">服务工程师</a-col>
-                <a-col :span="3">故障部位</a-col>
+                <a-col v-if="workOrderType == '1'" :span="3">故障部位</a-col>
                 <a-col :span="5">描述</a-col>
                 <a-col :span="3">派工时间</a-col>
                 <a-col :span="4">同行人员</a-col>
@@ -98,7 +98,7 @@
                     <j-select-user-by-dep v-decorator="['workOrderDetailList['+index+'].serviceEngineerName', {'initialValue':item.serviceEngineerName,rules: [{ required: true, message: '请选择服务工程师!' }]}]" :multi="false" :trigger-change="true"/>
                   </a-form-item>
                 </a-col>
-                <a-col :span="3">
+                <a-col v-if="workOrderType == '1'" :span="3">
                   <a-form-item>
                     <j-multi-select-tag placeholder="故障部位" v-decorator="['workOrderDetailList['+index+'].faultLocation', {'initialValue':item.faultLocation,rules: [{ required: true, message: '请选择故障部位!' }]}]" dictCode="work_order_detail_fault_location"/>
                   </a-form-item>
@@ -189,7 +189,8 @@
           edit: "/workorder/workOrder/edit",
           workOrderDetailList: "/workorder/workOrder/queryWorkOrderDetailListByMainId",
         },
-        client:null
+        client:null,
+        workOrderType:null
       }
     },
     created () {
@@ -204,6 +205,7 @@
         this.model.workOrderDetailList = [{}];
         if(this.model.id){
           this.client = this.model.clientId;
+          this.workOrderType = this.model.type;
           let params = {id:this.model.id}
           //初始化订单明细列表
           getAction(this.url.workOrderDetailList,params).then((res)=>{
@@ -277,6 +279,9 @@
       },
       selectClient(id) {
         this.client = id;
+      },
+      setWorkOrderType(value) {
+        this.workOrderType = value;
       }
     }
   }
