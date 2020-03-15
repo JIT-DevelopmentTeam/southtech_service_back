@@ -10,31 +10,23 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
 
-        <a-form-item label="编号" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'number', validatorRules.number]" placeholder="请输入编号"></a-input>
+        <a-form-item label="设备编号" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-dict-select-tag type="list" v-decorator="['deviceNumber']" :trigger-change="true" dictCode="" placeholder="请选择设备编号"/>
         </a-form-item>
-        <a-form-item label="名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'name', validatorRules.name]" placeholder="请输入名称"></a-input>
+        <a-form-item label="服务工程师" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'serviceEngineerId', validatorRules.serviceEngineerId]" placeholder="请输入服务工程师"></a-input>
         </a-form-item>
-        <a-form-item label="类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'type', validatorRules.type]" placeholder="请输入类型"></a-input>
-        </a-form-item>
-        <a-form-item label="客户" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <j-search-select-tag
-            placeholder="请选择客户"
-            v-decorator="['clientId',validatorRules.clientId]"
-            dict="tb_client,name,id"
-            :async="true">
-          </j-search-select-tag>
+        <a-form-item label="故障部位" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-multi-select-tag type="list_multi" v-decorator="['faultLocation']" :trigger-change="true" dictCode="" placeholder="请选择故障部位"/>
         </a-form-item>
         <a-form-item label="描述" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-textarea rows="4" placeholder="请输入描述" v-decorator="[ 'description', validatorRules.description]" style="resize:none;"/>
+          <a-input v-decorator="[ 'description', validatorRules.description]" placeholder="请输入描述"></a-input>
         </a-form-item>
-        <a-form-item label="保质期" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-date placeholder="请选择保质期" v-decorator="[ 'qgp', validatorRules.qgp]" :trigger-change="true" style="width: 100%"/>
+        <a-form-item label="派工时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-date placeholder="请选择派工时间" v-decorator="[ 'dispatchTime', validatorRules.dispatchTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
         </a-form-item>
-        <a-form-item label="签约日期" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-date placeholder="请选择签约日期" v-decorator="[ 'signing', validatorRules.signing]" :trigger-change="true" style="width: 100%"/>
+        <a-form-item label="同行人员" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-dict-select-tag type="radio" v-decorator="['peers']" :trigger-change="true" dictCode="" placeholder="请选择同行人员"/>
         </a-form-item>
 
       </a-form>
@@ -46,14 +38,16 @@
 
   import { httpAction } from '@/api/manage'
   import pick from 'lodash.pick'
-  import JDate from '@/components/jeecg/JDate'  
-  import JSearchSelectTag from '@/components/dict/JSearchSelectTag'
+  import JDate from '@/components/jeecg/JDate'
+  import JDictSelectTag from "@/components/dict/JDictSelectTag"
+  import JMultiSelectTag from "@/components/dict/JMultiSelectTag"
 
   export default {
-    name: "DeviceNumberModal",
+    name: "WorkOrderDetailModal",
     components: {
       JDate,
-      JSearchSelectTag
+      JDictSelectTag,
+      JMultiSelectTag,
     },
     props:{
       mainId:{
@@ -80,17 +74,16 @@
 
         confirmLoading: false,
         validatorRules:{
-        number:{rules: [{ required: true, message: '请输入编码!' }]},
-        name:{rules: [{ required: true, message: '请输入名称!' }]},
-        type:{rules: [{ required: true, message: '请输入类型!' }]},
-        clientId:{rules: [{ required: true, message: '请选择客户!' }]},
+        deviceNumber:{rules: [{ required: true, message: '请输入设备编号!' }]},
+        serviceEngineerId:{rules: [{ required: true, message: '请输入服务工程师!' }]},
+        faultLocation:{rules: [{ required: true, message: '请输入故障部位!' }]},
         description:{},
-        qgp:{rules: [{ required: true, message: '请选择保质期!' }]},
-        signing:{rules: [{ required: true, message: '请选择签约时间!' }]},
+        dispatchTime:{rules: [{ required: true, message: '请输入派工时间!' }]},
+        peers:{},
         },
         url: {
-          add: "/client/client/addDeviceNumber",
-          edit: "/client/client/editDeviceNumber",
+          add: "/workorder/workOrder/addWorkOrderDetail",
+          edit: "/workorder/workOrder/editWorkOrderDetail",
         }
 
       }
@@ -106,7 +99,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'createBy','createTime','updateBy','updateTime','sysOrgCode','number','name','type','description','quantity','erpClientNum','modifyTime','clientId'))
+          this.form.setFieldsValue(pick(this.model,'createBy','createTime','updateBy','updateTime','sysOrgCode','deviceNumber','serviceEngineerId','faultLocation','description','dispatchTime','peers','workOrderId'))
         })
       },
       close () {
@@ -129,7 +122,7 @@
                method = 'put';
             }
             let formData = Object.assign(this.model, values);
-            formData['clientId'] = this.mainId
+            formData['workOrderId'] = this.mainId
             console.log("表单提交数据",formData)
             httpAction(httpurl,formData,method).then((res)=>{
               if(res.success){
@@ -150,7 +143,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'createBy','createTime','updateBy','updateTime','sysOrgCode','number','name','type','description','quantity','erpClientNum','modifyTime','clientId'))
+        this.form.setFieldsValue(pick(row,'createBy','createTime','updateBy','updateTime','sysOrgCode','deviceNumber','serviceEngineerId','faultLocation','description','dispatchTime','peers','workOrderId'))
       },
 
 

@@ -37,22 +37,22 @@
           </a-col>
           <a-col :lg="8">
              <a-form-item label="省" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input v-decorator="[ 'province', validatorRules.province]" placeholder="请输入省"></a-input>
+              <a-input @blur="getLocationByAddress" v-decorator="[ 'province', validatorRules.province]" placeholder="请输入省"></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
             <a-form-item label="市" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input v-decorator="[ 'city', validatorRules.city]" placeholder="请输入市"></a-input>
+              <a-input @blur="getLocationByAddress" v-decorator="[ 'city', validatorRules.city]" placeholder="请输入市"></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
             <a-form-item label="区" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input v-decorator="[ 'area', validatorRules.area]" placeholder="请输入区"></a-input>
+              <a-input @blur="getLocationByAddress" v-decorator="[ 'area', validatorRules.area]" placeholder="请输入区"></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
             <a-form-item label="镇" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input v-decorator="[ 'community', validatorRules.community]" placeholder="请输入镇"></a-input>
+              <a-input @blur="getLocationByAddress" v-decorator="[ 'community', validatorRules.community]" placeholder="请输入镇"></a-input>
             </a-form-item>
           </a-col>
         </a-row>
@@ -60,7 +60,7 @@
         <a-row class="form-row" :gutter="16">
           <a-col :lg="32">
             <a-form-item label="详细地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-textarea style="resize: none;" v-decorator="['address']" rows="4" placeholder="请输入详细地址"/>
+              <a-textarea @blur="getLocationByAddress" style="resize: none;" v-decorator="['address']" rows="4" placeholder="请输入详细地址"/>
             </a-form-item>
           </a-col>
         </a-row>
@@ -106,7 +106,9 @@
               <a-input v-decorator="[ 'webSite', validatorRules.webSite]" placeholder="请输入网址"></a-input>
             </a-form-item>
           </a-col>
-          <a-col :lg="8">
+        </a-row>
+        <a-row class="form-row" :gutter="16">
+           <a-col :lg="8">
             <a-form-item label="经度" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-input-number v-decorator="[ 'longitude', validatorRules.longitude]" :disabled='true' placeholder="请输入经度" style="width: 100%"/>
             </a-form-item>
@@ -124,7 +126,7 @@
 
 <script>
 
-  import { httpAction } from '@/api/manage'
+  import { httpAction,getAction } from '@/api/manage'
   import pick from 'lodash.pick'
   import JDate from '@/components/jeecg/JDate'  
   import JSelectUserByDep from '@/components/jeecgbiz/JSelectUserByDep'
@@ -186,8 +188,8 @@
         url: {
           add: "/client/client/add",
           edit: "/client/client/edit",
-        }
-     
+          getLocationByAddress:"/amap/amap/getLocationByAddress"
+        },
       }
     },
     created () {
@@ -249,7 +251,22 @@
       popupCallback(row){
         this.form.setFieldsValue(pick(row,'number','name','type','sourceId','province','city','area','community','address','userId','lastContactTime','industry','creditCode','property','legalPerson','registeredCapital','establishmentDate','webSite','longitude','latitude'))
       },
-
+      getLocationByAddress() {
+        let formValus = this.form.getFieldsValue();
+        if (!formValus.province || !formValus.city || !formValus.area || !formValus.community || !formValus.address) {
+          return;
+        }
+        let fullAddress = formValus.province + formValus.city + formValus.area + formValus.community + formValus.address;
+        getAction(this.url.getLocationByAddress,{address:fullAddress}).then((res) => {
+          if (res.success) {
+            this.form.setFieldsValue({
+              longitude:res.result.longitude,
+              latitude:res.result.latitude
+            });
+            // TODO 设置经纬度 res.result
+          }
+        });
+      }
       
     }
   }

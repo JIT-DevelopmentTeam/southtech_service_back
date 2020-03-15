@@ -2,7 +2,7 @@
   <a-card :bordered="false" :class="'cust-erp-sub-tab'">
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <!-- <a-button v-if="mainId" @click="synchronizeDeviceNumber" v-has="'deviceNumber:synchronize'" type="primary" icon="cloud-download">同步</a-button> -->
+      <!-- <a-button v-if="mainId" @click="handleAdd" type="primary" icon="plus">新增</a-button> -->
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
@@ -51,8 +51,8 @@
         </template>
 
         <span slot="action" slot-scope="text, record">
-          <a @click="handleEdit(record)">编辑</a>
-          <a-divider type="vertical" />
+          <!-- <a @click="handleEdit(record)">编辑</a> -->
+          <!-- <a-divider type="vertical" /> -->
           <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
             <a>删除</a>
           </a-popconfirm>
@@ -61,22 +61,22 @@
       </a-table>
     </div>
 
-    <deviceNumber-modal ref="modalForm" @ok="modalFormOk" :mainId="mainId"></deviceNumber-modal>
+    <workOrderDetail-modal ref="modalForm" @ok="modalFormOk" :mainId="mainId"></workOrderDetail-modal>
   </a-card>
 </template>
 
 <script>
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
-  import DeviceNumberModal from './modules/DeviceNumberModal'
-  import { getAction } from '@/api/manage'
+  import WorkOrderDetailModal from './modules/WorkOrderDetailModal'
+  import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
 
 
   export default {
-    name: "DeviceNumberList",
+    name: "WorkOrderDetailList",
     mixins:[JeecgListMixin],
-    components: { DeviceNumberModal },
+    components: { WorkOrderDetailModal },
     props:{
       mainId:{
         type:String,
@@ -91,15 +91,16 @@
           if(!this.mainId){
             this.clearList()
           }else{
-            this.queryParam['clientId'] = val
+            this.queryParam['workOrderId'] = val
             this.loadData(1);
+            this.initDictConfig();
           }
         }
       }
     },
     data () {
       return {
-        description: '客户信息管理页面',
+        description: '工单信息管理页面',
         disableMixinCreated:true,
         // 表头
         columns: [
@@ -114,29 +115,57 @@
             }
           },
           {
-            title:'编号',
+            title:'设备编号',
             align:"center",
-            dataIndex: 'number'
+            dataIndex:"deviceNumber",
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return filterMultiDictText(this.dictOptions['deviceNumber'], text+"")
+              }
+            }
           },
           {
-            title:'名称',
+            title:'服务工程师',
             align:"center",
-            dataIndex: 'name'
+            dataIndex: 'serviceEngineerName',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return filterMultiDictText(this.dictOptions['serviceEngineerName'], text+"")
+              }
+            }
           },
           {
-            title:'类型',
+            title:'故障部位',
             align:"center",
-            dataIndex: 'type'
+            dataIndex: 'faultLocation',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return filterMultiDictText(this.dictOptions['faultLocation'], text+"")
+              }
+            }
           },
           {
-            title:'保质期',
+            title:'派工时间',
             align:"center",
-            dataIndex: 'qgp'
+            dataIndex: 'dispatchTime'
           },
           {
-            title:'签约日期',
+            title:'同行人员',
             align:"center",
-            dataIndex: 'signing'
+            dataIndex: 'peers',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return filterMultiDictText(this.dictOptions['peers'], text+"")
+              }
+            }
           },
           {
             title: '操作',
@@ -146,15 +175,20 @@
           }
         ],
         url: {
-          list: "/client/client/listDeviceNumberByMainId",
-          delete: "/client/client/deleteDeviceNumber",
-          deleteBatch: "/client/client/deleteBatchDeviceNumber",
+          list: "/workorder/workOrder/listWorkOrderDetailByMainId",
+          delete: "/workorder/workOrder/deleteWorkOrderDetail",
+          deleteBatch: "/workorder/workOrder/deleteBatchWorkOrderDetail"
         },
         dictOptions:{
+         status:[],
          type:[],
-         sourceId:[],
-         industry:[],
-         property:[],
+         clientId:[],
+         contactId:[],
+         emergencyLevel:[],
+         deviceNumber:[],
+         serviceEngineerName:[],
+         faultLocation:[],
+         peers:[]
         },
 
       }
@@ -164,6 +198,28 @@
         this.dataSource=[]
         this.selectedRowKeys=[]
         this.ipagination.current = 1
+      },
+      initDictConfig(){
+        initDictOptions('tb_device_number,name,id').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'deviceNumber', res.result)
+          }
+        })
+        initDictOptions('sys_user,realname,username').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'serviceEngineerName', res.result)
+          }
+        })
+        initDictOptions('work_order_detail_fault_location').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'faultLocation', res.result)
+          }
+        })
+        initDictOptions('sys_user,realname,username').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'peers', res.result)
+          }
+        })
       },
     }
   }
