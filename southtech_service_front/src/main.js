@@ -40,6 +40,8 @@ import JDictSelectTag from './components/dict/index.js'
 import hasPermission from '@/utils/hasPermission'
 import vueBus from '@/utils/vueBus';
 import JeecgComponents from '@/components/jeecg/index'
+// 引入vue-amap
+import VueAMap from 'vue-amap'
 
 Vue.config.productionTip = false
 Vue.use(Storage, config.storageOptions)
@@ -54,6 +56,16 @@ Vue.component('apexchart', VueApexCharts)
 Vue.use(preview)
 Vue.use(vueBus);
 Vue.use(JeecgComponents);
+Vue.use(VueAMap)
+
+// 初始化vue-amap
+VueAMap.initAMapApiLoader({
+  // 高德key
+  key: '3ea24bb0feca9045c72c7683af2c9360',
+  // 插件集合 （插件按需引入）
+  plugin: ['Geolocation', 'Scale'],
+  v: '1.4.4'
+});
 
 new Vue({
   router,
