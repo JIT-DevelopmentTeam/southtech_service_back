@@ -5,10 +5,10 @@
       <a-form layout="inline" @keyup.enter.native="searchQuery">
         <a-row :gutter="24">
           <a-col :md="6" :sm="8">
-            <a-form-item label="编号">
-              <a-input placeholder="请输入编号" v-model="queryParam.number"></a-input>
-            </a-form-item>
-          </a-col>
+              <a-form-item label="客户">
+                <a-input placeholder="请输入客户" v-model="queryParam.clientName"></a-input>
+              </a-form-item>
+            </a-col>
           <a-col :md="6" :sm="8">
             <a-form-item label="状态">
               <j-dict-select-tag placeholder="请选择状态" v-model="queryParam.status" dictCode="work_order_status"/>
@@ -21,23 +21,13 @@
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="8">
-              <a-form-item label="客户">
-                <j-dict-select-tag placeholder="请选择客户" v-model="queryParam.clientId" dictCode="tb_client,name,id"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="8">
-              <a-form-item label="联系人">
-                <j-dict-select-tag placeholder="请选择联系人" v-model="queryParam.contactId" dictCode="tb_contact,name,id"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="8">
               <a-form-item label="紧急程度">
                 <j-dict-select-tag placeholder="请选择紧急程度" v-model="queryParam.emergencyLevel" dictCode="work_order_emergency_level"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="8">
               <a-form-item label="客服">
-                <a-input placeholder="请输入客服" v-model="queryParam.customerServiceName"></a-input>
+                <a-input placeholder="请输入客服" v-model="queryParam.customerServiceRealName"></a-input>
               </a-form-item>
             </a-col>
           </template>
@@ -60,10 +50,10 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('工单信息')">导出</a-button>
+      <!-- <a-button type="primary" icon="download" @click="handleExportXls('工单信息')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
-      </a-upload>
+      </a-upload> -->
     </div>
 
     <!-- table区域-begin -->
@@ -187,6 +177,18 @@
             }
           },
           {
+            title:'接口方式',
+            align:"center",
+            dataIndex: 'accessMethod',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return filterMultiDictText(this.dictOptions['accessMethod'], text+"")
+              }
+            }
+          },
+          {
             title:'客户',
             align:"center",
             dataIndex: 'clientId',
@@ -235,6 +237,11 @@
             }
           },
           {
+            title:'申报时间',
+            align:"center",
+            dataIndex: 'declarationTime'
+          },
+          {
             title: '操作',
             dataIndex: 'action',
             align:"center",
@@ -251,6 +258,7 @@
         dictOptions:{
          status:[],
          type:[],
+         accessMethod:[],
          clientId:[],
          contactId:[],
          emergencyLevel:[],
@@ -287,6 +295,11 @@
         initDictOptions('work_order_type').then((res) => {
           if (res.success) {
             this.$set(this.dictOptions, 'type', res.result)
+          }
+        })
+        initDictOptions('work_order_access_method').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'accessMethod', res.result)
           }
         })
         initDictOptions('tb_client,name,id').then((res) => {

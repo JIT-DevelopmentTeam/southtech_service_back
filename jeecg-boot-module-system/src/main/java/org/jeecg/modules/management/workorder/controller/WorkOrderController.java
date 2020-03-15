@@ -1,5 +1,7 @@
 package org.jeecg.modules.management.workorder.controller;
 
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jeecg.common.system.query.QueryGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -7,13 +9,19 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.modules.management.client.entity.Client;
+import org.jeecg.modules.management.client.service.IClientService;
 import org.jeecg.modules.management.workorder.entity.WorkOrderPage;
+import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,6 +49,12 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 	@Autowired
 	private IWorkOrderDetailService workOrderDetailService;
 
+	@Autowired
+    private IClientService clientService;
+
+     @Autowired
+     private ISysUserService sysUserService;
+
 
 	/*---------------------------------主表处理-begin-------------------------------------*/
 
@@ -58,6 +72,34 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 		QueryWrapper<WorkOrder> queryWrapper = QueryGenerator.initQueryWrapper(workOrder, req.getParameterMap());
+        if (StringUtils.isNotBlank(req.getParameter("clientName"))) {
+            QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<Client>();
+            clientQueryWrapper.like("name",req.getParameter("clientName").trim());
+            List<Client> clientList = clientService.list(clientQueryWrapper);
+            List<String> clientIdsList = new ArrayList<>();
+            for (Client client : clientList) {
+                clientIdsList.add(client.getId());
+            }
+            if (!clientIdsList.isEmpty()) {
+                queryWrapper.in("client_id",clientIdsList);
+            } else {
+                queryWrapper.eq("client_id","0");
+            }
+        }
+        if (StringUtils.isNotBlank(req.getParameter("customerServiceRealName"))) {
+            QueryWrapper<SysUser> userQueryWrapper = new QueryWrapper<>();
+            userQueryWrapper.like("realname",req.getParameter("customerServiceRealName").trim());
+            List<SysUser> userList = sysUserService.list(userQueryWrapper);
+            List<String> userNamesList = new ArrayList<>();
+            for (SysUser user : userList) {
+                userNamesList.add(user.getUsername());
+            }
+            if (!userNamesList.isEmpty()) {
+                queryWrapper.in("customer_service_name",userNamesList);
+            } else {
+                queryWrapper.eq("customer_service_name","0");
+            }
+        }
 		Page<WorkOrder> page = new Page<WorkOrder>(pageNo, pageSize);
 		IPage<WorkOrder> pageList = workOrderService.page(page, queryWrapper);
 		return Result.ok(pageList);
