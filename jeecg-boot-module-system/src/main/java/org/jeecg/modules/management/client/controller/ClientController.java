@@ -251,6 +251,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
     /*--------------------------------子表处理-联系人信息-end----------------------------------------------*/
 
     /*--------------------------------子表处理-设备编号-begin----------------------------------------------*/
+
 	/**
 	 * 查询子表信息 会传入主表ID
 	 * @return
@@ -260,9 +261,31 @@ public class ClientController extends JeecgController<Client, IClientService> {
                                                     @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                                     @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                                     HttpServletRequest req) {
+	    if (StringUtils.isNotBlank(deviceNumber.getNumber())) {
+	        deviceNumber.setNumber(deviceNumber.getNumber().trim());
+        }
+        if (StringUtils.isNotBlank(deviceNumber.getName())) {
+            deviceNumber.setName(deviceNumber.getName().trim());
+        }
+        if (StringUtils.isNotBlank(deviceNumber.getType())) {
+            deviceNumber.setType(deviceNumber.getType().trim());
+        }
         QueryWrapper<DeviceNumber> queryWrapper = QueryGenerator.initQueryWrapper(deviceNumber, req.getParameterMap());
+        if (StringUtils.isNotBlank(req.getParameter("clientName"))) {
+            QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<>();
+            clientQueryWrapper.like("name",req.getParameter("clientName").trim());
+            List<Client> clientList = clientService.list(clientQueryWrapper);
+            if (!clientList.isEmpty()) {
+                List<String> clientIdsList = new ArrayList<>();
+                for (Client client : clientList) {
+                    clientIdsList.add(client.getId());
+                }
+                queryWrapper.in("client_id",clientIdsList);
+            } else {
+                queryWrapper.eq("client_id","0");
+            }
+        }
         Page<DeviceNumber> page = new Page<DeviceNumber>(pageNo, pageSize);
-
         IPage<DeviceNumber> pageList = deviceNumberService.page(page, queryWrapper);
         return Result.ok(pageList);
     }

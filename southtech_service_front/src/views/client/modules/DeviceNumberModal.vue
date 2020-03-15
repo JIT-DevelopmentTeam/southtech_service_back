@@ -19,14 +19,22 @@
         <a-form-item label="类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'type', validatorRules.type]" placeholder="请输入类型"></a-input>
         </a-form-item>
+        <a-form-item label="客户" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <j-search-select-tag
+            placeholder="请选择客户"
+            v-decorator="['clientId',validatorRules.clientId]"
+            dict="tb_client,name,id"
+            :async="true">
+          </j-search-select-tag>
+        </a-form-item>
         <a-form-item label="描述" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'description', validatorRules.description]" placeholder="请输入描述"></a-input>
+          <a-textarea rows="4" placeholder="请输入描述" v-decorator="[ 'description', validatorRules.description]" style="resize:none;"/>
         </a-form-item>
-        <a-form-item label="数量" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input-number v-decorator="[ 'quantity', validatorRules.quantity]" placeholder="请输入数量" style="width: 100%"/>
+        <a-form-item label="保质期" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-date placeholder="请选择保质期" v-decorator="[ 'qgp', validatorRules.qgp]" :trigger-change="true" style="width: 100%"/>
         </a-form-item>
-        <a-form-item label="ERP客户编号" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'erpClientNum', validatorRules.erpClientNum]" placeholder="请输入ERP客户编号"></a-input>
+        <a-form-item label="签约日期" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-date placeholder="请选择签约日期" v-decorator="[ 'signing', validatorRules.signing]" :trigger-change="true" style="width: 100%"/>
         </a-form-item>
 
       </a-form>
@@ -38,10 +46,14 @@
 
   import { httpAction } from '@/api/manage'
   import pick from 'lodash.pick'
+  import JDate from '@/components/jeecg/JDate'  
+  import JSearchSelectTag from '@/components/dict/JSearchSelectTag'
 
   export default {
     name: "DeviceNumberModal",
     components: {
+      JDate,
+      JSearchSelectTag
     },
     props:{
       mainId:{
@@ -68,12 +80,13 @@
 
         confirmLoading: false,
         validatorRules:{
-        number:{},
-        name:{},
-        type:{},
+        number:{rules: [{ required: true, message: '请输入编码!' }]},
+        name:{rules: [{ required: true, message: '请输入名称!' }]},
+        type:{rules: [{ required: true, message: '请输入类型!' }]},
+        clientId:{rules: [{ required: true, message: '请选择客户!' }]},
         description:{},
-        quantity:{},
-        erpClientNum:{},
+        qgp:{rules: [{ required: true, message: '请选择保质期!' }]},
+        signing:{rules: [{ required: true, message: '请选择签约时间!' }]},
         },
         url: {
           add: "/client/client/addDeviceNumber",
