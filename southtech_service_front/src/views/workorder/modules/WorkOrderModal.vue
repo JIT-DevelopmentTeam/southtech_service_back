@@ -16,11 +16,6 @@
             </a-form-item>
           </a-col>
           <a-col :lg="8">
-            <a-form-item label="状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-dict-select-tag type="list" v-decorator="['status', validatorRules.status]" :trigger-change="true" dictCode="work_order_status" placeholder="请选择状态"/>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
             <a-form-item label="类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
                 <j-dict-select-tag @change="setWorkOrderType" type="list" v-decorator="['type',validatorRules.type]" :trigger-change="true" dictCode="work_order_type" placeholder="请选择类型"/>
             </a-form-item>
@@ -78,44 +73,26 @@
           <a-tab-pane tab="工单明细" key="1">
             <div>
               <a-row type="flex" style="margin-bottom:10px" :gutter="16">
-                <a-col :span="3">设备编号</a-col>
-                <a-col :span="4">服务工程师</a-col>
-                <a-col v-if="workOrderType == '1'" :span="3">故障部位</a-col>
-                <a-col :span="5">描述</a-col>
-                <a-col :span="3">派工时间</a-col>
-                <a-col :span="4">同行人员</a-col>
+                <a-col :span="5">设备编号</a-col>
+                <a-col v-if="workOrderType == '1'" :span="7">故障部位</a-col>
+                <a-col :span="9">描述</a-col>
                 <a-col :span="2">操作</a-col>
               </a-row>
 
               <a-row type="flex" style="margin-bottom:10px" :gutter="16" v-for="(item, index) in model.workOrderDetailList" :key="index">
-                <a-col :span="3">
+                <a-col :span="5">
                   <a-form-item>
                     <j-dict-select-tag v-decorator="['workOrderDetailList['+index+'].deviceNumber', {'initialValue':item.deviceNumber,rules: [{ required: true, message: '请选择设备编号!' }]}]" placeholder="设备编号" :trigger-change="true" :dictCode="deviceNumberCondition()"/>
                   </a-form-item>
                 </a-col>
-                <a-col :span="4">
-                  <a-form-item>
-                    <j-select-user-by-dep v-decorator="['workOrderDetailList['+index+'].serviceEngineerName', {'initialValue':item.serviceEngineerName,rules: [{ required: true, message: '请选择服务工程师!' }]}]" :multi="false" :trigger-change="true"/>
-                  </a-form-item>
-                </a-col>
-                <a-col v-if="workOrderType == '1'" :span="3">
+                <a-col v-if="workOrderType == '1'" :span="7">
                   <a-form-item>
                     <j-multi-select-tag placeholder="故障部位" v-decorator="['workOrderDetailList['+index+'].faultLocation', {'initialValue':item.faultLocation,rules: [{ required: true, message: '请选择故障部位!' }]}]" dictCode="work_order_detail_fault_location"/>
                   </a-form-item>
                 </a-col>
-                <a-col :span="5">
+                <a-col :span="9">
                   <a-form-item>
                     <a-input v-decorator="['workOrderDetailList['+index+'].description', {'initialValue':item.description}]" placeholder="描述"/>
-                  </a-form-item>
-                </a-col>
-                <a-col :span="3">
-                  <a-form-item>
-                    <j-date placeholder="派工时间" v-decorator="['workOrderDetailList['+index+'].dispatchTime', {'initialValue':item.dispatchTime,rules: [{ required: true, message: '请选择派工时间!' }]}]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
-                  </a-form-item>
-                </a-col>
-                <a-col :span="4">
-                  <a-form-item>
-                    <j-select-user-by-dep v-decorator="['workOrderDetailList['+index+'].peers', {'initialValue':item.peers}]" :trigger-change="true"/>
                   </a-form-item>
                 </a-col>
                 <a-col :span="2">

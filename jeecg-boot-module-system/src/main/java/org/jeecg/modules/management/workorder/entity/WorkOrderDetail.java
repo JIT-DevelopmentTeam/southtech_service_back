@@ -66,4 +66,8 @@ public class WorkOrderDetail implements Serializable {
 	private java.lang.String peers;
 	/**所属工单*/
 	private java.lang.String workOrderId;
+	/**指派人*/
+	private java.lang.String assigneeName;
+    /**指派时间*/
+    private java.util.Date assignedTime;
 }
