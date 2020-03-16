@@ -28,6 +28,33 @@
         <a-form-item label="操作规程" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-dict-select-tag type="list" v-decorator="['operatingProcedures', validatorRules.operatingProcedures]" :trigger-change="true" dictCode="tb_operating_procedures,name,id" placeholder="请选择操作规程"/>
         </a-form-item>
+        <a-form-item label="需要签到" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'checkIn', validatorRules.checkIn]" placeholder="请输入需要签到"></a-input>
+        </a-form-item>
+        <a-form-item label="需要签出" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'checkOut', validatorRules.checkOut]" placeholder="请输入需要签出"></a-input>
+        </a-form-item>
+        <a-form-item label="需要拍照" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'takePicture', validatorRules.takePicture]" placeholder="请输入需要拍照"></a-input>
+        </a-form-item>
+        <a-form-item label="需要费用模板" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'costTemplate', validatorRules.costTemplate]" placeholder="请输入需要费用模板"></a-input>
+        </a-form-item>
+        <a-form-item label="需要原件归档" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'archive', validatorRules.archive]" placeholder="请输入需要原件归档"></a-input>
+        </a-form-item>
+        <a-form-item label="资料状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'stateInformation', validatorRules.stateInformation]" placeholder="请输入资料状态"></a-input>
+        </a-form-item>
+        <a-form-item label="触发消息" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'triggerMessage', validatorRules.triggerMessage]" placeholder="请输入触发消息"></a-input>
+        </a-form-item>
+        <a-form-item label="触发应收" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'triggerReceivable', validatorRules.triggerReceivable]" placeholder="请输入触发应收"></a-input>
+        </a-form-item>
+        <a-form-item label="提交附件" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'attachment', validatorRules.attachment]" placeholder="请输入提交附件"></a-input>
+        </a-form-item>
         <a-form-item label="工作说明" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'jobDescription', validatorRules.jobDescription]" placeholder="请输入工作说明"></a-input>
         </a-form-item>
@@ -87,6 +114,24 @@
           ]},
           operatingProcedures: {rules: [
           ]},
+          checkIn: {rules: [
+          ]},
+          checkOut: {rules: [
+          ]},
+          takePicture: {rules: [
+          ]},
+          costTemplate: {rules: [
+          ]},
+          archive: {rules: [
+          ]},
+          stateInformation: {rules: [
+          ]},
+          triggerMessage: {rules: [
+          ]},
+          triggerReceivable: {rules: [
+          ]},
+          attachment: {rules: [
+          ]},
           jobDescription: {rules: [
           ]},
         },
@@ -107,7 +152,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'workOrderType','stageNumber','stageName','cumulativePercentage','orderIndex','operatingProcedures','jobDescription'))
+          this.form.setFieldsValue(pick(this.model,'workOrderType','stageNumber','stageName','cumulativePercentage','orderIndex','operatingProcedures','checkIn','checkOut','takePicture','costTemplate','archive','stateInformation','triggerMessage','triggerReceivable','attachment','jobDescription'))
         })
       },
       close () {
@@ -150,7 +195,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'workOrderType','stageNumber','stageName','cumulativePercentage','orderIndex','operatingProcedures','jobDescription'))
+        this.form.setFieldsValue(pick(row,'workOrderType','stageNumber','stageName','cumulativePercentage','orderIndex','operatingProcedures','checkIn','checkOut','takePicture','costTemplate','archive','stateInformation','triggerMessage','triggerReceivable','attachment','jobDescription'))
       }
       
     }

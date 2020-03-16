@@ -160,6 +160,57 @@
             }
           },
           {
+            title:'需要签到',
+            align:"center",
+            dataIndex: 'checkIn'
+          },
+          {
+            title:'需要签出',
+            align:"center",
+            dataIndex: 'checkOut'
+          },
+          {
+            title:'需要拍照',
+            align:"center",
+            dataIndex: 'takePicture'
+          },
+          {
+            title:'需要费用模板',
+            align:"center",
+            dataIndex: 'costTemplate'
+          },
+          {
+            title:'需要原件归档',
+            align:"center",
+            dataIndex: 'archive'
+          },
+          {
+            title:'资料状态',
+            align:"center",
+            dataIndex: 'stateInformation'
+          },
+          {
+            title:'触发消息',
+            align:"center",
+            dataIndex: 'triggerMessage'
+          },
+          {
+            title:'触发应收',
+            align:"center",
+            dataIndex: 'triggerReceivable'
+          },
+          {
+            title:'提交附件',
+            align:"center",
+            dataIndex: 'attachment'
+          },
+          {
+            title:'工作说明',
+            align:"center",
+            dataIndex: 'jobDescription',
+            scopedSlots: {customRender: 'htmlSlot'}
+          },
+          {
             title: '操作',
             dataIndex: 'action',
             align:"center",
@@ -179,7 +230,7 @@
          workOrderType:[],
          operatingProcedures:[],
         },
-        tableScroll:{x :6*147+50}
+        tableScroll:{x :16*147+50}
       }
     },
     computed: {
