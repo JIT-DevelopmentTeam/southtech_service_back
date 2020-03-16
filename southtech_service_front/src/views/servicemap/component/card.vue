@@ -1,5 +1,5 @@
 <template>
-  <a-card :title="title" :bordered="true" style="width: 300px; height: 300px" :hoverable="true" :loading="false"
+  <a-card ref="card" :title="title" :bordered="true" style="width: 300px; height: 300px" :hoverable="true" :loading="false"
           type="inner" :bodyStyle="bodyStyle">
     <a-checkbox-group @change="onChange" style="line-height: 2; display: block; text-align: left">
       <a-row v-for="(item, index) in list" :key="index">
