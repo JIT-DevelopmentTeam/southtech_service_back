@@ -196,7 +196,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
       * @return
       */
     @GetMapping(value = "/listPageByWorkOrder")
-    public Result<?> listPageByWorkOrder(Client client,@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,@RequestParam(name="pageSize", defaultValue="10") Integer pageSize) {
+    public Result<?> listPageByWorkOrder(Client client,@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,@RequestParam(name="pageSize", defaultValue="10") Integer pageSize,HttpServletRequest req) {
         List<WorkOrder> workOrderList = workOrderService.list();
         List<String> clientIdsList = new ArrayList<>();
         for (WorkOrder workOrder : workOrderList) {
@@ -205,9 +205,8 @@ public class ClientController extends JeecgController<Client, IClientService> {
         if (clientIdsList.isEmpty()) {
             return Result.error("暂无客户数据!");
         }
-        QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<>();
+        QueryWrapper<Client> clientQueryWrapper = QueryGenerator.initQueryWrapper(client, req.getParameterMap());
         clientQueryWrapper.in("id",clientIdsList);
-        clientQueryWrapper.setEntity(client);
         Page<Client> page = new Page<>();
         IPage<Client> pageList = clientService.page(page, clientQueryWrapper);
         return Result.ok(pageList.getRecords());
