@@ -195,8 +195,8 @@ public class ClientController extends JeecgController<Client, IClientService> {
       * 获取工单客户
       * @return
       */
-    @GetMapping(value = "/listByWorkOrder")
-    public Result<?> listByWorkOrder(Client client,@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,@RequestParam(name="pageSize", defaultValue="10") Integer pageSize) {
+    @GetMapping(value = "/listPageByWorkOrder")
+    public Result<?> listPageByWorkOrder(Client client,@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,@RequestParam(name="pageSize", defaultValue="10") Integer pageSize) {
         Result<List<Client>> result = new Result<>();
         List<WorkOrder> workOrderList = workOrderService.list();
         List<String> clientIdsList = new ArrayList<>();
