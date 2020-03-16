@@ -49,6 +49,14 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/lib/taobao-sdk-java-auto_1479188381469-20200219-source.jar</systemPath>
         </dependency>
+
+		<dependency>
+			<groupId>net.sf.dozer</groupId>
+			<artifactId>dozer</artifactId>
+			<version>5.5.1</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
@@ -56,6 +64,8 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+
+
 			</plugin>
 		</plugins>
 	</build>

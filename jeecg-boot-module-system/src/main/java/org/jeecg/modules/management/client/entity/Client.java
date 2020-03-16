@@ -1,6 +1,8 @@
 package org.jeecg.modules.management.client.entity;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -107,5 +109,6 @@ public class Client implements Serializable {
     @Excel(name = "纬度", width = 15)
     private java.lang.Double latitude;
     private java.sql.Timestamp modifyTime;
-    
+
+
 }
