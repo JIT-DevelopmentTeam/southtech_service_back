@@ -1,6 +1,7 @@
 package org.jeecg.modules.management.client.controller;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.PageUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
@@ -194,8 +195,8 @@ public class ClientController extends JeecgController<Client, IClientService> {
       * 获取工单客户
       * @return
       */
-    @GetMapping(value = "listByWorkOrder")
-    public Result<?> listByWorkOrder() {
+    @GetMapping(value = "/listByWorkOrder")
+    public Result<?> listByWorkOrder(Client client,@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,@RequestParam(name="pageSize", defaultValue="10") Integer pageSize) {
         Result<List<Client>> result = new Result<>();
         List<WorkOrder> workOrderList = workOrderService.list();
         List<String> clientIdsList = new ArrayList<>();
@@ -208,9 +209,11 @@ public class ClientController extends JeecgController<Client, IClientService> {
         }
         QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<>();
         clientQueryWrapper.in("id",clientIdsList);
-        List<Client> clientList = clientService.list(clientQueryWrapper);
+        clientQueryWrapper.setEntity(client);
+        Page<Client> page = new Page<>();
+        IPage<Client> pageList = clientService.page(page, clientQueryWrapper);
         result.setSuccess(true);
-        result.setResult(clientList);
+        result.setResult(pageList.getRecords());
         return result;
     }
 
