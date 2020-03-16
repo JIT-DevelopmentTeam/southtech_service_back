@@ -97,6 +97,7 @@
     },
     created() {
       this.loadTicketData(this.tPageNo)
+      this.loadEnginerData(this.ePageNo)
     },
     mounted() {
       window.addEventListener('scroll', this.tscrollFn, true)
