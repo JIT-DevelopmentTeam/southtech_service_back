@@ -3,7 +3,9 @@ package org.jeecg.modules.management.client.controller;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.lang.StringUtils;
+import org.dozer.DozerBeanMapper;
 import org.jeecg.common.system.query.QueryGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -14,6 +16,7 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.util.HttpHelper;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.management.erp.erpinterface.ERPInterfaceConstant;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +60,9 @@ public class ClientController extends JeecgController<Client, IClientService> {
      @Autowired
      private RedisUtil redisUtil;
 
+	 @Autowired
+	 DozerBeanMapper beanMapper;
+
 
 	/*---------------------------------主表处理-begin-------------------------------------*/
 
@@ -82,6 +88,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
 		QueryWrapper<Client> queryWrapper = QueryGenerator.initQueryWrapper(client, req.getParameterMap());
 		Page<Client> page = new Page<Client>(pageNo, pageSize);
 		IPage<Client> pageList = clientService.page(page, queryWrapper);
+
 		return Result.ok(pageList);
 	}
 

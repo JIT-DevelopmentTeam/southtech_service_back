@@ -109,4 +109,6 @@ public class Client implements Serializable {
     @Excel(name = "纬度", width = 15)
     private java.lang.Double latitude;
     private java.sql.Timestamp modifyTime;
+
+
 }
