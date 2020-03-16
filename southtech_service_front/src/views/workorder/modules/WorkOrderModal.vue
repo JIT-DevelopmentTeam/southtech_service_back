@@ -66,11 +66,11 @@
               <j-date placeholder="请选择申报时间" v-decorator="[ 'declarationTime', validatorRules.declarationTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="8">
+          <!-- <a-col :lg="8">
             <a-form-item label="附件" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-upload v-decorator="['annex']" :trigger-change="true"></j-upload>
             </a-form-item>
-          </a-col>
+          </a-col> -->
         </a-row>
 
         <!-- 子表单区域 -->
@@ -182,7 +182,6 @@
         emergencyLevel:{rules: [{ required: true, message: '请输入紧急程度!' }]},
         customerServiceName:{rules: [{ required: true, message: '请输入客服!' }]},
         declarationTime:{rules: [{ required: true, message: '请输入申报时间!' }]},
-        annex:{},
         },
         url: {
           add: "/workorder/workOrder/add",
@@ -217,7 +216,7 @@
         }
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
+          this.form.setFieldsValue(pick(this.model,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime'))
         })
       },
       close () {
@@ -260,7 +259,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
+        this.form.setFieldsValue(pick(row,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime'))
       },
       contactCondition() {
         return "tb_contact,name,id,client_id="+this.client;

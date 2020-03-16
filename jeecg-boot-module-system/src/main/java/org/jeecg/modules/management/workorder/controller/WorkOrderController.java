@@ -11,7 +11,9 @@ import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.management.client.entity.Client;
 import org.jeecg.modules.management.client.service.IClientService;
-import org.jeecg.modules.management.workorder.entity.WorkOrderPage;
+import org.jeecg.modules.management.workorder.entity.WorkOrderProgress;
+import org.jeecg.modules.management.workorder.service.IWorkOrderProgressService;
+import org.jeecg.modules.management.workorder.vo.WorkOrderPage;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.BeanUtils;
@@ -48,6 +50,9 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 
 	@Autowired
 	private IWorkOrderDetailService workOrderDetailService;
+
+     @Autowired
+     private IWorkOrderProgressService workOrderProgressService;
 
 	@Autowired
     private IClientService clientService;
@@ -247,7 +252,20 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 
     /*--------------------------------子表处理-工单明细-end----------------------------------------------*/
 
+     /*--------------------------------子表处理-工单进度-begin----------------------------------------------*/
+     /**
+      * 通过id查询
+      *
+      * @param id
+      * @return
+      */
+     @GetMapping(value = "/queryWorkOrderProgressByMainId")
+     public Result<?> queryWorkOrderProgressListByMainId(@RequestParam(name="id",required=true) String id) {
+         List<WorkOrderProgress> workOrderProgressList = workOrderProgressService.selectByMainId(id);
+         return Result.ok(workOrderProgressList);
+     }
 
+     /*--------------------------------子表处理-工单进度-end----------------------------------------------*/
 
 
 }
