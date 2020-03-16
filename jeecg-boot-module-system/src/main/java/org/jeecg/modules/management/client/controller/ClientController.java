@@ -15,6 +15,8 @@ import org.jeecg.common.util.HttpHelper;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.management.erp.erpinterface.ERPInterfaceConstant;
+import org.jeecg.modules.management.workorder.entity.WorkOrder;
+import org.jeecg.modules.management.workorder.service.IWorkOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +59,9 @@ public class ClientController extends JeecgController<Client, IClientService> {
 
      @Autowired
      private RedisUtil redisUtil;
+
+     @Autowired
+     private IWorkOrderService workOrderService;
 
 
 	/*---------------------------------主表处理-begin-------------------------------------*/
@@ -183,6 +188,30 @@ public class ClientController extends JeecgController<Client, IClientService> {
             return Result.error("同步出错,请联系管理员!");
         }
         return Result.ok("同步成功!");
+    }
+
+     /**
+      * 获取工单客户
+      * @return
+      */
+    @GetMapping(value = "listByWorkOrder")
+    public Result<?> listByWorkOrder() {
+        Result<List<Client>> result = new Result<>();
+        List<WorkOrder> workOrderList = workOrderService.list();
+        List<String> clientIdsList = new ArrayList<>();
+        for (WorkOrder workOrder : workOrderList) {
+            clientIdsList.add(workOrder.getClientId());
+        }
+        if (clientIdsList.isEmpty()) {
+            result.setSuccess(false);
+            return result;
+        }
+        QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<>();
+        clientQueryWrapper.in("id",clientIdsList);
+        List<Client> clientList = clientService.list(clientQueryWrapper);
+        result.setSuccess(true);
+        result.setResult(clientList);
+        return result;
     }
 
 	/*---------------------------------主表处理-end-------------------------------------*/
