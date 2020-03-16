@@ -207,7 +207,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
         }
         QueryWrapper<Client> clientQueryWrapper = QueryGenerator.initQueryWrapper(client, req.getParameterMap());
         clientQueryWrapper.in("id",clientIdsList);
-        Page<Client> page = new Page<>();
+        Page<Client> page = new Page<>(pageNo,pageSize);
         IPage<Client> pageList = clientService.page(page, clientQueryWrapper);
         return Result.ok(pageList.getRecords());
     }
