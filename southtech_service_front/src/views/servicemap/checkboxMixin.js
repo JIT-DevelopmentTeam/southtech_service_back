@@ -53,9 +53,12 @@ export const checkboxMixin = {
       }
     },
     loadTicketData(pageNo) {
-      this.loadData('/client/client/listPageByWorkOrder',pageNo,'ticket',this.ticketList)
+      this.loadData('/client/client/listPageByWorkOrder', pageNo, 'ticket', this.ticketList)
     },
-    loadData(url,pageNo,type,list) {
+    loadEnginerData(pageNo) {
+      this.loadData('/sys/user/enginerList', pageNo, 'enginer', this.enginerList)
+    },
+    loadData(url, pageNo, type, list) {
       getAction(url, {pageNo: pageNo, pageSize: this.pageSize})
         .then(res => {
           console.log("-->>", res);
