@@ -2,20 +2,20 @@
   <div id="components-layout-demo-basic">
     <a-layout>
       <a-layout-sider>
-        <sac-card ref="ticket" title="服务工单" :list="ticketList" @checkboxChange="ticketSel"></sac-card>
-        <sac-card ref="enginer" title="服务工程师" :list="enginerList" @checkboxChange="engSel"></sac-card>
+        <sac-card ref="ticket" title="服务工单" :url='ticketUrl' v-model="ticketMarkers"></sac-card>
+        <sac-card ref="enginer" title="服务工程师" :url='enginerUrl' v-model="enginerMarkers"></sac-card>
       </a-layout-sider>
       <a-layout>
         <div :style="{width: '100%', height: '100%'}">
-          <el-amap vid="amap" :zoom="zoom" :plugin="plugin" :center="center" :amap-manager="amapManager">
+          <el-amap vid="servicemap" :zoom="zoom" :plugin="plugin" :center="center" :amap-manager="amapManager">
             <el-amap-marker v-for="(titem, index) in ticketMarkers" :key="index"
                             :position="[titem.longitude,titem.latitude]"
-                            :vid="index" :title="titem.name" :clickable="true" :icon="customerIcon"
+                            :vid="index" :title="'客户名称：' + titem.name" :clickable="true" :icon="customerIcon"
                             :offset="[-16, -30]" :events="titem.events"></el-amap-marker>
 
             <el-amap-marker v-for="(eitem, index) in enginerMarkers" :key="index"
                             :position="[eitem.longitude,eitem.latitude]"
-                            :vid="index" :title="eitem.name" :clickable="true" :icon="enginerIcon"
+                            :vid="index" :title="'工程师：' + eitem.name" :clickable="true" :icon="enginerIcon"
                             :offset="[-16, -30]"></el-amap-marker>
 
             <el-amap-info-window v-if="window" :position="window.position" :visible="window.visible"
@@ -28,13 +28,11 @@
 </template>
 
 <script>
-  import {checkboxMixin} from "./checkboxMixin";
   import {AMapManager} from "vue-amap"
 
   let amapManager = new AMapManager();
   export default {
     name: "ServiceMap",
-    mixins: [checkboxMixin],
     components: {
       sacCard: () => import('./component/card')
     },
@@ -43,15 +41,12 @@
       return {
         customerIcon: require('../../assets/customerIcon.png'),
         enginerIcon: require('../../assets/enginerIcon.png'),
-        center: [0, 0],
-        oldCenter: [0, 0],// 记录最初始的经纬度
+        center: [109.12014,32.441281],
+        oldCenter: [109.12014,32.441281],// 记录最初始的经纬度
         amapManager,
-        zoom: 12,
-        tPageNo: 1,
-        ePageNo: 1,
-        pageSize: 10,
+        zoom: 5,
         plugin: [
-          {
+          /*{
             convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
             buttonPosition: 'RB',    //定位按钮停靠位置，默认：'LB'，左下角
             panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
@@ -72,49 +67,32 @@
                 });
               }
             }
-          },
+          },*/
           {
             pName: 'Scale'
           }
         ],
-        ticketList: [],
-        enginerList: [],
         ticketMarkers: [],
         enginerMarkers: [],
         windows: [],
-        window: ''
+        window: '',
+        ticketUrl: {
+          list: '/client/client/listPageByWorkOrder'
+        },
+        enginerUrl: {
+          list: '/sys/user/enginerList'
+        }
       }
     },
     methods: {
-      ticketSel(obj) {
-        this.checkboxSel(obj, this.ticketMarkers);
-        let map = amapManager.getMap();
-        map.setFitView();
-      },
-      engSel(obj) {
-        this.checkboxSel(obj, this.enginerMarkers);
-        let map = amapManager.getMap();
-        map.setFitView();
-      },
       tscrollFn(e) {
         this.handleScroll(e, 'ticket');
       },
-      escrollFn() {
+      escrollFn(e) {
         this.handleScroll(e, 'enginer');
       },
+
     },
-    created() {
-      this.loadTicketData(this.tPageNo)
-      this.loadEnginerData(this.ePageNo)
-    },
-    mounted() {
-      window.addEventListener('scroll', this.tscrollFn, true)
-      window.addEventListener('scroll', this.escrollFn, true)
-    },
-    destroyed() {
-      window.removeEventListener('scroll', this.tscrollFn); // 销毁监听
-      window.removeEventListener('scroll', this.escrollFn); // 销毁监听
-    }
   }
 </script>
 
@@ -137,9 +115,10 @@
   }
 
   #components-layout-demo-basic .ant-layout-sider {
-    background: #3ba0e9;
-    color: #fff;
-    line-height: 120px;
+    background: #fff;
+    color: #000;
+    /*line-height: 120px;*/
+    line-height: 50px;
     flex: none !important;
     max-width: 300px !important;
     min-width: 300px !important;

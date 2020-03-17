@@ -27,7 +27,7 @@
         <a-divider type="vertical" style="margin: 0 0 !important;"/>
         <a-layout>
           <div :style="{width: '100%', height: '100%'}" v-show="value == 1">
-            <el-amap vid="amap" :zoom="zoom" :plugin="plugin" :center="center" :amap-manager="amapManager">
+            <el-amap vid="dispathingmap" :zoom="zoom" :plugin="plugin" :center="center" :amap-manager="amapManager">
               <el-amap-marker v-for="(eitem, index) in enginerMarkers" :key="index"
                               :position="[eitem.longitude,eitem.latitude]"
                               :vid="index" :title="eitem.name" :clickable="true" :icon="enginerIcon"

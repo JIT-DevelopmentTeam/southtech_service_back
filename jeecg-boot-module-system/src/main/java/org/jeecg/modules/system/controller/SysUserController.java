@@ -943,7 +943,9 @@ public class SysUserController {
             map.put("address", "");
             mapList.add(map);
         }
-        return Result.ok(mapList);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("records", mapList);
+        return Result.ok(jsonObject);
     }
 
 }
