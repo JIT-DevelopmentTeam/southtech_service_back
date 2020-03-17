@@ -7,7 +7,7 @@
       </a-layout-sider>
       <a-layout>
         <div :style="{width: '100%', height: '100%'}">
-          <el-amap vid="amap" :zoom="zoom" :plugin="plugin" :center="center">
+          <el-amap vid="amap" :zoom="zoom" :plugin="plugin" :center="center" :amap-manager="amapManager">
             <el-amap-marker v-for="(titem, index) in ticketMarkers" :key="index"
                             :position="[titem.longitude,titem.latitude]"
                             :vid="index" :title="titem.name" :clickable="true" :icon="customerIcon"
@@ -29,7 +29,9 @@
 
 <script>
   import {checkboxMixin} from "./checkboxMixin";
+  import {AMapManager} from "vue-amap"
 
+  let amapManager = new AMapManager();
   export default {
     name: "ServiceMap",
     mixins: [checkboxMixin],
@@ -43,6 +45,7 @@
         enginerIcon: require('../../assets/enginerIcon.png'),
         center: [0, 0],
         oldCenter: [0, 0],// 记录最初始的经纬度
+        amapManager,
         zoom: 12,
         tPageNo: 1,
         ePageNo: 1,
@@ -85,14 +88,19 @@
     methods: {
       ticketSel(obj) {
         this.checkboxSel(obj, this.ticketMarkers);
+        let map = amapManager.getMap();
+        map.setFitView();
       },
       engSel(obj) {
         this.checkboxSel(obj, this.enginerMarkers);
+        let map = amapManager.getMap();
+        map.setFitView();
       },
       tscrollFn(e) {
         this.handleScroll(e, 'ticket');
       },
       escrollFn() {
+        this.handleScroll(e, 'enginer');
       },
     },
     created() {
