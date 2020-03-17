@@ -9,15 +9,20 @@
     cancelText="关闭">
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
-        <a-row class="form-row" :gutter="16">
-          <a-col :lg="8">
-            <a-form-item label="服务工程师" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-row class="form-row" :gutter="24">
+          <a-col :lg="12">
+            <a-form-item label="工程师" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-select-user-by-dep v-decorator="['serviceEngineerName',validatorRules.serviceEngineerName]" :multi="false" :trigger-change="true"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="8">
+          <a-col :lg="12">
             <a-form-item label="派工时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-date placeholder="请选择派工时间" v-decorator="[ 'declarationTime', validatorRules.declarationTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
+              <j-date placeholder="请选择派工时间" v-decorator="[ 'dispatchTime', validatorRules.dispatchTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="12">
+            <a-form-item label="同行人员" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <j-select-user-by-dep v-decorator="['peers',validatorRules.peers]" :multi="true" :trigger-change="true"/>
             </a-form-item>
           </a-col>
         </a-row>
@@ -63,13 +68,15 @@
 
         confirmLoading: false,
         validatorRules:{
-        serviceEngineerName:{rules: [{ required: true, message: '请选择服务工程师!' }]},
+        
+        serviceEngineerName:{rules: [{ required: true, message: '请选择工程师!' }]},
         dispatchTime:{rules: [{ required: true, message: '请选择派工时间!' }]},
+        peers:{}
         },
         url: {
-          edit: "/workorder/workOrder/editWorkOrderDetail",
-        }
-
+          edit: "/workorder/workOrder/dispatchWorkOrderDetailByIds",
+        },
+        workOrderDetailIds:null
       }
     },
     created () {
@@ -79,12 +86,9 @@
         this.edit({});
       },
       edit (record) {
+        this.workOrderDetailIds = record;
         this.form.resetFields();
-        this.model = Object.assign({}, record);
         this.visible = true;
-        this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'serviceEngineerName','dispatchTime'))
-        })
       },
       close () {
         this.$emit('close');
@@ -98,17 +102,9 @@
             that.confirmLoading = true;
             let httpurl = '';
             let method = '';
-            if(!this.model.id){
-              httpurl+=this.url.add;
-              method = 'post';
-            }else{
-              httpurl+=this.url.edit;
-               method = 'put';
-            }
-            let formData = Object.assign(this.model, values);
-            formData['workOrderId'] = this.mainId
-            console.log("表单提交数据",formData)
-            httpAction(httpurl,formData,method).then((res)=>{
+            httpurl+=this.url.edit+"?serviceEngineerName="+values.serviceEngineerName+"&dispatchTime="+values.dispatchTime+"&peers="+values.peers+"&workOrderDetailIds="+this.workOrderDetailIds;
+            method = 'post';       
+            httpAction(httpurl,null,method).then((res)=>{
               if(res.success){
                 that.$message.success(res.message);
                 that.$emit('ok');
@@ -127,7 +123,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'serviceEngineerName','dispatchTime'))
+        this.form.setFieldsValue(pick(row,'serviceEngineerName','dispatchTime','peers'))
       },
 
 

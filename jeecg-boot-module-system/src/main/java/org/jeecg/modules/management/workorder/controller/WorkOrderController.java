@@ -2,6 +2,7 @@ package org.jeecg.modules.management.workorder.controller;
 
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.system.query.QueryGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -9,6 +10,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.system.vo.LoginUser;
+import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.management.client.entity.Client;
 import org.jeecg.modules.management.client.service.IClientService;
 import org.jeecg.modules.management.workorder.entity.WorkOrderProgress;
@@ -23,8 +26,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.jeecg.common.util.oConvertUtils;
@@ -32,9 +37,10 @@ import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
+import sun.rmi.runtime.Log;
 
 
- /**
+/**
  * @Description: 工单信息
  * @Author: jeecg-boot
  * @Date:   2020-03-13
@@ -175,6 +181,35 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
         return super.importExcel(request, response, WorkOrder.class);
     }
+
+    /**
+     * 批量设置状态
+     * @param ids
+     * @param status
+     * @return
+     */
+    @PostMapping(value = "/setStatusBatch")
+    public Result<?> setStatusBatch(@RequestParam("ids") String ids,@RequestParam("status") String status) {
+        String[] idsArray = ids.split(",");
+        StringBuffer messge = new StringBuffer();
+        messge.append("操作成功!");
+        StringBuffer failWorkOrder = new StringBuffer();
+        for (String id : idsArray) {
+            WorkOrder workOrder = workOrderService.getById(id);
+            if (StringUtils.equals("3",workOrder.getStatus()) || StringUtils.equals("4",workOrder.getStatus()) || StringUtils.equals("8",workOrder.getStatus()) || StringUtils.equals("9",workOrder.getStatus())) {
+                failWorkOrder.append("'"+workOrder.getNumber()+"',");
+                continue;
+            }
+            workOrder.setStatus(status);
+            workOrderService.updateById(workOrder);
+        }
+        if (failWorkOrder.length() > 0) {
+            failWorkOrder = failWorkOrder.deleteCharAt(failWorkOrder.length()-1);
+            messge.append("("+failWorkOrder+"工单已完成或已关闭无法设置!)");
+        }
+        return Result.ok(messge.toString());
+    }
+
 	/*---------------------------------主表处理-end-------------------------------------*/
 	
 
@@ -249,6 +284,56 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 		this.workOrderDetailService.removeByIds(Arrays.asList(ids.split(",")));
 		return Result.ok("批量删除成功!");
 	}
+
+    /**
+     * 批量派工
+     * @param workOrderDetailIds 工单ids
+     * @param serviceEngineerName 服务工程师
+     * @param dispatchTime 派工时间
+     * @param peers 同行人
+     * @return
+     */
+	@PostMapping(value = "/dispatchWorkOrderDetailByIds")
+    public Result<?> dispatchWorkOrderDetailByIds(@RequestParam("workOrderDetailIds") String workOrderDetailIds,
+                                                  @RequestParam("serviceEngineerName") String serviceEngineerName,
+                                                  @RequestParam("dispatchTime") String dispatchTime,
+                                                  String peers) {
+        String[] idsArray = workOrderDetailIds.split(",");
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        WorkOrder workOrder = null;
+        for (String id : idsArray) {
+            WorkOrderDetail workOrderDetail = workOrderDetailService.getById(id);
+            workOrder = workOrderService.getById(workOrderDetail.getWorkOrderId());
+            if (!StringUtils.equals("1",workOrder.getStatus())){
+                return Result.error("派工失败,请检查工单状态是否为待分派!");
+            }
+            workOrderDetail.setServiceEngineerName(serviceEngineerName);
+            try {
+                workOrderDetail.setDispatchTime(DateUtils.parseDate(dispatchTime,"yyyy-MM-dd HH:mm:ss"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if (StringUtils.isNotBlank(peers)) {
+                workOrderDetail.setPeers(peers);
+            }
+            workOrderDetail.setAssigneeName(loginUser.getUsername());
+            workOrderDetail.setAssignedTime(DateUtils.getDate());
+            workOrderDetailService.updateById(workOrderDetail);
+
+        }
+        List<WorkOrderDetail> workOrderDetailList = workOrderDetailService.selectByMainId(workOrder.getId());
+        boolean isFinish = true;
+        for (WorkOrderDetail workOrderDetail : workOrderDetailList) {
+            if (workOrderDetail.getAssignedTime() == null) {
+                isFinish = false;
+            }
+        }
+        if (isFinish) {
+            workOrder.setStatus("2");
+            workOrderService.updateById(workOrder);
+        }
+	    return Result.ok("派工成功!");
+    }
 
     /*--------------------------------子表处理-工单明细-end----------------------------------------------*/
 

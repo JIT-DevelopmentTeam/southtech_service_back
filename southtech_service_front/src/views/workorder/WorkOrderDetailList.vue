@@ -63,7 +63,7 @@
     </div>
 
     <workOrderDetail-modal ref="modalForm" @ok="modalFormOk" :mainId="mainId"></workOrderDetail-modal>
-    <dispatch-modal ref="dispatchModalForm" @ok="modalFormOk"></dispatch-modal>
+    <DisPatchModal ref="dispatchModalForm" @ok="modalFormOk" :mainId="mainId"></DisPatchModal>
   </a-card>
 </template>
 
@@ -71,6 +71,7 @@
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import WorkOrderDetailModal from './modules/WorkOrderDetailModal'
+  import DisPatchModal from './modules/DispatchModal'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
 
@@ -78,7 +79,7 @@
   export default {
     name: "WorkOrderDetailList",
     mixins:[JeecgListMixin],
-    components: { WorkOrderDetailModal },
+    components: { WorkOrderDetailModal,DisPatchModal },
     props:{
       mainId:{
         type:String,
@@ -233,7 +234,7 @@
             ids += this.selectedRowKeys[a] + ",";
           }
         }
-        this.$refs.dispatchModalForm.edit(this.selectedRowKeys);
+        this.$refs.dispatchModalForm.edit(ids);
         this.$refs.dispatchModalForm.title = "派工";
         this.$refs.dispatchModalForm.disableSubmit = false;
       }

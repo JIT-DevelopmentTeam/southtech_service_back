@@ -50,9 +50,9 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" v-has="'workOrder:returnVisits'" icon="message">回访意见</a-button>
-      <a-button type="primary" v-has="'workOrder:finish'" icon="check">完成</a-button>
-      <a-button type="primary" v-has="'workOrder:close'" icon="close">关闭</a-button>
+      <a-button type="primary" v-has="'workOrder:returnVisits'" v-if="selectedRowKeys.length > 0" icon="message">回访意见</a-button>
+      <a-button type="primary" v-has="'workOrder:finish'" v-if="selectedRowKeys.length > 0" @click="setStatus(3)" icon="check">完成</a-button>
+      <a-button type="primary" v-has="'workOrder:close'" v-if="selectedRowKeys.length > 0" @click="setStatus(4)" icon="close">关闭</a-button>
     </div>
 
     <!-- table区域-begin -->
@@ -131,7 +131,7 @@
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import WorkOrderModal from './modules/WorkOrderModal'
-  import { getAction } from '@/api/manage'
+  import { getAction,postAction } from '@/api/manage'
   import WorkOrderDetailList from './WorkOrderDetailList'
   import WorkOrderProgressPage from './WorkOrderProgressPage'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
@@ -270,6 +270,7 @@
           deleteBatch: "/workorder/workOrder/deleteBatch",
           exportXlsUrl: "/workorder/workOrder/exportXls",
           importExcelUrl: "workorder/workOrder/importExcel",
+          setStatusBatch:"/workorder/workOrder/setStatusBatch"
         },
         dictOptions:{
          status:[],
@@ -386,6 +387,40 @@
           }
           this.loading = false;
         })
+      },
+      setStatus(status) {
+        if (this.selectedRowKeys.length <= 0) {
+          this.$message.warning('请选择一条记录！');
+          return;
+        } else {
+          var ids = "";
+          for (var a = 0; a < this.selectedRowKeys.length; a++) {
+            ids += this.selectedRowKeys[a] + ",";
+          }
+        }
+        let message = '';
+        switch (status) {
+          case 3:
+            message += '您确定要完成选中工单吗?';
+            break;
+          case 4:
+             message += '您确定要关闭选中工单吗?';
+            break;
+        }
+        this.$confirm({
+          title:message,
+          onOk:() =>{
+            let url = this.url.setStatusBatch+"?ids="+this.selectedRowKeys.toString()+"&status="+status
+            postAction(url,null).then((res) => {
+              if (res.success) {
+                this.$message.success(res.message);
+                this.loadData();
+              } else {
+                this.$message.error(res.message);
+              }
+            });
+          }
+        });
       }
 
     }

@@ -29,4 +29,7 @@ public class DingTalkConstant {
     // 获取用户详情
     public static final String USER_DETAIL_URL = "https://oapi.dingtalk.com/user/get";
 
+    // 新增代办任务
+    public static final String ADD_WORK_RECORD_URL = "https://oapi.dingtalk.com/topapi/workrecord/add?access_token=ACCESS_TOKEN";
+
 }
