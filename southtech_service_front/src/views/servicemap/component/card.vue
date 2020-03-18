@@ -32,12 +32,10 @@
 </template>
 
 <script>
-  import {checkboxMixin} from "../checkboxMixin";
   import {getAction} from '@/api/manage'
 
   export default {
     name: "card",
-    mixins: [checkboxMixin],
     props: {
       title: {
         type: String
