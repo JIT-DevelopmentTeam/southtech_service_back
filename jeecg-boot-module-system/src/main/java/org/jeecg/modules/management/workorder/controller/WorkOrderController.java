@@ -32,12 +32,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
-import sun.rmi.runtime.Log;
 
 
 /**
@@ -290,6 +288,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
      * @param workOrderDetailIds 工单ids
      * @param serviceEngineerName 服务工程师
      * @param dispatchTime 派工时间
+     * @param plannedCompletionTime 计划完成时间
      * @param peers 同行人
      * @return
      */
@@ -297,6 +296,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
     public Result<?> dispatchWorkOrderDetailByIds(@RequestParam("workOrderDetailIds") String workOrderDetailIds,
                                                   @RequestParam("serviceEngineerName") String serviceEngineerName,
                                                   @RequestParam("dispatchTime") String dispatchTime,
+                                                  @RequestParam("plannedCompletionTime") String plannedCompletionTime,
                                                   String peers) {
         String[] idsArray = workOrderDetailIds.split(",");
         LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
@@ -310,6 +310,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             workOrderDetail.setServiceEngineerName(serviceEngineerName);
             try {
                 workOrderDetail.setDispatchTime(DateUtils.parseDate(dispatchTime,"yyyy-MM-dd HH:mm:ss"));
+                workOrderDetail.setPlannedCompletionTime(DateUtils.parseDate(plannedCompletionTime,"yyyy-MM-dd HH:mm:ss"));
             } catch (ParseException e) {
                 e.printStackTrace();
             }

@@ -42,6 +42,8 @@ import vueBus from '@/utils/vueBus';
 import JeecgComponents from '@/components/jeecg/index'
 // 引入vue-amap
 import VueAMap from 'vue-amap'
+import Gantt from '@/components/Gantt'
+
 
 Vue.config.productionTip = false
 Vue.use(Storage, config.storageOptions)
@@ -57,6 +59,8 @@ Vue.use(preview)
 Vue.use(vueBus);
 Vue.use(JeecgComponents);
 Vue.use(VueAMap)
+Vue.use(Gantt);
+Vue.component('Gantt', Gantt)
 
 // 初始化vue-amap
 VueAMap.initAMapApiLoader({

@@ -4,7 +4,7 @@
       <a-layout-header>
         <a-row>
           <a-col :span="12" style="text-align: left;">
-            <a-select placeholder="请选择工单类型" style="width: 200px" @change="handleChange" :allowClear="true">
+            <a-select placeholder="请选择工单类型" style="width: 200px" @change="handleChange" v-if="value == 1" :allowClear="true">
               <a-select-option value="jack">Jack</a-select-option>
               <a-select-option value="lucy">Lucy</a-select-option>
               <a-select-option value="disabled" disabled>Disabled</a-select-option>
@@ -21,7 +21,7 @@
       </a-layout-header>
       <a-divider style="margin: 0 0 !important;"/>
       <a-layout>
-        <a-layout-sider>
+        <a-layout-sider v-show="value == 1">
           <list-card :list="ticketList"></list-card>
         </a-layout-sider>
         <a-divider type="vertical" style="margin: 0 0 !important;"/>
@@ -39,6 +39,9 @@
                               :offset="[-16, -30]"></el-amap-marker>
             </el-amap>
           </div>
+          <div :style="{width: '100%', height: '100%'}" v-show="value == 2">
+            <Gantt ref="myGantt" class="left-container" :tasks="tasks"></Gantt>
+          </div>
         </a-layout>
       </a-layout>
     </a-layout>
@@ -47,6 +50,7 @@
 
 <script>
   import {AMapManager} from "vue-amap"
+  import { getAction } from '@/api/manage'
 
   let amapManager = new AMapManager();
   export default {
@@ -104,7 +108,13 @@
         ],
         ticketMarkers: [],
         enginerMarkers: [],
-      }
+        tasks: {
+          data: [],
+        },
+        url:{
+          listTaskByEngineer:"/gantttask/gantttask/listTaskByEngineer"
+        }
+       }
     },
     components: {
       listCard: () => import('./component/listCard')
@@ -115,6 +125,17 @@
       },
       onChange(e) {
         console.log('radio checked', e.target.value);
+        if (e.target.value == 2) {
+          getAction(this.url.listTaskByEngineer,null).then((res)=>{
+            if (res.success) {
+              this.tasks.data = res.result;
+              console.log(+this.$refs.myGantt.$refs)
+              this.$refs.myGantt.$refs.gantt.gantt.refreshData();
+            } else {
+              this.$message.error(res.message);
+            }
+          });
+        }
       },
     }
   }
@@ -160,5 +181,14 @@
 
   #components-layout-demo-basic > .ant-layout:last-child {
     margin: 0;
+  }
+  .container {
+    height: 100%;
+    width: 100%;
+  }
+  .left-container {
+    overflow: hidden;
+    position: relative;
+    height: 500px;
   }
 </style>

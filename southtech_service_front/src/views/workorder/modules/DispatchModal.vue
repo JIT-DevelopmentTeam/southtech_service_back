@@ -21,6 +21,11 @@
             </a-form-item>
           </a-col>
           <a-col :lg="12">
+            <a-form-item label="计划完成时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <j-date placeholder="请选择计划完成时间" v-decorator="[ 'plannedCompletionTime', validatorRules.plannedCompletionTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="12">
             <a-form-item label="同行人员" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-select-user-by-dep v-decorator="['peers',validatorRules.peers]" :multi="true" :trigger-change="true"/>
             </a-form-item>
@@ -54,7 +59,7 @@
       return {
         form: this.$form.createForm(this),
         title:"操作",
-        width:800,
+        width:1200,
         visible: false,
         model: {},
         labelCol: {
@@ -71,6 +76,7 @@
         
         serviceEngineerName:{rules: [{ required: true, message: '请选择工程师!' }]},
         dispatchTime:{rules: [{ required: true, message: '请选择派工时间!' }]},
+        plannedCompletionTime:{rules: [{ required: true, message: '请选择计划完成时间!' }]},
         peers:{}
         },
         url: {
@@ -102,7 +108,10 @@
             that.confirmLoading = true;
             let httpurl = '';
             let method = '';
-            httpurl+=this.url.edit+"?serviceEngineerName="+values.serviceEngineerName+"&dispatchTime="+values.dispatchTime+"&peers="+values.peers+"&workOrderDetailIds="+this.workOrderDetailIds;
+            httpurl+=this.url.edit+"?serviceEngineerName="+values.serviceEngineerName+"&dispatchTime="+values.dispatchTime+"&plannedCompletionTime="+values.plannedCompletionTime+"&workOrderDetailIds="+this.workOrderDetailIds;
+            if (values.peers) {
+              httpurl += '&peers='+values.peers;
+            }
             method = 'post';       
             httpAction(httpurl,null,method).then((res)=>{
               if(res.success){
@@ -123,7 +132,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'serviceEngineerName','dispatchTime','peers'))
+        this.form.setFieldsValue(pick(row,'serviceEngineerName','dispatchTime','plannedCompletionTime','peers'))
       },
 
 
