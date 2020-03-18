@@ -85,13 +85,6 @@
       }
     },
     methods: {
-      tscrollFn(e) {
-        this.handleScroll(e, 'ticket');
-      },
-      escrollFn(e) {
-        this.handleScroll(e, 'enginer');
-      },
-
     },
   }
 </script>
