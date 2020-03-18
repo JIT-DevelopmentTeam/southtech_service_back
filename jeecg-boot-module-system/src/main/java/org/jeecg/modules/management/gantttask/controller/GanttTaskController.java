@@ -79,6 +79,8 @@ public class GanttTaskController {
                 GanttTask userGanttTask = new GanttTask();
                 userGanttTask.setId(user.getUsername());
                 userGanttTask.setText(user.getRealname());
+                userGanttTask.setOpen(true);
+                userGanttTask.setParent("0");
                 ganttTaskList.add(userGanttTask);
                 for (WorkOrderDetail workOrderDetail : addWorkOrderList) {
                     WorkOrder workOrder = workOrderService.getById(workOrderDetail.getWorkOrderId());
@@ -88,6 +90,7 @@ public class GanttTaskController {
                     workDetailGanttTask.setStart_date(DateUtils.formatDate(workOrderDetail.getDispatchTime(),"yyyy-MM-dd HH:mm:ss"));
                     workDetailGanttTask.setDuration(Integer.parseInt(DateUtils.getBetweenDays(workOrderDetail.getDispatchTime(),workOrderDetail.getPlannedCompletionTime())));
                     workDetailGanttTask.setParent(userGanttTask.getId());
+                    workDetailGanttTask.setOpen(true);
                     ganttTaskList.add(workDetailGanttTask);
                 }
             }

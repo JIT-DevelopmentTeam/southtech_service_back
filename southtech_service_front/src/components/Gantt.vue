@@ -18,6 +18,8 @@ export default {
 
   mounted: function () {
     gantt.config.xml_date = "%Y-%m-%d";
+    gantt.config.drag_links = false;
+    gantt.config.drag_resize = false;
     gantt.init(this.$refs.gantt)
     gantt.parse(this.$props.tasks)
   }
