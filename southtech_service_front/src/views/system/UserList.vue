@@ -65,11 +65,11 @@
 
     <!-- 操作按钮区域 -->
     <div class="table-operator" style="border-top: 5px">
-      <a-button @click="handleAdd" type="primary" icon="plus">添加用户</a-button>
+      <!-- <a-button @click="handleAdd" type="primary" icon="plus">添加用户</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('用户信息')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
-      </a-upload>
+      </a-upload> -->
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay" @click="handleMenuClick">
           <a-menu-item key="1">
@@ -135,11 +135,11 @@
                 <a href="javascript:;" @click="handleChangePassword(record.username)">密码</a>
               </a-menu-item>
 
-              <a-menu-item>
+              <!-- <a-menu-item>
                 <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
                   <a>删除</a>
                 </a-popconfirm>
-              </a-menu-item>
+              </a-menu-item> -->
 
               <a-menu-item v-if="record.status==1">
                 <a-popconfirm title="确定冻结吗?" @confirm="() => handleFrozen(record.id,2,record.username)">

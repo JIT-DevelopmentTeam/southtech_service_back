@@ -16,7 +16,7 @@ import org.jeecg.common.aspect.annotation.Dict;
 /**
  * @Description: 阶段信息
  * @Author: jeecg-boot
- * @Date:   2020-03-13
+ * @Date:   2020-03-16
  * @Version: V1.0
  */
 @Data
@@ -94,6 +94,4 @@ public class Stage implements Serializable {
 	/**工作说明*/
 	@Excel(name = "工作说明", width = 15)
     private java.lang.String jobDescription;
-
-
 }

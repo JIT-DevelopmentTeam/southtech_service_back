@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jeecg.common.util.HttpHelper;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.SpringContextUtils;
+import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.management.erp.erpinterface.ERPInterfaceConstant;
 
 
@@ -26,8 +27,8 @@ public class ERPTokenUtils {
     public static void setToken() {
         try {
             JSONObject jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.GET_TOKEN_URL.replace("AUTHORIZATION",ERPInterfaceConstant.AUTHORIZATIONCODE));
-            if (ObjectUtil.isNotEmpty(jsonObject.get("token"))) {
-                if (ObjectUtil.isEmpty(redisUtil.get(ERPInterfaceConstant.TOKEN_KEY))) {
+            if (oConvertUtils.isNotEmpty(jsonObject.get("token"))) {
+                if (oConvertUtils.isEmpty(redisUtil.get(ERPInterfaceConstant.TOKEN_KEY))) {
                     if (StringUtils.isNotBlank(jsonObject.getString("token"))) {
                         redisUtil.set(ERPInterfaceConstant.TOKEN_KEY,jsonObject.getString("token"),jsonObject.getLongValue("effective_Time"));
                     }

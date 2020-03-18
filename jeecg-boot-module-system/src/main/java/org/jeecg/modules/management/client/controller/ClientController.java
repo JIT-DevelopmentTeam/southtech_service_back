@@ -1,11 +1,10 @@
 package org.jeecg.modules.management.client.controller;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.PageUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.lang.StringUtils;
-import org.dozer.DozerBeanMapper;
 import org.jeecg.common.system.query.QueryGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,8 +14,10 @@ import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.util.HttpHelper;
 import org.jeecg.common.util.RedisUtil;
+import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.management.erp.erpinterface.ERPInterfaceConstant;
-import org.springframework.beans.BeanUtils;
+import org.jeecg.modules.management.workorder.entity.WorkOrder;
+import org.jeecg.modules.management.workorder.service.IWorkOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
@@ -60,8 +61,8 @@ public class ClientController extends JeecgController<Client, IClientService> {
      @Autowired
      private RedisUtil redisUtil;
 
-	 @Autowired
-	 DozerBeanMapper beanMapper;
+     @Autowired
+     private IWorkOrderService workOrderService;
 
 
 	/*---------------------------------主表处理-begin-------------------------------------*/
@@ -88,7 +89,6 @@ public class ClientController extends JeecgController<Client, IClientService> {
 		QueryWrapper<Client> queryWrapper = QueryGenerator.initQueryWrapper(client, req.getParameterMap());
 		Page<Client> page = new Page<Client>(pageNo, pageSize);
 		IPage<Client> pageList = clientService.page(page, queryWrapper);
-
 		return Result.ok(pageList);
 	}
 
@@ -191,6 +191,28 @@ public class ClientController extends JeecgController<Client, IClientService> {
         return Result.ok("同步成功!");
     }
 
+     /**
+      * 获取工单客户
+      * @return
+      */
+    @GetMapping(value = "/listPageByWorkOrder")
+    public Result<?> listPageByWorkOrder(Client client,@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,@RequestParam(name="pageSize", defaultValue="10") Integer pageSize) {
+        List<WorkOrder> workOrderList = workOrderService.list();
+        List<String> clientIdsList = new ArrayList<>();
+        for (WorkOrder workOrder : workOrderList) {
+            clientIdsList.add(workOrder.getClientId());
+        }
+        if (clientIdsList.isEmpty()) {
+            return Result.error("暂无客户数据!");
+        }
+        QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<>();
+        clientQueryWrapper.in("id",clientIdsList);
+        clientQueryWrapper.setEntity(client);
+        Page<Client> page = new Page<>();
+        IPage<Client> pageList = clientService.page(page, clientQueryWrapper);
+        return Result.ok(pageList.getRecords());
+    }
+
 	/*---------------------------------主表处理-end-------------------------------------*/
 	
 
@@ -257,6 +279,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
     /*--------------------------------子表处理-联系人信息-end----------------------------------------------*/
 
     /*--------------------------------子表处理-设备编号-begin----------------------------------------------*/
+
 	/**
 	 * 查询子表信息 会传入主表ID
 	 * @return
@@ -266,9 +289,31 @@ public class ClientController extends JeecgController<Client, IClientService> {
                                                     @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                                     @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                                     HttpServletRequest req) {
+	    if (StringUtils.isNotBlank(deviceNumber.getNumber())) {
+	        deviceNumber.setNumber(deviceNumber.getNumber().trim());
+        }
+        if (StringUtils.isNotBlank(deviceNumber.getName())) {
+            deviceNumber.setName(deviceNumber.getName().trim());
+        }
+        if (StringUtils.isNotBlank(deviceNumber.getType())) {
+            deviceNumber.setType(deviceNumber.getType().trim());
+        }
         QueryWrapper<DeviceNumber> queryWrapper = QueryGenerator.initQueryWrapper(deviceNumber, req.getParameterMap());
+        if (StringUtils.isNotBlank(req.getParameter("clientName"))) {
+            QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<>();
+            clientQueryWrapper.like("name",req.getParameter("clientName").trim());
+            List<Client> clientList = clientService.list(clientQueryWrapper);
+            if (!clientList.isEmpty()) {
+                List<String> clientIdsList = new ArrayList<>();
+                for (Client client : clientList) {
+                    clientIdsList.add(client.getId());
+                }
+                queryWrapper.in("client_id",clientIdsList);
+            } else {
+                queryWrapper.eq("client_id","0");
+            }
+        }
         Page<DeviceNumber> page = new Page<DeviceNumber>(pageNo, pageSize);
-
         IPage<DeviceNumber> pageList = deviceNumberService.page(page, queryWrapper);
         return Result.ok(pageList);
     }
@@ -341,7 +386,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
                 QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<>();
                 clientQueryWrapper.eq("number",data.getString("custNo"));
                 Client client = clientService.getOne(clientQueryWrapper);
-                if (ObjectUtil.isNotEmpty(client)) {
+                if (oConvertUtils.isNotEmpty(client)) {
                     DeviceNumber deviceNumber = new DeviceNumber();
                     deviceNumber.setNumber(data.getString("number"));
                     deviceNumber.setName(data.getString("name"));

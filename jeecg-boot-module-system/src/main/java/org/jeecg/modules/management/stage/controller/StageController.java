@@ -9,8 +9,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import cn.hutool.core.exceptions.ValidateException;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
@@ -38,7 +36,7 @@ import com.alibaba.fastjson.JSON;
  /**
  * @Description: 阶段信息
  * @Author: jeecg-boot
- * @Date:   2020-03-13
+ * @Date:   2020-03-16
  * @Version: V1.0
  */
 @RestController
@@ -67,6 +65,7 @@ public class StageController extends JeecgController<Stage, IStageService> {
 		IPage<Stage> pageList = stageService.page(page, queryWrapper);
 		return Result.ok(pageList);
 	}
+	
 	/**
 	 *   添加
 	 *
@@ -75,13 +74,7 @@ public class StageController extends JeecgController<Stage, IStageService> {
 	 */
 	@PostMapping(value = "/add")
 	public Result<?> add(@RequestBody Stage stage) {
-
-		try {
-			stageService.save(stage);
-		}catch (ValidateException ex){
-			return Result.error(ex.getMessage());
-		}
-
+		stageService.save(stage);
 		return Result.ok("添加成功！");
 	}
 	
@@ -158,7 +151,5 @@ public class StageController extends JeecgController<Stage, IStageService> {
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
         return super.importExcel(request, response, Stage.class);
     }
-
-
 
 }

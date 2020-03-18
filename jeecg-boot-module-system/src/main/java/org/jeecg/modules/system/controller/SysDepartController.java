@@ -1,30 +1,38 @@
 package org.jeecg.modules.system.controller;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.OapiDepartmentListRequest;
+import com.dingtalk.api.request.OapiUserGetRequest;
+import com.dingtalk.api.request.OapiUserListbypageRequest;
+import com.dingtalk.api.request.OapiUserSimplelistRequest;
 import com.dingtalk.api.response.OapiDepartmentListResponse;
+import com.dingtalk.api.response.OapiUserGetResponse;
+import com.dingtalk.api.response.OapiUserListbypageResponse;
+import com.dingtalk.api.response.OapiUserSimplelistResponse;
 import com.taobao.api.ApiException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.constant.CacheConstant;
+import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.system.vo.LoginUser;
-import org.jeecg.common.util.RedisUtil;
+import org.jeecg.common.util.*;
 import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.system.entity.SysDepart;
+import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.model.DepartIdModel;
 import org.jeecg.modules.system.model.SysDepartTreeModel;
 import org.jeecg.modules.system.service.ISysDepartService;
@@ -358,19 +366,127 @@ public class SysDepartController {
      */
     @RequestMapping(value = "/synchronize",method = RequestMethod.GET)
     public Result<?> synchronize() {
+        String accessToken = redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString();
         try {
-            DingTalkClient client = new DefaultDingTalkClient(DingTalkConstant.DEPART_LIST_URL);
-            OapiDepartmentListRequest request = new OapiDepartmentListRequest();
-            request.setHttpMethod("GET");
-            OapiDepartmentListResponse response = client.execute(request, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
-            List<OapiDepartmentListResponse.Department> departmentList = response.getDepartment();
-            // 排序钉钉部门列表
-            Collections.sort(departmentList, Comparator.comparing(OapiDepartmentListResponse.Department::getParentid));
-
-            // 新增
+            // 同步部门
+            DingTalkClient departmentClient = new DefaultDingTalkClient(DingTalkConstant.DEPART_LIST_URL);
+            OapiDepartmentListRequest departmentRequest = new OapiDepartmentListRequest();
+            departmentRequest.setHttpMethod("GET");
+            departmentRequest.setFetchChild(true);
+            OapiDepartmentListResponse departmentResponse = departmentClient.execute(departmentRequest, accessToken);
+            List<OapiDepartmentListResponse.Department> departmentList = departmentResponse.getDepartment();
+            if (departmentList.isEmpty()) {
+                return Result.error("同步失败,企业应用暂无部门数据!");
+            } else {
+                // 清除部门
+                QueryWrapper<SysDepart> departQueryWrapper = new QueryWrapper<>();
+                departQueryWrapper.notIn("id","southtech");
+                List<SysDepart> departList = sysDepartService.list(departQueryWrapper);
+                if (!departList.isEmpty()) {
+                    List<String> deleteIdsList = new ArrayList<>();
+                    for (SysDepart depart : departList) {
+                        deleteIdsList.add(depart.getId());
+                    }
+                    sysDepartService.deleteBatchWithChildren(deleteIdsList);
+                }
+                // 清除员工
+                QueryWrapper<SysUser> userQueryWrapper = new QueryWrapper<>();
+                userQueryWrapper.notIn("username","admin");
+                List<SysUser> delectUserList = sysUserService.list(userQueryWrapper);
+                if (!delectUserList.isEmpty()) {
+                    StringBuffer delectIds = new StringBuffer();
+                    for (SysUser delectUser : delectUserList) {
+                        delectIds.append(delectUser.getId()+",");
+                    }
+                    delectIds = delectIds.deleteCharAt(delectIds.length()-1);
+                    sysUserService.deleteBatchUsers(delectIds.toString());
+                }
+            }
+            if ("1".equals(departmentList.get(0).getId().toString())) {
+                departmentList.remove(0);
+            }
             for (OapiDepartmentListResponse.Department department : departmentList) {
-                boolean isAdd = true;
-
+                SysDepart depart = new SysDepart();
+                depart.setId(department.getId().toString());
+                depart.setDepartName(department.getName());
+                if (department.getParentid() == 1) {
+                    depart.setParentId("southtech");
+                    depart.setOrgType("1");
+                } else {
+                    depart.setParentId(department.getParentid().toString());
+                    depart.setOrgType("2");
+                }
+                depart.setOrgCode(depart.getId());
+                depart.setOrgCategory("1");
+                depart.setStatus(CommonConstant.STATUS_1);
+                depart.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
+                sysDepartService.save(depart);
+                // 同步当前部门用户
+                DingTalkClient userClient = new DefaultDingTalkClient(DingTalkConstant.USER_SIMPLELIST_URL);
+                OapiUserSimplelistRequest request = new OapiUserSimplelistRequest();
+                request.setDepartmentId(department.getId());
+                request.setOffset(0L);
+                request.setSize(100L);
+                request.setHttpMethod("GET");
+                OapiUserSimplelistResponse userResponse = userClient.execute(request, accessToken);
+                List<OapiUserSimplelistResponse.Userlist> userList = userResponse.getUserlist();
+                List<SysUser> saveOrUpdateUserList = new ArrayList<>();
+                for (OapiUserSimplelistResponse.Userlist dingTalkUser : userList) {
+                    DingTalkClient userDetailClient = new DefaultDingTalkClient(DingTalkConstant.USER_DETAIL_URL);
+                    OapiUserGetRequest userDetailRequest = new OapiUserGetRequest();
+                    userDetailRequest.setUserid(dingTalkUser.getUserid());
+                    userDetailRequest.setHttpMethod("GET");
+                    OapiUserGetResponse userDetailResponse = userDetailClient.execute(userDetailRequest, accessToken);
+                    // 获取是否部门主管信息同步
+                    Map<Integer, Boolean> departMap = JSONObject.parseObject(userDetailResponse.getIsLeaderInDepts(),HashMap.class);
+                    Map<String,Integer> departsMap = new HashMap<>();
+                    for (Integer departId : departMap.keySet()) {
+                        if (departMap.get(departId)) {
+                            departsMap.put(departId.toString(),1);
+                        } else {
+                            departsMap.put(departId.toString(),0);
+                        }
+                    }
+                    QueryWrapper<SysUser> userQueryWrapper = new QueryWrapper<>();
+                    userQueryWrapper.eq("username",userDetailResponse.getJobnumber());
+                    SysUser editUser = sysUserService.getOne(userQueryWrapper);
+                    if (oConvertUtils.isEmpty(editUser)) {
+                        SysUser addUser = new SysUser();
+                        addUser.setId(UUIDGenerator.generate());
+                        addUser.setUsername(userDetailResponse.getJobnumber());
+                        addUser.setRealname(userDetailResponse.getName());
+                        addUser.setSex(0);
+                        String salt = oConvertUtils.randomGen(8);
+                        addUser.setSalt(salt);
+                        String passwordEncode = PasswordUtil.encrypt(addUser.getUsername(), "123456", salt);
+                        addUser.setPassword(passwordEncode);
+                        addUser.setEmail(userDetailResponse.getEmail());
+                        addUser.setPhone(userDetailResponse.getMobile());
+                        addUser.setOrgCode(depart.getOrgCode());
+                        addUser.setStatus(Integer.parseInt(CommonConstant.STATUS_1));
+                        addUser.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
+                        addUser.setWorkNo(userDetailResponse.getJobnumber());
+                        addUser.setPost(userDetailResponse.getPosition());
+                        addUser.setActivitiSync(CommonConstant.ACT_SYNC_1);
+                        saveOrUpdateUserList.add(addUser);
+                        sysUserService.addUserWithDepart(addUser,departsMap);
+                    } else {
+                        editUser.setRealname(userDetailResponse.getName());
+                        editUser.setEmail(userDetailResponse.getEmail());
+                        editUser.setPhone(userDetailResponse.getMobile());
+                        editUser.setOrgCode(depart.getOrgCode());
+                        editUser.setStatus(Integer.parseInt(CommonConstant.STATUS_1));
+                        editUser.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
+                        editUser.setWorkNo(userDetailResponse.getJobnumber());
+                        editUser.setPost(userDetailResponse.getPosition());
+                        editUser.setActivitiSync(CommonConstant.ACT_SYNC_1);
+                        saveOrUpdateUserList.add(editUser);
+                        sysUserService.editUserWithDepart(editUser,departsMap);
+                    }
+                }
+                if (!saveOrUpdateUserList.isEmpty()) {
+                    sysUserService.saveOrUpdateBatch(saveOrUpdateUserList);
+                }
             }
         } catch (ApiException e) {
             e.printStackTrace();

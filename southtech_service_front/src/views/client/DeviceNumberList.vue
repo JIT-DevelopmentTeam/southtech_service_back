@@ -129,12 +129,12 @@
             dataIndex: 'type'
           },
           {
-            title:'保质期至',
+            title:'保质期',
             align:"center",
             dataIndex: 'qgp'
           },
           {
-            title:'签约时间',
+            title:'签约日期',
             align:"center",
             dataIndex: 'signing'
           },

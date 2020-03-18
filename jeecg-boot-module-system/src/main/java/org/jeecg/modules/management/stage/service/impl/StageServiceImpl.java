@@ -2,8 +2,6 @@ package org.jeecg.modules.management.stage.service.impl;
 
 import cn.hutool.core.exceptions.ValidateException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.dozer.DozerBeanMapper;
-import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.management.stage.entity.Stage;
 import org.jeecg.modules.management.stage.mapper.StageMapper;
 import org.jeecg.modules.management.stage.service.IStageService;
@@ -16,7 +14,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 /**
  * @Description: 阶段信息
  * @Author: jeecg-boot
- * @Date:   2020-03-13
+ * @Date:   2020-03-16
  * @Version: V1.0
  */
 @Service
@@ -24,8 +22,6 @@ public class StageServiceImpl extends ServiceImpl<StageMapper, Stage> implements
 
     @Autowired
     ISysDictService sysDictService;
-
-
 
     @Override
     public boolean save(Stage entity) {
@@ -47,7 +43,7 @@ public class StageServiceImpl extends ServiceImpl<StageMapper, Stage> implements
             throw new ValidateException(errText);
         }
 
-        
+
 
         return super.save(entity);
     }
