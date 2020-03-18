@@ -131,7 +131,6 @@
               this.tasks.data = res.result;
               gantt.init(this.$refs.myGantt.$refs.gantt);
               gantt.parse(this.tasks);
-              this.$refs.myGantt.$refs.gantt.gantt.parse(this.tasks);
             } else {
               this.$message.error(res.message);
             }
