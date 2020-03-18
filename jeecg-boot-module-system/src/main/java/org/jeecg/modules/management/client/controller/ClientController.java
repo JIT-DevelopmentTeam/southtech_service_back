@@ -1,41 +1,38 @@
 package org.jeecg.modules.management.client.controller;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.PageUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang.StringUtils;
-import org.jeecg.common.system.query.QueryGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.jeecg.common.system.base.controller.JeecgController;
+import org.apache.commons.lang.StringUtils;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.system.base.controller.JeecgController;
+import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.HttpHelper;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.management.client.entity.Client;
+import org.jeecg.modules.management.client.entity.Contact;
+import org.jeecg.modules.management.client.entity.DeviceNumber;
+import org.jeecg.modules.management.client.service.IClientService;
+import org.jeecg.modules.management.client.service.IContactService;
+import org.jeecg.modules.management.client.service.IDeviceNumberService;
 import org.jeecg.modules.management.erp.erpinterface.ERPInterfaceConstant;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.jeecg.modules.management.client.entity.Contact;
-import org.jeecg.modules.management.client.entity.DeviceNumber;
-import org.jeecg.modules.management.client.entity.Client;
-import org.jeecg.modules.management.client.service.IClientService;
-import org.jeecg.modules.management.client.service.IContactService;
-import org.jeecg.modules.management.client.service.IDeviceNumberService;
 
 
  /**
@@ -209,7 +206,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
         clientQueryWrapper.in("id",clientIdsList);
         Page<Client> page = new Page<>(pageNo,pageSize);
         IPage<Client> pageList = clientService.page(page, clientQueryWrapper);
-        return Result.ok(pageList.getRecords());
+        return Result.ok(pageList);
     }
 
 	/*---------------------------------主表处理-end-------------------------------------*/
