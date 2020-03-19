@@ -3,6 +3,8 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <!-- <a-button v-if="mainId" @click="handleAdd" type="primary" icon="plus">新增</a-button> -->
+      <a-button type="primary" v-if="selectedRowKeys.length > 0" v-has="'workOrder:dispatch'" @click="dispatch" icon="select">派工</a-button>
+      <a-button type="primary" @click="test">测试</a-button>
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
@@ -62,6 +64,7 @@
     </div>
 
     <workOrderDetail-modal ref="modalForm" @ok="modalFormOk" :mainId="mainId"></workOrderDetail-modal>
+    <DisPatchModal ref="dispatchModalForm" @ok="modalFormOk" :mainId="mainId"></DisPatchModal>
   </a-card>
 </template>
 
@@ -69,6 +72,7 @@
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import WorkOrderDetailModal from './modules/WorkOrderDetailModal'
+  import DisPatchModal from './modules/DispatchModal'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
 
@@ -76,7 +80,7 @@
   export default {
     name: "WorkOrderDetailList",
     mixins:[JeecgListMixin],
-    components: { WorkOrderDetailModal },
+    components: { WorkOrderDetailModal,DisPatchModal },
     props:{
       mainId:{
         type:String,
@@ -221,6 +225,23 @@
           }
         })
       },
+      dispatch(){
+        if (this.selectedRowKeys.length <= 0) {
+          this.$message.warning('请选择一条记录！');
+          return;
+        } else {
+          var ids = "";
+          for (var a = 0; a < this.selectedRowKeys.length; a++) {
+            ids += this.selectedRowKeys[a] + ",";
+          }
+        }
+        this.$refs.dispatchModalForm.edit(ids);
+        this.$refs.dispatchModalForm.title = "派工";
+        this.$refs.dispatchModalForm.disableSubmit = false;
+      },
+      test() {
+        console.log(this.$refs);
+      }
     }
   }
 </script>
