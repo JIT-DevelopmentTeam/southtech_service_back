@@ -1,12 +1,12 @@
 <template>
   <div class="card">
-    <div :style="{ borderBottom: '1px solid #E9E9E9', height: '50px' }">
-      <a-row>
-        <a-col :span="8" style="margin-left: 10px;">
-          <a-button type="danger">关闭工单</a-button>
-        </a-col>
-      </a-row>
-    </div>
+<!--    <div :style="{ borderBottom: '1px solid #E9E9E9', height: '50px' }">-->
+<!--      <a-row>-->
+<!--        <a-col :span="8" style="margin-left: 10px;">-->
+<!--          <a-button type="danger">关闭工单</a-button>-->
+<!--        </a-col>-->
+<!--      </a-row>-->
+<!--    </div>-->
     <div class="content" @scroll="hscroll($event)">
       <a-spin :spinning="spinning">
         <div id="card" @click="cardClick(item)" v-for="(item, index) in showList" :key="index">
@@ -189,7 +189,7 @@
   }
 
   .content {
-    height: 450px;
+    height: 500px;
     overflow: auto;
   }
 </style>
