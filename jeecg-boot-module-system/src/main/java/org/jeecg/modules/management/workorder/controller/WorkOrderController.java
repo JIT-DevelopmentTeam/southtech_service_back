@@ -331,6 +331,15 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         }
         if (isFinish) {
             workOrder.setStatus("2");
+            QueryWrapper<WorkOrderProgress> workOrderProgressQueryWrapper = new QueryWrapper<>();
+            workOrderProgressQueryWrapper.eq("work_order_id",workOrder.getId());
+            List<WorkOrderProgress> workOrderProgressesList = workOrderProgressService.list(workOrderProgressQueryWrapper);
+            for (int i = 0; i < workOrderProgressesList.size(); i++) {
+                if (i == 1) {
+                    workOrderProgressesList.get(i).setFinishTime(new Date());
+                    workOrderProgressService.updateById(workOrderProgressesList.get(i));
+                }
+            }
             workOrderService.updateById(workOrder);
         }
 	    return Result.ok("派工成功!");
