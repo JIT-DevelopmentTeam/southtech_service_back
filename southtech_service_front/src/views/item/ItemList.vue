@@ -261,7 +261,7 @@
           title: '同步物料信息',
           content: `同步需要时间,您确定要同步吗?`,
           onOk: () => {
-            //this.loading = true;
+            this.loading = true;
             var ws = new WebSocket('ws://localhost:8080');
             
             getAction(this.url.syncUrl)
@@ -278,7 +278,7 @@
                 this.$message.error("请求超时");
               })
               .finally(() => {
-               // this.loading = false;
+                this.loading = false;
               })
           }
         })

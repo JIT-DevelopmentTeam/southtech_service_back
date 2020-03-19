@@ -233,19 +233,16 @@ public class ItemController extends JeecgController<Item, IItemService> {
                             break;
                     }
                 }
-                ThreadRunItem threadRunItem1 = new ThreadRunItem(dataArray,saveMethod,service,this);
-                ThreadRunItem threadRunItem2 = new ThreadRunItem(dataArray,saveMethod,service,this);
-                ThreadRunItem threadRunItem3 = new ThreadRunItem(dataArray,saveMethod,service,this);
-                ThreadRunItem threadRunItem4 = new ThreadRunItem(dataArray,saveMethod,service,this);
-                ThreadRunItem threadRunItem5 = new ThreadRunItem(dataArray,saveMethod,service,this);
-                System.out.println("======>>开始:"+ DateUtils.formatDateTime());
+                ThreadRunItem threadRunItem1 = new ThreadRunItem(itemArray1,saveMethod,service,this);
+                ThreadRunItem threadRunItem2 = new ThreadRunItem(itemArray2,saveMethod,service,this);
+                ThreadRunItem threadRunItem3 = new ThreadRunItem(itemArray3,saveMethod,service,this);
+                ThreadRunItem threadRunItem4 = new ThreadRunItem(itemArray4,saveMethod,service,this);
+                ThreadRunItem threadRunItem5 = new ThreadRunItem(itemArray5,saveMethod,service,this);
                 threadRunItem1.run();
                 threadRunItem2.run();
                 threadRunItem3.run();
                 threadRunItem4.run();
                 threadRunItem5.run();
-
-                System.out.println("======>>结束:"+DateUtils.formatDateTime());
             } else {
                 // 增量同步
                 saveItemBatch(dataArray,saveMethod,list,service);
@@ -282,8 +279,8 @@ public class ItemController extends JeecgController<Item, IItemService> {
                 e.printStackTrace();
             }
             list.add(obj);
-            if (i % 10000 == 0 || i == dataArray.size() - 1) {
-                service.saveBatch(list, 10000);
+            if (i > 0 && i % 5000 == 0 || i == dataArray.size() - 1) {
+                service.saveBatch(list, 5000);
                 list.clear();
             }
         }
