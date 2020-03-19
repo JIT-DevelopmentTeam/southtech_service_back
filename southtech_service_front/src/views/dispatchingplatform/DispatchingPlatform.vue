@@ -101,12 +101,12 @@
           getAction(this.url.listTaskByEngineer, null).then((res) => {
             if (res.success) {
               this.tasks.data = res.result;
-              console.log(this.$refs.myGantt.$refs.gantt.gantt)
-              this.$refs.myGantt.$refs.gantt.gantt.refreshData();
+              gantt.init(this.$refs.myGantt.$refs.gantt);
+              gantt.parse(this.tasks);
             } else {
               this.$message.error(res.message);
             }
-          });
+          })
         }
       },
       loadDict(type) {

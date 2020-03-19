@@ -262,6 +262,8 @@
           content: `同步需要时间,您确定要同步吗?`,
           onOk: () => {
             this.loading = true;
+            var ws = new WebSocket('ws://localhost:8080');
+            
             getAction(this.url.syncUrl)
               .then(res => {
                 if (res.success) {

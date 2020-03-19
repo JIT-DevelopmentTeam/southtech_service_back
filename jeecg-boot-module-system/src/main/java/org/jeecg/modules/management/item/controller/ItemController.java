@@ -8,15 +8,18 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.HttpHelper;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.management.BaseEntity;
 import org.jeecg.modules.management.erp.erpinterface.ERPInterfaceConstant;
 import org.jeecg.modules.management.item.entity.Item;
 import org.jeecg.modules.management.item.service.IItemService;
+import org.jeecg.modules.management.item.thread.ThreadRunItem;
 import org.jeecg.modules.management.itemclass.entity.ItemClass;
 import org.jeecg.modules.management.itemclass.service.IItemClassService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +28,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -200,15 +205,48 @@ public class ItemController extends JeecgController<Item, IItemService> {
 			List<T> list = new ArrayList<>();
 			JSONObject jsonObject = HttpHelper.httpGet(url);
 			JSONArray dataArray = jsonObject.getJSONArray("data");
-			for (int i = 0; i < dataArray.size(); i++) {
-				JSONObject data = dataArray.getJSONObject(i);
-				T obj = (T) saveMethod.invoke(this, data);
-				list.add(obj);
-				if (i % 10000 == 0 || i == dataArray.size() - 1) {
-					service.saveBatch(list, 10000);
-					list.clear();
-				}
-			}
+            if (dataList.isEmpty() && "2".equals(syncType) && dataArray.size() > 10000) {
+                // 首次同步
+                JSONArray itemArray1 = new JSONArray();
+                JSONArray itemArray2 = new JSONArray();
+                JSONArray itemArray3 = new JSONArray();
+                JSONArray itemArray4 = new JSONArray();
+                JSONArray itemArray5 = new JSONArray();
+                // 数据拆分五个数组
+                for (int i = 0; i < dataArray.size(); i++) {
+                    int remainder = i % 5;
+                    switch (remainder) {
+                        case 0 :
+                            itemArray1.add(dataArray.get(i));
+                            break;
+                        case 1:
+                            itemArray2.add(dataArray.get(i));
+                            break;
+                        case 2:
+                            itemArray3.add(dataArray.get(i));
+                            break;
+                        case 3:
+                            itemArray4.add(dataArray.get(i));
+                            break;
+                        case 4:
+                            itemArray5.add(dataArray.get(i));
+                            break;
+                    }
+                }
+                ThreadRunItem threadRunItem1 = new ThreadRunItem(itemArray1,saveMethod,service,this);
+                ThreadRunItem threadRunItem2 = new ThreadRunItem(itemArray2,saveMethod,service,this);
+                ThreadRunItem threadRunItem3 = new ThreadRunItem(itemArray3,saveMethod,service,this);
+                ThreadRunItem threadRunItem4 = new ThreadRunItem(itemArray4,saveMethod,service,this);
+                ThreadRunItem threadRunItem5 = new ThreadRunItem(itemArray5,saveMethod,service,this);
+                threadRunItem1.run();
+                threadRunItem2.run();
+                threadRunItem3.run();
+                threadRunItem4.run();
+                threadRunItem5.run();
+            } else {
+                // 增量同步
+                saveItemBatch(dataArray,saveMethod,list,service);
+            }
 		} catch (Exception e) {
 			e.printStackTrace();
 			String msg = "";
@@ -225,6 +263,28 @@ public class ItemController extends JeecgController<Item, IItemService> {
 		}
 		return "同步成功";
 	}
+
+    /**
+     * 批量储存商品
+     */
+	private void saveItemBatch(JSONArray dataArray,Method saveMethod,List list,IService service) {
+        for (int i = 0; i < dataArray.size(); i++) {
+            JSONObject data = dataArray.getJSONObject(i);
+            T obj = null;
+            try {
+                obj = (T) saveMethod.invoke(this, data);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            list.add(obj);
+            if (i > 0 && i % 5000 == 0 || i == dataArray.size() - 1) {
+                service.saveBatch(list, 5000);
+                list.clear();
+            }
+        }
+    }
 
 	// 物料信息保存方法
 	public Item saveItem(JSONObject data) {
