@@ -20,8 +20,7 @@
         ic_work_order workOrder
         LEFT JOIN tb_client client ON workOrder.client_id = client.id
         WHERE
-        <!--workOrder.status = '1'-->
-        1=1
+        workOrder.status = '1'
         <if test="type != null and type != ''">
             AND workOrder.type = #{type}
         </if>

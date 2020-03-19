@@ -96,17 +96,20 @@
         var loading = false;
         //滚动条到底部的条件
         if (scrollTop + windowHeight == scrollHeight) {
-          if (loading) return;
-          loading = true;
-          this.spinning = true;
-          //写后台加载数据的函数
-          console.log("距顶部" + scrollTop + "可视区高度" + windowHeight + "滚动条总高度" + scrollHeight);
-          setTimeout(() => {
-            this.pageNo += 1;
-            this.loadData(this.pageNo);
-            loading = false;
-            this.spinning = false;
-          }, 2000)
+          if (this.total != this.dataSource.length) {
+            if (loading) return;
+            loading = true;
+            this.spinning = true;
+            //写后台加载数据的函数
+            console.log("距顶部" + scrollTop + "可视区高度" + windowHeight + "滚动条总高度" + scrollHeight);
+            setTimeout(() => {
+              this.pageNo += 1;
+              this.loadData(this.pageNo);
+              loading = false;
+              this.spinning = false;
+            }, 2000)
+          }
+
         }
       },
       loadData(pageNo) {
