@@ -9,6 +9,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
@@ -60,7 +62,7 @@ public class ItemClassController extends JeecgController<ItemClass, IItemClassSe
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
-		if(oConvertUtils.isEmpty(itemClass.getPid())){
+		if(StringUtils.isBlank(itemClass.getPid())){
 			itemClass.setPid("0");
 		}
 		QueryWrapper<ItemClass> queryWrapper = QueryGenerator.initQueryWrapper(itemClass, req.getParameterMap());

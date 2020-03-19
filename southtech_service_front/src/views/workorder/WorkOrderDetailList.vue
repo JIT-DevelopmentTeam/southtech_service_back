@@ -4,7 +4,6 @@
     <div class="table-operator">
       <!-- <a-button v-if="mainId" @click="handleAdd" type="primary" icon="plus">新增</a-button> -->
       <a-button type="primary" v-if="selectedRowKeys.length > 0" v-has="'workOrder:dispatch'" @click="dispatch" icon="select">派工</a-button>
-      <a-button type="primary" @click="test">测试</a-button>
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
@@ -239,9 +238,6 @@
         this.$refs.dispatchModalForm.title = "派工";
         this.$refs.dispatchModalForm.disableSubmit = false;
       },
-      test() {
-        console.log(this.$refs);
-      }
     }
   }
 </script>
