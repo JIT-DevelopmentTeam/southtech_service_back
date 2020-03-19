@@ -71,6 +71,7 @@
         ticListUrl: '/workorder/workOrder/queryWorkOrderList',
         ticketList: [],
         spinning: false,
+        total: 0
       }
     },
     mounted() {
@@ -108,28 +109,38 @@
         var scrollHeight = e.target.scrollHeight;
         var loading = false;
         //滚动条到底部的条件
-        if (scrollTop + windowHeight == scrollHeight) {
-          if (loading) return;
-          loading = true;
-          this.spinning = true;
-          //写后台加载数据的函数
-          console.log("距顶部" + scrollTop + "可视区高度" + windowHeight + "滚动条总高度" + scrollHeight);
-          setTimeout(() => {
-            this.pageNo += 1;
-            this.loadTicket(this.orderType, this.pageNo);
-            loading = false;
-            this.spinning = false;
-          }, 2000)
+        if (scrollTop + windowHeight === scrollHeight && scrollTop !== 0) {
+          if (this.total != this.showList.length) {
+            if (loading) return;
+            loading = true;
+            this.spinning = true;
+            //写后台加载数据的函数
+            console.log("距顶部" + scrollTop + "可视区高度" + windowHeight + "滚动条总高度" + scrollHeight);
+            setTimeout(() => {
+              this.pageNo += 1;
+              this.loadTicket(this.orderType, this.pageNo);
+              loading = false;
+              this.spinning = false;
+            }, 2000)
+          }
+
         }
       },
       loadTicket(type, pageNo) {
-        getAction(this.ticListUrl, {type: type, pageNo: pageNo})
+        this.pageNo = pageNo;
+        getAction(this.ticListUrl, {type: type, pageNo: this.pageNo})
           .then(res => {
-            console.log(res)
-            let result = res.result.records
+            if (res.success) {
+              console.log(res)
+              this.total = res.result.total;
+              let result = res.result.records;
               result.forEach(item => {
                 this.ticketList.push(item);
               })
+            }
+            if(res.code===510){
+              this.$message.warning(res.message)
+            }
           })
       }
     },

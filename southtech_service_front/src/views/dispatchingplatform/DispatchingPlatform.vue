@@ -21,7 +21,7 @@
       <a-divider style="margin: 0 0 !important;"/>
       <a-layout>
         <a-layout-sider v-show="value == 1">
-          <list-card v-model="selectdWorkOrder" :orderType="orderType"></list-card>
+          <list-card v-model="selectdWorkOrder" ref="workOrderList" :orderType="orderType"></list-card>
         </a-layout-sider>
         <a-divider type="vertical" style="margin: 0 0 !important;"/>
         <a-layout-sider v-show="value == 1">
@@ -94,6 +94,8 @@
       handleChange(value) {
         console.log(`selected ${value}`);
         this.orderType = value ? value : '';
+        this.$refs.workOrderList.ticketList = [];
+        this.$refs.workOrderList.loadTicket(this.orderType, 1);
       },
       onChange(e) {
         console.log('radio checked', e.target.value);
