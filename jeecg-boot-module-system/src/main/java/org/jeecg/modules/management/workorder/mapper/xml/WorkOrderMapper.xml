@@ -2,4 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.management.workorder.mapper.WorkOrderMapper">
 
+    <select id="queryListByType" resultType="org.jeecg.modules.management.workorder.vo.WorkOrderDTO">
+        SELECT
+        workOrder.id AS "id",
+        workOrder.type AS "type",
+        workOrder.declaration_time AS "declarationTime",
+        workOrder.emergency_level AS "emergencyLevel",
+        client.name AS "clientName",
+        client.province AS "province",
+        client.city AS "city",
+        client.area AS "area",
+        client.community AS "community",
+        client.address AS "address",
+        client.longitude AS "longitude",
+        client.latitude AS "latitude"
+        FROM
+        ic_work_order workOrder
+        LEFT JOIN tb_client client ON workOrder.client_id = client.id
+        WHERE
+        <!--workOrder.status = '1'-->
+        1=1
+        <if test="type != null and type != ''">
+            AND workOrder.type = #{type}
+        </if>
+    </select>
+
 </mapper>

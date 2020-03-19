@@ -1,9 +1,11 @@
 package org.jeecg.modules.management.workorder.service;
 
-import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
-import org.jeecg.modules.management.workorder.entity.WorkOrder;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jeecg.modules.management.workorder.entity.WorkOrder;
+import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
+import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -39,4 +41,10 @@ public interface IWorkOrderService extends IService<WorkOrder> {
     public void updateMain(WorkOrder workOrder,List<WorkOrderDetail> workOrderDetailList);
 
 
+	/**
+	 * 查询出所有待分派的工单（过滤条件：type）
+	 * @param type
+	 * @return
+	 */
+	Page<WorkOrderDTO> queryListByType(Page<WorkOrderDTO> page, String type);
 }

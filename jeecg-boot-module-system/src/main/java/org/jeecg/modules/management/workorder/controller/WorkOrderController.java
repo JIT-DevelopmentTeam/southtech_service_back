@@ -1,41 +1,39 @@
 package org.jeecg.modules.management.workorder.controller;
 
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.SecurityUtils;
-import org.jeecg.common.system.query.QueryGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
-import org.jeecg.common.system.base.controller.JeecgController;
+import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.system.base.controller.JeecgController;
+import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.management.client.entity.Client;
 import org.jeecg.modules.management.client.service.IClientService;
+import org.jeecg.modules.management.workorder.entity.WorkOrder;
+import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
 import org.jeecg.modules.management.workorder.entity.WorkOrderProgress;
+import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderProgressService;
+import org.jeecg.modules.management.workorder.service.IWorkOrderService;
+import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 import org.jeecg.modules.management.workorder.vo.WorkOrderPage;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-
-import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
-import org.jeecg.modules.management.workorder.entity.WorkOrder;
-import org.jeecg.modules.management.workorder.service.IWorkOrderService;
-import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
 
 
 /**
@@ -353,5 +351,17 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 
      /*--------------------------------子表处理-工单进度-end----------------------------------------------*/
 
+
+    @GetMapping(value = "/queryWorkOrderList")
+    public Result<Page<WorkOrderDTO>> queryWorkOrderList(WorkOrderDTO workOrderDTO, @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+                                        @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+                                        HttpServletRequest req) {
+        Result<Page<WorkOrderDTO>> result = new Result<>();
+        Page<WorkOrderDTO> pageList = new Page<>(pageNo, pageSize);
+        pageList = workOrderService.queryListByType(pageList, req.getParameter("type"));
+        result.setSuccess(true);
+        result.setResult(pageList);
+        return result;
+    }
 
 }

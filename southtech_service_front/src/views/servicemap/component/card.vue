@@ -61,7 +61,8 @@
         pageSize: 10,
         columns: [],
         dataSource: [],
-        spinning: false
+        spinning: false,
+        total: 0
       }
     },
     methods: {
@@ -112,6 +113,7 @@
         getAction(this.url.list, {pageNo: pageNo})
           .then(res => {
             if (res.success) {
+              this.total = res.result.total;
               let list = res.result.records;
               list.forEach(item => {
                 this.dataSource.push(item);
