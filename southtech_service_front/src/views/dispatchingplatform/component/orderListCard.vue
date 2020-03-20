@@ -3,9 +3,11 @@
     <template slot="content">
       <div style="width: 110px; height: 200px; overflow: auto;">
         <a-radio-group @change="onChange" v-model="radioValue">
-          <a-radio :style="radioStyle" :value="1">欧阳呐呐</a-radio>
-          <a-radio :style="radioStyle" :value="2">张三</a-radio>
-          <a-radio :style="radioStyle" :value="3">你好呀</a-radio>
+          <a-radio :style="radioStyle" :value="item.id" v-for="(item, index) in enginerList" :key="index">{{ item.realname }}</a-radio>
+
+<!--          <a-radio :style="radioStyle" :value="1">欧阳呐呐</a-radio>-->
+<!--          <a-radio :style="radioStyle" :value="2">张三</a-radio>-->
+<!--          <a-radio :style="radioStyle" :value="3">你好呀</a-radio>-->
         </a-radio-group>
       </div>
       <a-divider/>
@@ -142,7 +144,10 @@
       },
       orderType: {
         type: String
-      }
+      },
+      enginerList: {
+        type: Array
+      },
     },
     methods: {
       onChange(e) {
@@ -151,11 +156,14 @@
       },
       // ------------------------------------------
       cardClick(item) {
+
         this.radioValue = 1;
+
         this.visible = false;
         setTimeout(function () {
           this.visible = true;
         }, 500)
+
         this.activeItem = item;
         this.$emit('input', item)
       },
@@ -200,7 +208,6 @@
         getAction(this.ticListUrl, {type: type, pageNo: this.pageNo})
           .then(res => {
             if (res.success) {
-              console.log(res)
               this.total = res.result.total;
               let result = res.result.records;
               result.forEach(item => {
@@ -220,9 +227,18 @@
         }
         return this.ticketList.filter(e => e.type === this.orderType);
       },
+      sortEnginer(cusLngLat) {
+        let enginerList = this.enginerList;
+        for (let i = 0; i < enginerList.length; i++) {
+
+        }
+      }
     },
     created() {
       this.loadTicket('', this.pageNo);
+      var p1 = [116.434027, 39.941037];
+      var p2 = [116.461665, 39.941564];
+      console.log(AMap.GeometryUtil.distance(p1,p2))
     }
   }
 </script>

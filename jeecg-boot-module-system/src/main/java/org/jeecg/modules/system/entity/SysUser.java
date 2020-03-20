@@ -158,33 +158,6 @@ public class SysUser implements Serializable {
      * 同步工作流引擎1同步0不同步
      */
     private String activitiSync;
-    /**
-     * 省
-     */
-    private String province;
-    /**
-     * 市
-     */
-    private String city;
-    /**
-     * 区
-     */
-    private String area;
-    /**
-     * 镇
-     */
-    private String community;
-    /**
-     * 详细地址
-     */
-    private String address;
-    /**
-     * 经度
-     */
-    private Double longitude;
-    /**
-     * 纬度
-     */
-    private Double latitude;
+
 
 }
