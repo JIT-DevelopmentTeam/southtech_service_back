@@ -118,7 +118,7 @@
             }
           },
           {
-            title:'设备编号',
+            title:'设备档案',
             align:"center",
             dataIndex:"deviceNumber",
             customRender:(text)=>{

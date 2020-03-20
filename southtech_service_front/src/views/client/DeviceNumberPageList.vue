@@ -43,9 +43,9 @@
     <!-- 查询区域-END -->
     
     <!-- 操作按钮区域 -->
-    <!-- <div class="table-operator">
-      <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-    </div> -->
+    <div class="table-operator">
+       <a-button @click="synchronizeDeviceNumber" v-has="'deviceNumber:synchronize'" type="primary" icon="cloud-download">同步</a-button>
+    </div>
 
     <!-- table区域-begin -->
     <div>
@@ -127,7 +127,7 @@
     },
     data () {
       return {
-        description: '设备编号管理页面',
+        description: '设备档案管理页面',
         // 表头
         columns: [
           {
@@ -178,6 +178,7 @@
           list: "/client/client/listDeviceNumberByMainId",
           delete: "/client/client/deleteDeviceNumber",
           deleteBatch: "/client/client/deleteBatchDeviceNumber",
+          synchronizeDeviceNumber: '/client/client/synchronizeDeviceNumber'
         },
         dictOptions:{
          clientId:[]
@@ -252,6 +253,24 @@
           }
           this.loading = false;
         })
+      },
+      synchronizeDeviceNumber() {
+        this.$confirm({
+          title:'同步设备档案',
+          content:'同步设备档案需要时间,您确定要同步吗?(注:同步前请确认已同步客户信息!)',
+          onOk:() => {
+            this.loading = true;
+            getAction(this.url.synchronizeDeviceNumber,null).then((res) => {
+              if (res.success) {
+                this.$message.success(res.message);
+                this.loadData();
+              } else {
+                this.$message.console.error(res.message);
+              }
+              this.loading = true;
+            });
+          }
+        });
       }
     }
   }

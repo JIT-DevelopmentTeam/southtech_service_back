@@ -165,7 +165,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
             if (clientList.isEmpty()) {
                 jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_CLIENT_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",""));
             } else {
-                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_CLIENT_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",clientList.get(0).getModifyTime().getTime()+""));
+                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_CLIENT_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",clientList.get(0).getModifytime().getTime()+""));
             }
             JSONArray dataArray = jsonObject.getJSONArray("data");
             DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -176,7 +176,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
                 client.setName(data.getString("FName"));
                 client.setType("1");
                 client.setCreateTime(dataFormat.parse(data.getString("FRegDate")));
-                client.setModifyTime(data.getTimestamp("FModifyTime"));
+                client.setModifytime(data.getTimestamp("FModifyTime"));
                 clientService.save(client);
                 // TODO ERP联系人
             }

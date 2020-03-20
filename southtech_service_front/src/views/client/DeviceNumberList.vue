@@ -2,7 +2,6 @@
   <a-card :bordered="false" :class="'cust-erp-sub-tab'">
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <!-- <a-button v-if="mainId" @click="synchronizeDeviceNumber" v-has="'deviceNumber:synchronize'" type="primary" icon="cloud-download">同步</a-button> -->
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
@@ -149,6 +148,7 @@
           list: "/client/client/listDeviceNumberByMainId",
           delete: "/client/client/deleteDeviceNumber",
           deleteBatch: "/client/client/deleteBatchDeviceNumber",
+          
         },
         dictOptions:{
          type:[],
