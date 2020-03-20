@@ -21,11 +21,8 @@
       <a-divider style="margin: 0 0 !important;"/>
       <a-layout>
         <a-layout-sider v-show="value == 1">
-          <list-card v-model="selectdWorkOrder" ref="workOrderList" :orderType="orderType"></list-card>
-        </a-layout-sider>
-        <a-divider type="vertical" style="margin: 0 0 !important;"/>
-        <a-layout-sider v-show="value == 1">
-          <!--          <list-card :list="ticketList"></list-card>-->
+          <order-list-card v-model="selectdWorkOrder" ref="workOrderList" :orderType="orderType"
+                           :enginerList="enginerMarkers"></order-list-card>
         </a-layout-sider>
         <a-divider type="vertical" style="margin: 0 0 !important;"/>
         <a-layout>
@@ -33,7 +30,7 @@
             <el-amap vid="dispathingmap" :zoom="zoom" :plugin="plugin" :center="center" :amap-manager="amapManager">
               <el-amap-marker v-for="(eitem, index) in enginerMarkers" :key="index"
                               :position="[eitem.longitude,eitem.latitude]"
-                              :vid="index" :title="eitem.name" :clickable="true" :icon="enginerIcon"
+                              :vid="index" :title="'工程师：' + eitem.realname" :clickable="true" :icon="enginerIcon"
                               :offset="[-16, -30]"></el-amap-marker>
 
               <el-amap-marker v-if="JSON.stringify(this.selectdWorkOrder) != '{}'"
@@ -84,11 +81,12 @@
         url: {
           listTaskByEngineer: "/gantttask/gantttask/listTaskByEngineer",
           dictList: '/sys/dict/getDictItems/',
+          enginerList: '/sys/user/enginerList'
         }
       }
     },
     components: {
-      listCard: () => import('./component/listCard')
+      orderListCard: () => import('./component/orderListCard')
     },
     methods: {
       handleChange(value) {
@@ -122,10 +120,21 @@
             }
           })
       },
+      loadEnginer() {
+        getAction(this.url.enginerList)
+          .then(res => {
+            if (res.success) {
+              this.enginerMarkers = res.result.records
+            }
+            if (res.code === 510) {
+              this.$message.warning(res.message)
+            }
+          })
+      }
     },
     created() {
-      this.loadDict('work_order_type')
-      console.log(JSON.stringify(this.selectdWorkOrder) == '{}')
+      this.loadDict('work_order_type');
+      this.loadEnginer();
     }
   }
 </script>

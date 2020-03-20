@@ -930,22 +930,7 @@ public class SysUserController {
         SysRole role = sysRoleService.getOne(queryWrapperRole);
         Page<SysUser> page = new Page<SysUser>(pageNo, pageSize);
         IPage<SysUser> pageList = sysUserService.getUserByRoleId(page, role.getId(), null);
-        List<Map<String, Object>> mapList = new ArrayList<>();
-        for (int i = 0; i < pageList.getRecords().size(); i++) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("name", pageList.getRecords().get(i).getRealname());
-            map.put("longitude", "");
-            map.put("latitude", "");
-            map.put("province", "");
-            map.put("city", "");
-            map.put("area", "");
-            map.put("community", "");
-            map.put("address", "");
-            mapList.add(map);
-        }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("records", mapList);
-        return Result.ok(jsonObject);
+        return Result.ok(pageList);
     }
 
 }
