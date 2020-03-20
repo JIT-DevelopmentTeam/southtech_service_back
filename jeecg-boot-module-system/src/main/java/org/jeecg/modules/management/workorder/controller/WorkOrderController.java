@@ -28,6 +28,8 @@ import org.jeecg.modules.management.workorder.service.IWorkOrderProgressService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
 import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 import org.jeecg.modules.management.workorder.vo.WorkOrderPage;
+import org.jeecg.modules.message.entity.SysMessageTemplate;
+import org.jeecg.modules.message.service.ISysMessageTemplateService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.BeanUtils;
@@ -69,6 +71,9 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 
      @Autowired
      private ISysUserService sysUserService;
+
+     @Autowired
+     private ISysMessageTemplateService sysMessageTemplateService;
 
      @Autowired
      private RedisUtil redisUtil;
@@ -309,6 +314,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                                                   String peers) {
         String[] idsArray = workOrderDetailIds.split(",");
         LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        SysUser serviceEngineer = sysUserService.getUserByName(serviceEngineerName);
         WorkOrder workOrder = null;
         boolean hasSeccess = false;
         for (String id : idsArray) {
@@ -332,23 +338,34 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             workOrderDetail.setAssignedTime(DateUtils.getDate());
             workOrderDetailService.updateById(workOrderDetail);
         }
+        // 钉钉发起待办
         if (hasSeccess) {
-            DingTalkClient client = new DefaultDingTalkClient(DingTalkConstant.ADD_WORK_RECORD_URL);
-            OapiWorkrecordAddRequest req = new OapiWorkrecordAddRequest();
-            req.setUserid("manager7078");
-            req.setCreateTime(System.currentTimeMillis());
-            req.setTitle("测试");
-            req.setUrl("https://www.baidu.com");
-            List<OapiWorkrecordAddRequest.FormItemVo> list2 = new ArrayList<>();
-            OapiWorkrecordAddRequest.FormItemVo obj3 = new OapiWorkrecordAddRequest.FormItemVo();
-            list2.add(obj3);
-            obj3.setTitle("标题");
-            obj3.setContent("内容");
-            req.setFormItemList(list2);
-            try {
-                OapiWorkrecordAddResponse rsp = client.execute(req, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
-            } catch (ApiException e) {
-                e.printStackTrace();
+            Client client = clientService.getById(workOrder.getClientId());
+            List<SysMessageTemplate> messageTemplateList = sysMessageTemplateService.selectByCode("dingTalk_dispatch_remind");
+            if (!messageTemplateList.isEmpty()) {
+                DingTalkClient dingTalkClient = new DefaultDingTalkClient(DingTalkConstant.ADD_WORK_RECORD_URL);
+                OapiWorkrecordAddRequest req = new OapiWorkrecordAddRequest();
+                req.setUserid(serviceEngineer.getEnterpriseId());
+                req.setCreateTime(System.currentTimeMillis());
+                req.setTitle("待办");
+                // TODO 跳转应用
+                req.setUrl("https://www.baidu.com");
+                List<OapiWorkrecordAddRequest.FormItemVo> list2 = new ArrayList<>();
+                OapiWorkrecordAddRequest.FormItemVo obj3 = new OapiWorkrecordAddRequest.FormItemVo();
+                list2.add(obj3);
+                obj3.setTitle(messageTemplateList.get(0).getTemplateName());
+                obj3.setContent(messageTemplateList.get(0).getTemplateContent().replace("${clientServiceName}",loginUser.getRealname()).replace("${clientName}",client.getName()));
+                req.setFormItemList(list2);
+                try {
+                    OapiWorkrecordAddResponse rsp = dingTalkClient.execute(req, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
+                    if (rsp.isSuccess()) {
+                        log.info("钉钉派单待办提醒发送成功!");
+                    } else {
+                        log.info("钉钉派单待办提醒发送失败,错误码:"+rsp.getCode()+",错误信息:"+rsp.getErrmsg());
+                    }
+                } catch (ApiException e) {
+                    e.printStackTrace();
+                }
             }
         }
         List<WorkOrderDetail> workOrderDetailList = workOrderDetailService.selectByMainId(workOrder.getId());
