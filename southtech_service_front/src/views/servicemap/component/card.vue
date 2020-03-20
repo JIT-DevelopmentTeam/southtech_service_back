@@ -17,7 +17,7 @@
                           style="line-height: 2; display: block; text-align: left; margin: 0 20px;">
           <a-list itemLayout="horizontal" :dataSource="dataSource" :split="false">
             <a-list-item slot="renderItem" slot-scope="item, index">
-              <a-checkbox :value="item.name">{{ item.name }}</a-checkbox>
+              <a-checkbox :value="item.name ? item.name : item.realname">{{ item.name ? item.name : item.realname }}</a-checkbox>
             </a-list-item>
           </a-list>
           <!--        <a-row v-for="(item, index) in list" :key="index">-->
@@ -69,14 +69,14 @@
       onChange(checkedList) {
         this.indeterminate = !!checkedList.length && checkedList.length < this.dataSource.length;
         this.checkAll = checkedList.length === this.dataSource.length;
-        const selectList = this.dataSource.filter(e => checkedList.includes(e.name))
+        const selectList = this.dataSource.filter(e => checkedList.includes(e.name ? e.name : e.realname))
         this.$emit('input', selectList)
       },
       onCheckAllChange(e) {
         let list = this.dataSource
         let checkedList = []
         for (let i = 0; i < list.length; i++) {
-          checkedList.push(list[i].name)
+          checkedList.push(list[i].name ? list[i].name : list[i].realname)
         }
         Object.assign(this, {
           checkedList: e.target.checked ? checkedList : [],
