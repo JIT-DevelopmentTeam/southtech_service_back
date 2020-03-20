@@ -121,7 +121,6 @@
     },
     created() {
       this.loadDict('work_order_type')
-      console.log(JSON.stringify(this.selectdWorkOrder) == '{}')
     }
   }
 </script>
