@@ -21,11 +21,7 @@
       <a-divider style="margin: 0 0 !important;"/>
       <a-layout>
         <a-layout-sider v-show="value == 1">
-          <list-card v-model="selectdWorkOrder" ref="workOrderList" :orderType="orderType"></list-card>
-        </a-layout-sider>
-        <a-divider type="vertical" style="margin: 0 0 !important;"/>
-        <a-layout-sider v-show="value == 1">
-          <!--          <list-card :list="ticketList"></list-card>-->
+          <order-list-card v-model="selectdWorkOrder" ref="workOrderList" :orderType="orderType"></order-list-card>
         </a-layout-sider>
         <a-divider type="vertical" style="margin: 0 0 !important;"/>
         <a-layout>
@@ -88,7 +84,7 @@
       }
     },
     components: {
-      listCard: () => import('./component/listCard')
+      orderListCard: () => import('./component/orderListCard')
     },
     methods: {
       handleChange(value) {
