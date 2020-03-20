@@ -3,6 +3,11 @@ package org.jeecg.modules.management.workorder.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dingtalk.api.DefaultDingTalkClient;
+import com.dingtalk.api.DingTalkClient;
+import com.dingtalk.api.request.OapiWorkrecordAddRequest;
+import com.dingtalk.api.response.OapiWorkrecordAddResponse;
+import com.taobao.api.ApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -11,6 +16,8 @@ import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.DateUtils;
+import org.jeecg.common.util.RedisUtil;
+import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.management.client.entity.Client;
 import org.jeecg.modules.management.client.service.IClientService;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
@@ -62,6 +69,9 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 
      @Autowired
      private ISysUserService sysUserService;
+
+     @Autowired
+     private RedisUtil redisUtil;
 
 
 	/*---------------------------------主表处理-begin-------------------------------------*/
@@ -300,12 +310,14 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         String[] idsArray = workOrderDetailIds.split(",");
         LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         WorkOrder workOrder = null;
+        boolean hasSeccess = false;
         for (String id : idsArray) {
             WorkOrderDetail workOrderDetail = workOrderDetailService.getById(id);
             workOrder = workOrderService.getById(workOrderDetail.getWorkOrderId());
             if (!StringUtils.equals("1",workOrder.getStatus())){
                 return Result.error("派工失败,请检查工单状态是否为待分派!");
             }
+            hasSeccess = true;
             workOrderDetail.setServiceEngineerName(serviceEngineerName);
             try {
                 workOrderDetail.setDispatchTime(DateUtils.parseDate(dispatchTime,"yyyy-MM-dd HH:mm:ss"));
@@ -319,7 +331,25 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             workOrderDetail.setAssigneeName(loginUser.getUsername());
             workOrderDetail.setAssignedTime(DateUtils.getDate());
             workOrderDetailService.updateById(workOrderDetail);
-
+        }
+        if (hasSeccess) {
+            DingTalkClient client = new DefaultDingTalkClient(DingTalkConstant.ADD_WORK_RECORD_URL);
+            OapiWorkrecordAddRequest req = new OapiWorkrecordAddRequest();
+            req.setUserid("manager7078");
+            req.setCreateTime(System.currentTimeMillis());
+            req.setTitle("测试");
+            req.setUrl("https://www.baidu.com");
+            List<OapiWorkrecordAddRequest.FormItemVo> list2 = new ArrayList<>();
+            OapiWorkrecordAddRequest.FormItemVo obj3 = new OapiWorkrecordAddRequest.FormItemVo();
+            list2.add(obj3);
+            obj3.setTitle("标题");
+            obj3.setContent("内容");
+            req.setFormItemList(list2);
+            try {
+                OapiWorkrecordAddResponse rsp = client.execute(req, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
+            } catch (ApiException e) {
+                e.printStackTrace();
+            }
         }
         List<WorkOrderDetail> workOrderDetailList = workOrderDetailService.selectByMainId(workOrder.getId());
         boolean isFinish = true;

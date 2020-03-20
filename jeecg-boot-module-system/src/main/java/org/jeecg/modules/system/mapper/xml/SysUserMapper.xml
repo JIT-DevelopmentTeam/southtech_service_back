@@ -97,4 +97,14 @@
 			#{id}
 		</foreach>
 	</update>
+
+    <!-- 批量删除非超级管理员用户 -->
+    <update id="deleteBatch" parameterType="String" >
+        delete from sys_user where
+          username != 'admin'
+        <if test="ids != null and ids != ''">
+            and id in (${ids})
+        </if>
+    </update>
+
 </mapper>

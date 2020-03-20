@@ -80,5 +80,9 @@ public class WorkOrder implements Serializable {
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private java.util.Date declarationTime;
+    /**附件*/
+    @Excel(name = "附件", width = 15)
+    private java.lang.String annex;
+
 
 }

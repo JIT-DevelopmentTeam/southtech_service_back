@@ -96,4 +96,11 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * @Description: 批量删除角色与权限关系
      */
 	void deleteBathRolePermissionRelation(@Param("roleIdArray") String[] roleIdArray);
+
+    /**
+     * 批量删除非admin用户
+     * @param ids
+     */
+	void deleteBatch(@Param("ids") String ids);
+
 }

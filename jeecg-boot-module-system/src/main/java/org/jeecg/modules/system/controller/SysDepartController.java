@@ -36,6 +36,7 @@ import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.model.DepartIdModel;
 import org.jeecg.modules.system.model.SysDepartTreeModel;
 import org.jeecg.modules.system.service.ISysDepartService;
+import org.jeecg.modules.system.service.ISysUserDepartService;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.system.util.FindsDepartsChildrenUtil;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
@@ -46,6 +47,7 @@ import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -76,6 +78,9 @@ public class SysDepartController {
 
     @Autowired
     private ISysUserService sysUserService;
+
+    @Autowired
+    private ISysUserDepartService sysUserDepartService;
 
     @Autowired
     private RedisUtil redisUtil;
@@ -399,8 +404,10 @@ public class SysDepartController {
                         delectIds.append(delectUser.getId()+",");
                     }
                     delectIds = delectIds.deleteCharAt(delectIds.length()-1);
-                    sysUserService.deleteBatchUsers(delectIds.toString());
+                    sysUserService.deleteBatch(delectIds.toString());
                 }
+                // 清除部门关系
+                sysUserDepartService.deleteAll();
             }
             if ("1".equals(departmentList.get(0).getId().toString())) {
                 departmentList.remove(0);
@@ -430,7 +437,6 @@ public class SysDepartController {
                 request.setHttpMethod("GET");
                 OapiUserSimplelistResponse userResponse = userClient.execute(request, accessToken);
                 List<OapiUserSimplelistResponse.Userlist> userList = userResponse.getUserlist();
-                List<SysUser> saveOrUpdateUserList = new ArrayList<>();
                 for (OapiUserSimplelistResponse.Userlist dingTalkUser : userList) {
                     DingTalkClient userDetailClient = new DefaultDingTalkClient(DingTalkConstant.USER_DETAIL_URL);
                     OapiUserGetRequest userDetailRequest = new OapiUserGetRequest();
@@ -451,25 +457,27 @@ public class SysDepartController {
                     userQueryWrapper.eq("enterprise_id",userDetailResponse.getUserid());
                     SysUser editUser = sysUserService.getOne(userQueryWrapper);
                     if (oConvertUtils.isEmpty(editUser)) {
-                        SysUser addUser = new SysUser();
-                        addUser.setUsername(userDetailResponse.getJobnumber());
-                        addUser.setRealname(userDetailResponse.getName());
-                        addUser.setEnterpriseId(userDetailResponse.getUserid());
-                        addUser.setSex(0);
-                        String salt = oConvertUtils.randomGen(8);
-                        addUser.setSalt(salt);
-                        String passwordEncode = PasswordUtil.encrypt(addUser.getUsername(), "123456", salt);
-                        addUser.setPassword(passwordEncode);
-                        addUser.setEmail(userDetailResponse.getEmail());
-                        addUser.setPhone(userDetailResponse.getMobile());
-                        addUser.setOrgCode(depart.getOrgCode());
-                        addUser.setStatus(Integer.parseInt(CommonConstant.STATUS_1));
-                        addUser.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
-                        addUser.setWorkNo(userDetailResponse.getJobnumber());
-                        addUser.setPost(userDetailResponse.getPosition());
-                        addUser.setActivitiSync(CommonConstant.ACT_SYNC_1);
-                        saveOrUpdateUserList.add(addUser);
-                        sysUserService.addUserWithDepart(addUser,departsMap);
+                        if (!StringUtils.isEmpty(userDetailResponse.getJobnumber())) {
+                            SysUser addUser = new SysUser();
+                            addUser.setUsername(userDetailResponse.getJobnumber());
+                            addUser.setRealname(userDetailResponse.getName());
+                            addUser.setEnterpriseId(userDetailResponse.getUserid());
+                            addUser.setSex(0);
+                            String salt = oConvertUtils.randomGen(8);
+                            addUser.setSalt(salt);
+                            String passwordEncode = PasswordUtil.encrypt(addUser.getUsername(), "123456", salt);
+                            addUser.setPassword(passwordEncode);
+                            addUser.setEmail(userDetailResponse.getEmail());
+                            addUser.setPhone(userDetailResponse.getMobile());
+                            addUser.setOrgCode(depart.getOrgCode());
+                            addUser.setStatus(Integer.parseInt(CommonConstant.STATUS_1));
+                            addUser.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
+                            addUser.setWorkNo(userDetailResponse.getJobnumber());
+                            addUser.setPost(userDetailResponse.getPosition());
+                            addUser.setActivitiSync(CommonConstant.ACT_SYNC_1);
+                            sysUserService.save(addUser);
+                            sysUserService.addUserWithDepart(addUser,departsMap);
+                        }
                     } else {
                         editUser.setRealname(userDetailResponse.getName());
                         editUser.setEmail(userDetailResponse.getEmail());
@@ -480,12 +488,9 @@ public class SysDepartController {
                         editUser.setWorkNo(userDetailResponse.getJobnumber());
                         editUser.setPost(userDetailResponse.getPosition());
                         editUser.setActivitiSync(CommonConstant.ACT_SYNC_1);
-                        saveOrUpdateUserList.add(editUser);
+                        sysUserService.updateById(editUser);
                         sysUserService.editUserWithDepart(editUser,departsMap);
                     }
-                }
-                if (!saveOrUpdateUserList.isEmpty()) {
-                    sysUserService.saveOrUpdateBatch(saveOrUpdateUserList);
                 }
             }
         } catch (ApiException e) {

@@ -6,4 +6,10 @@
 		FROM sys_user_depart
 		WHERE user_id = #{userId, jdbcType=VARCHAR}
     </select>
+
+    <delete id="deleteAll">
+        delete from sys_user_depart
+        where
+          dep_id != 'southtech'
+    </delete>
 </mapper>

@@ -1,5 +1,6 @@
 package org.jeecg.modules.management.itemclass.service.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.jeecg.common.exception.JeecgBootException;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.management.itemclass.entity.ItemClass;
@@ -21,7 +22,7 @@ public class ItemClassServiceImpl extends ServiceImpl<ItemClassMapper, ItemClass
 
 	@Override
 	public void addItemClass(ItemClass itemClass) {
-		if(oConvertUtils.isEmpty(itemClass.getPid())){
+		if(StringUtils.isBlank(itemClass.getPid())){
 			itemClass.setPid(IItemClassService.ROOT_PID_VALUE);
 		}else{
 			//如果当前节点父ID不为空 则设置父节点的hasChildren 为1
@@ -44,7 +45,7 @@ public class ItemClassServiceImpl extends ServiceImpl<ItemClassMapper, ItemClass
 		String new_pid = itemClass.getPid();
 		if(!old_pid.equals(new_pid)) {
 			updateOldParentNode(old_pid);
-			if(oConvertUtils.isEmpty(new_pid)){
+			if(StringUtils.isBlank(new_pid)){
 				itemClass.setPid(IItemClassService.ROOT_PID_VALUE);
 			}
 			if(!IItemClassService.ROOT_PID_VALUE.equals(itemClass.getPid())) {

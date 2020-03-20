@@ -336,4 +336,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		}
 		return result;
 	}
+
+	@Override
+    @Transactional
+    public void deleteBatch(String ids) {
+	    userMapper.deleteBatch(ids);
+    }
+
 }

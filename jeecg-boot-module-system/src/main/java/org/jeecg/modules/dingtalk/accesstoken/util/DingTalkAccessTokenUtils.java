@@ -34,7 +34,7 @@ public class DingTalkAccessTokenUtils {
             request.setHttpMethod("GET");
             OapiGettokenResponse response = client.execute(request);
             if (response.getErrcode() == 0) {
-                if (oConvertUtils.isEmpty(redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY))) {
+                if (redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY) == null) {
                     redisUtil.set(DingTalkConstant.ACCESS_TOKEN_KEY,response.getAccessToken(),response.getExpiresIn());
                 } else {
                     if (!redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString().equals(response.getAccessToken())) {

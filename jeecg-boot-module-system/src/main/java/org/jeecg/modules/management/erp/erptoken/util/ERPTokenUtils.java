@@ -28,7 +28,7 @@ public class ERPTokenUtils {
         try {
             JSONObject jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.GET_TOKEN_URL.replace("AUTHORIZATION",ERPInterfaceConstant.AUTHORIZATIONCODE));
             if (oConvertUtils.isNotEmpty(jsonObject.get("token"))) {
-                if (oConvertUtils.isEmpty(redisUtil.get(ERPInterfaceConstant.TOKEN_KEY))) {
+                if (redisUtil.get(ERPInterfaceConstant.TOKEN_KEY) == null) {
                     if (StringUtils.isNotBlank(jsonObject.getString("token"))) {
                         redisUtil.set(ERPInterfaceConstant.TOKEN_KEY,jsonObject.getString("token"),jsonObject.getLongValue("effective_Time"));
                     }

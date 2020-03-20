@@ -34,4 +34,6 @@ public interface ISysUserDepartService extends IService<SysUserDepart> {
 	 * @return
 	 */
 	List<SysUser> queryUserByDepId(String depId);
+
+	void deleteAll();
 }

@@ -179,4 +179,10 @@ public interface ISysUserService extends IService<SysUser> {
 	 */
 	Result checkUserIsEffective(SysUser sysUser);
 
+    /**
+     * 批量删除非admin用户
+     * @param ids
+     */
+	void deleteBatch(String ids);
+
 }
