@@ -153,6 +153,9 @@
     },
     methods: {
       modalFormOk() {
+        this.activeItem = {}
+        this.$emit('input', this.activeItem);
+        this.ticketList = [];
         this.pageNo = 1;
         this.loadTicket('', this.pageNo);
       },
