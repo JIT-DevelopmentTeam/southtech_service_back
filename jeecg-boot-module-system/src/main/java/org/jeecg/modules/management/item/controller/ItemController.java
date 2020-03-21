@@ -171,8 +171,8 @@ public class ItemController extends JeecgController<Item, IItemService> {
 	public Result<?> sync() {
     	String msg = "";
 		try {
-			msg = synchronization(ItemClass.class, itemClassService, ERPInterfaceConstant.LIST_ITEM_CLASS_URL, "1");
-			msg = synchronization(Item.class, itemService, ERPInterfaceConstant.LIST_ITEM_URL, "2");
+			msg = synchronization(ItemClass.class, itemClassService, ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.LIST_ITEM_CLASS_URL, "1");
+			msg = synchronization(Item.class, itemService, ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.LIST_ITEM_URL, "2");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Result.error(e.getMessage());

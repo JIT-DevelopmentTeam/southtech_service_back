@@ -116,7 +116,7 @@
 
     <a-tabs defaultActiveKey="1">
       <a-tab-pane tab="工单明细" key="1" >
-        <work-order-detail-list :mainId="selectedMainId" />
+        <work-order-detail-list :mainId="selectedMainId" :mainStatus="selectedMainStatus" @ok="loadData"/>
       </a-tab-pane>
       <a-tab-pane tab="工单进度" key="2" >
         <work-order-progress-page :mainId="selectedMainId" />
@@ -273,7 +273,7 @@
         /* 分页参数 */
         ipagination:{
           current: 1,
-          pageSize: 5,
+          pageSize: 10,
           pageSizeOptions: ['5', '10', '50'],
           showTotal: (total, range) => {
             return range[0] + "-" + range[1] + " 共" + total + "条"
@@ -282,8 +282,8 @@
           showSizeChanger: true,
           total: 0
         },
-        selectedMainId:''
-
+        selectedMainId:'',
+        selectedMainStatus:null
       }
     },
     computed: {
@@ -349,7 +349,10 @@
         this.selectedMainId=''
       },
       onSelectChange(selectedRowKeys, selectionRows) {
-        this.selectedMainId=selectedRowKeys[0]
+        this.selectedMainId=selectedRowKeys[0];
+        if (selectionRows[0]) {
+          this.selectedMainStatus=selectionRows[0].status;
+        }
         this.selectedRowKeys = selectedRowKeys;
         this.selectionRows = selectionRows;
       },
@@ -410,7 +413,6 @@
           }
         });
       }
-
     }
   }
 </script>

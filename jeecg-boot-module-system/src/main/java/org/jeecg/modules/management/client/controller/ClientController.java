@@ -163,9 +163,9 @@ public class ClientController extends JeecgController<Client, IClientService> {
         try {
             JSONObject jsonObject;
             if (clientList.isEmpty()) {
-                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_CLIENT_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",""));
+                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.LIST_CLIENT_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",""));
             } else {
-                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_CLIENT_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",clientList.get(0).getModifytime().getTime()+""));
+                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.LIST_CLIENT_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",clientList.get(0).getModifytime().getTime()+""));
             }
             JSONArray dataArray = jsonObject.getJSONArray("data");
             DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -370,9 +370,9 @@ public class ClientController extends JeecgController<Client, IClientService> {
 	    try {
             JSONObject jsonObject;
             if (deviceNumberList.isEmpty()) {
-                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_DEVICENUMBER_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",""));
+                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.LIST_DEVICENUMBER_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",""));
             } else {
-                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_DEVICENUMBER_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",deviceNumberList.get(0).getModifytime().getTime()+""));
+                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.LIST_DEVICENUMBER_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",deviceNumberList.get(0).getModifytime().getTime()+""));
             }
             JSONArray dataArray = jsonObject.getJSONArray("data");
             DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
