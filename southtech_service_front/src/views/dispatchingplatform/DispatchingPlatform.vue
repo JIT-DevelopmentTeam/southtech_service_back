@@ -28,17 +28,19 @@
         <a-layout>
           <div :style="{width: '100%', height: '100%'}" v-show="value == 1">
             <el-amap vid="dispathingmap" :zoom="zoom" :plugin="plugin" :center="center" :amap-manager="amapManager">
-              <el-amap-marker v-for="(eitem, index) in enginerMarkers" :key="index"
+              <el-amap-marker v-if="eitem.longitude != null && eitem.latitude != null"
+                              v-for="(eitem, index) in enginerMarkers" :key="index"
                               :position="[eitem.longitude,eitem.latitude]"
                               :vid="index" :title="'工程师：' + eitem.realname" :clickable="true" :icon="enginerIcon"
                               :offset="[-16, -30]"></el-amap-marker>
 
-              <el-amap-marker v-if="JSON.stringify(this.selectdWorkOrder) != '{}'"
-                              :position="[selectdWorkOrder.longitude,selectdWorkOrder.latitude]"
-                              :vid="selectdWorkOrder.id" :title="selectdWorkOrder.name" :clickable="true"
-                              :icon="customerIcon"
-                              :offset="[-16, -30]"
-                              animation="AMAP_ANIMATION_BOUNCE"></el-amap-marker>
+              <el-amap-marker
+                v-if="JSON.stringify(this.selectdWorkOrder) != '{}' && selectdWorkOrder.longitude != null && selectdWorkOrder.latitude != null"
+                :position="[selectdWorkOrder.longitude,selectdWorkOrder.latitude]"
+                :vid="selectdWorkOrder.id" :title="selectdWorkOrder.name" :clickable="true"
+                :icon="customerIcon"
+                :offset="[-16, -30]"
+                animation="AMAP_ANIMATION_BOUNCE"></el-amap-marker>
             </el-amap>
           </div>
           <div :style="{width: '100%', height: '100%'}" v-show="value == 2">
