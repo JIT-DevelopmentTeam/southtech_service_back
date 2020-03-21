@@ -94,6 +94,12 @@ public class SysUserController {
         return result;
     }
 
+    @RequestMapping(value = "/queryAll", method = RequestMethod.GET)
+    public Result<?> queryAll() {
+        List<SysUser> sysUserList = sysUserService.queryAll();
+        return Result.ok(sysUserList);
+    }
+
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public Result<SysUser> add(@RequestBody JSONObject jsonObject) {
         Result<SysUser> result = new Result<SysUser>();

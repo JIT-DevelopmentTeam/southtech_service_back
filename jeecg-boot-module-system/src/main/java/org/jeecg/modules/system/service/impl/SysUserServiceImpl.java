@@ -265,6 +265,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		return userMapper.getByRoleCode(page, roleCode);
 	}
 
+	// 查询所有用户
+	@Override
+	public List<SysUser> queryAll() {
+		return userMapper.queryAll();
+	}
+
 	@Override
 	@CacheEvict(value= {CacheConstant.SYS_USERS_CACHE}, key="#username")
 	public void updateUserDepart(String username,String orgCode) {

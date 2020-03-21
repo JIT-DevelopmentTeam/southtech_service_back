@@ -49,6 +49,12 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	 * @return
 	 */
 	Page<EnginerDTO> getByRoleCode(Page<EnginerDTO> page, @Param("roleCode") String roleCode);
+
+	/**
+	 * 查询所有用户
+	 * @return
+	 */
+	List<SysUser> queryAll();
 	
 	/**
 	 * 根据用户名设置部门ID
