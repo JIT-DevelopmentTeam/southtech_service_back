@@ -217,18 +217,6 @@
             }
           },
           {
-            title:'联系方式',
-            align:"center",
-            dataIndex: 'contactId',
-            customRender:(text)=>{
-              if(!text){
-                return ''
-              }else{
-                return filterMultiDictText(this.dictOptions['mobilePhone'], text+"")
-              }
-            }
-          },
-          {
             title:'紧急程度',
             align:"center",
             dataIndex: 'emergencyLevel',

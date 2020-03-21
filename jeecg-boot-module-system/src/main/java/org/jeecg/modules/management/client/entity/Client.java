@@ -6,6 +6,7 @@ import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import org.jeecg.modules.management.BaseEntity;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -19,7 +20,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @Data
 @TableName("tb_client")
-public class Client implements Serializable {
+public class Client extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     
 	/**主键*/
@@ -74,41 +75,18 @@ public class Client implements Serializable {
 	/**所属用户*/
     @Excel(name = "所属用户", width = 15)
     private java.lang.String userId;
-	/**最近联系时间*/
-    @Excel(name = "最近联系时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    private java.util.Date lastContactTime;
 	/**行业*/
     @Excel(name = "行业", width = 15)
     private java.lang.String industry;
-	/**社会信用代码*/
-    @Excel(name = "社会信用代码", width = 15)
-    private java.lang.String creditCode;
 	/**性质*/
     @Excel(name = "性质", width = 15)
     private java.lang.String property;
-	/**法人代表*/
-    @Excel(name = "法人代表", width = 15)
-    private java.lang.String legalPerson;
-	/**注册资金*/
-    @Excel(name = "注册资金", width = 15)
-    private java.lang.Double registeredCapital;
-	/**成立日期*/
-    @Excel(name = "成立日期", width = 15, format = "yyyy-MM-dd")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
-    @DateTimeFormat(pattern="yyyy-MM-dd")
-    private java.util.Date establishmentDate;
-	/**网址*/
-    @Excel(name = "网址", width = 15)
-    private java.lang.String webSite;
 	/**经度*/
     @Excel(name = "经度", width = 15)
     private java.lang.Double longitude;
 	/**纬度*/
     @Excel(name = "纬度", width = 15)
     private java.lang.Double latitude;
-    private java.sql.Timestamp modifyTime;
 
 
 }

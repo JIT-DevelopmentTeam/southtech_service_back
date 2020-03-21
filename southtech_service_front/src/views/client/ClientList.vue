@@ -44,13 +44,13 @@
     
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button @click="synchronizeClient" v-has="'client:synchronize'" type="primary" icon="cloud-download">同步客户</a-button>
-      <a-button @click="synchronizeDeviceNumber" v-has="'deviceNumber:synchronize'" type="primary" icon="cloud-download">同步设备编号</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('客户信息')">导出</a-button>
+      <!-- <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button> -->
+      <a-button @click="synchronizeClient" v-has="'client:synchronize'" type="primary" icon="cloud-download">同步</a-button>
+      
+      <!-- <a-button type="primary" icon="download" @click="handleExportXls('客户信息')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
-      </a-upload>
+      </a-upload> -->
     </div>
 
     <!-- table区域-begin -->
@@ -116,7 +116,7 @@
       <a-tab-pane tab="联系人信息" key="1" >
         <contact-list :mainId="selectedMainId" />
       </a-tab-pane>
-      <a-tab-pane tab="设备编号" key="2" forceRender>
+      <a-tab-pane tab="设备档案" key="2" forceRender>
         <device-number-list :mainId="selectedMainId" />
       </a-tab-pane>
     </a-tabs>
@@ -189,11 +189,6 @@
             dataIndex: 'userId'
           },
           {
-            title:'最近联系时间',
-            align:"center",
-            dataIndex: 'lastContactTime'
-          },
-          {
             title:'行业',
             align:"center",
             dataIndex: 'industry',
@@ -218,16 +213,6 @@
             }
           },
           {
-            title:'法人代表',
-            align:"center",
-            dataIndex: 'legalPerson'
-          },
-          {
-            title:'注册资金',
-            align:"center",
-            dataIndex: 'registeredCapital'
-          },
-          {
             title:'建档时间',
             align:"center",
             dataIndex: 'createTime'
@@ -246,7 +231,7 @@
           exportXlsUrl: "/client/client/exportXls",
           importExcelUrl: "/client/client/importExcel",
           synchronizeClient:'/client/client/synchronizeClient',
-          synchronizeDeviceNumber: '/client/client/synchronizeDeviceNumber'
+          
         },
         dictOptions:{
          type:[],
@@ -358,24 +343,6 @@
             }
         });
       },
-      synchronizeDeviceNumber() {
-        this.$confirm({
-          title:'同步设备编号',
-          content:'同步设备编号需要时间,您确定要同步吗?(注:同步前请确认已同步客户信息!)',
-          onOk:() => {
-            this.loading = true;
-            getAction(this.url.synchronizeDeviceNumber,null).then((res) => {
-              if (res.success) {
-                this.$message.success(res.message);
-                this.loadData();
-              } else {
-                this.$message.console.error(res.message);
-              }
-              this.loading = true;
-            });
-          }
-        });
-      }
     }
   }
 </script>

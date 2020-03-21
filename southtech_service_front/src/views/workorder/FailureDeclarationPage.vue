@@ -71,7 +71,7 @@
           <a-tab-pane tab="工单明细" key="1">
             <div>
               <a-row type="flex" style="margin-bottom:10px" :gutter="16">
-                <a-col :span="5">设备编号</a-col>
+                <a-col :span="5">设备档案</a-col>
                 <a-col :span="7">故障部位</a-col>
                 <a-col :span="9">描述</a-col>
                 <a-col :span="2">操作</a-col>
@@ -80,7 +80,7 @@
               <a-row type="flex" style="margin-bottom:10px" :gutter="16" v-for="(item, index) in model.workOrderDetailList" :key="index">
                 <a-col :span="5">
                   <a-form-item>
-                    <j-dict-select-tag v-decorator="['workOrderDetailList['+index+'].deviceNumber', {'initialValue':item.deviceNumber,rules: [{ required: true, message: '请选择设备编号!' }]}]" placeholder="设备编号" :trigger-change="true" :dictCode="deviceNumberCondition()"/>
+                    <j-dict-select-tag v-decorator="['workOrderDetailList['+index+'].deviceNumber', {'initialValue':item.deviceNumber,rules: [{ required: true, message: '请选择设备档案!' }]}]" placeholder="设备档案" :trigger-change="true" :dictCode="deviceNumberCondition()"/>
                   </a-form-item>
                 </a-col>
                 <a-col :span="7">
@@ -105,7 +105,7 @@
         </a-tabs>
          <div id="components-layout-demo-basic">
             <a-layout>
-            <a-layout-footer><a-button @click="handleOk" type="primary" icon="plus">申报</a-button></a-layout-footer>
+            <a-layout-footer><a-button @click="handleOk" type="primary" icon="check">保存</a-button></a-layout-footer>
             </a-layout>
          </div>
       </a-form>

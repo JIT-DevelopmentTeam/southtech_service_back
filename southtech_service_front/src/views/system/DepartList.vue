@@ -7,7 +7,7 @@
         <a-row style="margin-left: 14px">
           <!-- <a-button @click="handleAdd(2)" type="primary">添加子部门</a-button>
           <a-button @click="handleAdd(1)" type="primary">添加一级部门</a-button> -->
-           <a-button @click="synchronize" type="primary" icon="cloud-download">同步</a-button>
+           
           <!-- <a-button type="primary" icon="download" @click="handleExportXls('部门信息')">导出</a-button>
           <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
             <a-button type="primary" icon="import">导入</a-button>
@@ -255,7 +255,7 @@
           deleteBatch: '/sys/sysDepart/deleteBatch',
           exportXlsUrl: "sys/sysDepart/exportXls",
           importExcelUrl: "sys/sysDepart/importExcel",
-          synchronize:"/sys/sysDepart/synchronize"
+          
         },
         orgCategoryDisabled:false,
       }
@@ -551,22 +551,6 @@
         }
       },
       // <!---- author:os_chengtgen -- date:20190827 --  for:切换父子勾选模式 =======------>
-      synchronize() {
-        this.$confirm({
-          title:'同步',
-          content: `同步信息需要时间,您确定要同步部门和员工信息吗?`,
-            onOk: () => {
-              getAction(this.url.synchronize,null).then((res) => {
-                if (res.success) {
-                  this.$message.success(res.message);
-                  this.loadData();
-                } else {
-                  this.$message.error(res.message);
-                }
-              });
-            }
-        });
-      }
     },
     created() {
       this.currFlowId = this.$route.params.id
