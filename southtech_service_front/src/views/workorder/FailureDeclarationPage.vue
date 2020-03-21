@@ -209,7 +209,12 @@
             }).finally(() => {
               that.confirmLoading = false;
               this.form.resetFields();
+              this.model.type = "1";
               this.model.workOrderDetailList = [{}];
+              this.visible = true;
+              this.$nextTick(() => {
+                this.form.setFieldsValue(pick(this.model,'type'))
+              })
             })
           }
          

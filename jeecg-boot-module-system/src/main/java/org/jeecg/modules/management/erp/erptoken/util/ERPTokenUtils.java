@@ -26,7 +26,7 @@ public class ERPTokenUtils {
      */
     public static void setToken() {
         try {
-            JSONObject jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.GET_TOKEN_URL.replace("AUTHORIZATION",ERPInterfaceConstant.AUTHORIZATIONCODE));
+            JSONObject jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.GET_TOKEN_URL.replace("AUTHORIZATION",ERPInterfaceConstant.AUTHORIZATIONCODE));
             if (oConvertUtils.isNotEmpty(jsonObject.get("token"))) {
                 if (oConvertUtils.isEmpty(redisUtil.get(ERPInterfaceConstant.TOKEN_KEY))) {
                     if (StringUtils.isNotBlank(jsonObject.getString("token"))) {

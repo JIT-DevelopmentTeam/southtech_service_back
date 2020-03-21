@@ -95,6 +95,8 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 		QueryWrapper<WorkOrder> queryWrapper = QueryGenerator.initQueryWrapper(workOrder, req.getParameterMap());
+        queryWrapper.orderByAsc("status");
+        queryWrapper.orderByDesc("create_time");
         if (StringUtils.isNotBlank(req.getParameter("clientName"))) {
             QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<Client>();
             clientQueryWrapper.like("name",req.getParameter("clientName").trim());
@@ -315,15 +317,10 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         String[] idsArray = workOrderDetailIds.split(",");
         LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         SysUser serviceEngineer = sysUserService.getUserByName(serviceEngineerName);
-        WorkOrder workOrder = null;
-        boolean hasSeccess = false;
+        WorkOrderDetail findParent = workOrderDetailService.getById(idsArray[0]);
+        WorkOrder workOrder = workOrderService.getById(findParent.getWorkOrderId());
         for (String id : idsArray) {
             WorkOrderDetail workOrderDetail = workOrderDetailService.getById(id);
-            workOrder = workOrderService.getById(workOrderDetail.getWorkOrderId());
-            if (!StringUtils.equals("1",workOrder.getStatus())){
-                return Result.error("派工失败,请检查工单状态是否为待分派!");
-            }
-            hasSeccess = true;
             workOrderDetail.setServiceEngineerName(serviceEngineerName);
             try {
                 workOrderDetail.setDispatchTime(DateUtils.parseDate(dispatchTime,"yyyy-MM-dd HH:mm:ss"));
@@ -337,36 +334,6 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             workOrderDetail.setAssigneeName(loginUser.getUsername());
             workOrderDetail.setAssignedTime(DateUtils.getDate());
             workOrderDetailService.updateById(workOrderDetail);
-        }
-        // 钉钉发起待办
-        if (hasSeccess) {
-            Client client = clientService.getById(workOrder.getClientId());
-            List<SysMessageTemplate> messageTemplateList = sysMessageTemplateService.selectByCode("dingTalk_dispatch_remind");
-            if (!messageTemplateList.isEmpty()) {
-                DingTalkClient dingTalkClient = new DefaultDingTalkClient(DingTalkConstant.ADD_WORK_RECORD_URL);
-                OapiWorkrecordAddRequest req = new OapiWorkrecordAddRequest();
-                req.setUserid(serviceEngineer.getEnterpriseId());
-                req.setCreateTime(System.currentTimeMillis());
-                req.setTitle("待办");
-                // TODO 跳转应用
-                req.setUrl("https://www.baidu.com");
-                List<OapiWorkrecordAddRequest.FormItemVo> list2 = new ArrayList<>();
-                OapiWorkrecordAddRequest.FormItemVo obj3 = new OapiWorkrecordAddRequest.FormItemVo();
-                list2.add(obj3);
-                obj3.setTitle(messageTemplateList.get(0).getTemplateName());
-                obj3.setContent(messageTemplateList.get(0).getTemplateContent().replace("${clientServiceName}",loginUser.getRealname()).replace("${clientName}",client.getName()));
-                req.setFormItemList(list2);
-                try {
-                    OapiWorkrecordAddResponse rsp = dingTalkClient.execute(req, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
-                    if (rsp.isSuccess()) {
-                        log.info("钉钉派单待办提醒发送成功!");
-                    } else {
-                        log.info("钉钉派单待办提醒发送失败,错误码:"+rsp.getCode()+",错误信息:"+rsp.getErrmsg());
-                    }
-                } catch (ApiException e) {
-                    e.printStackTrace();
-                }
-            }
         }
         List<WorkOrderDetail> workOrderDetailList = workOrderDetailService.selectByMainId(workOrder.getId());
         boolean isFinish = true;
@@ -387,6 +354,34 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                 }
             }
             workOrderService.updateById(workOrder);
+        }
+        // 钉钉发起待办
+        Client client = clientService.getById(workOrder.getClientId());
+        List<SysMessageTemplate> messageTemplateList = sysMessageTemplateService.selectByCode("dingTalk_dispatch_remind");
+        if (!messageTemplateList.isEmpty()) {
+            DingTalkClient dingTalkClient = new DefaultDingTalkClient(DingTalkConstant.ADD_WORK_RECORD_URL);
+            OapiWorkrecordAddRequest req = new OapiWorkrecordAddRequest();
+            req.setUserid(serviceEngineer.getEnterpriseId());
+            req.setCreateTime(System.currentTimeMillis());
+            req.setTitle("待办");
+            // TODO 跳转应用
+            req.setUrl("https://www.baidu.com");
+            List<OapiWorkrecordAddRequest.FormItemVo> list2 = new ArrayList<>();
+            OapiWorkrecordAddRequest.FormItemVo obj3 = new OapiWorkrecordAddRequest.FormItemVo();
+            list2.add(obj3);
+            obj3.setTitle(messageTemplateList.get(0).getTemplateName());
+            obj3.setContent(messageTemplateList.get(0).getTemplateContent().replace("${clientServiceName}",loginUser.getRealname()).replace("${clientName}",client.getName()));
+            req.setFormItemList(list2);
+            try {
+                OapiWorkrecordAddResponse rsp = dingTalkClient.execute(req, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
+                if (rsp.isSuccess()) {
+                    log.info("钉钉派单待办提醒发送成功!");
+                } else {
+                    log.info("钉钉派单待办提醒发送失败,错误码:"+rsp.getCode()+",错误信息:"+rsp.getErrmsg());
+                }
+            } catch (ApiException e) {
+                e.printStackTrace();
+            }
         }
 	    return Result.ok("派工成功!");
     }
