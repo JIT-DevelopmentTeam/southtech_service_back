@@ -244,7 +244,11 @@
             ids += this.selectedRowKeys[a] + ",";
           }
         }
-        this.$refs.dispatchModalForm.edit(ids);
+        var record = {
+          ids: ids,
+          serviceEngineerName: null
+        }
+        this.$refs.dispatchModalForm.edit(record);
         this.$refs.dispatchModalForm.title = "派工";
         this.$refs.dispatchModalForm.disableSubmit = false;
       },

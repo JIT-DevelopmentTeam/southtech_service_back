@@ -3,13 +3,13 @@
     <template slot="content">
       <div style="width: 110px; height: 200px; overflow: auto;">
         <a-radio-group @change="onChange" v-model="radioValue">
-          <a-radio :style="radioStyle" :value="item.id" v-for="(item, index) in enginerList" :key="index">{{
+          <a-radio :style="radioStyle" :value="item.userName" v-for="(item, index) in enginerList" :key="index">{{
             item.realname }}
           </a-radio>
         </a-radio-group>
       </div>
       <a-divider/>
-      <a-button type="primary">派工</a-button>
+      <a-button type="primary" @click="dispatch">派工</a-button>
     </template>
     <div class="card">
       <div class="content" @scroll="hscroll($event)">
@@ -49,6 +49,7 @@
         </a-spin>
       </div>
     </div>
+    <dis-patch-modal ref="dispatchModalForm" @ok="modalFormOk"></dis-patch-modal>
   </a-popover>
   <!--<div class="card">
     &lt;!&ndash;    <div :style="{ borderBottom: '1px solid #E9E9E9', height: '50px' }">&ndash;&gt;
@@ -103,6 +104,9 @@
 
   export default {
     name: "orderListCard",
+    components: {
+      DisPatchModal: () => import('@/views/workorder/modules/DispatchModal')
+    },
     data() {
       return {
         radioValue: 1,
@@ -148,6 +152,21 @@
       },
     },
     methods: {
+      modalFormOk() {
+        this.pageNo = 1;
+        this.loadTicket('', this.pageNo);
+      },
+      dispatch() {
+        this.visible = false;
+        var ids = this.activeItem.detailId;
+        var record = {
+          ids: ids,
+          serviceEngineerName: this.radioValue
+        }
+        this.$refs.dispatchModalForm.edit(record);
+        this.$refs.dispatchModalForm.title = "派工";
+        this.$refs.dispatchModalForm.disableSubmit = false;
+      },
       onChange(e) {
         this.radioValue = e.target.value;
         console.log('radio checked', e.target.value);
@@ -155,21 +174,12 @@
       // ------------------------------------------
       cardClick(item) {
         let enginerList = this.enginerList;
-        let temp = {};
         let p1 = [item.longitude, item.latitude];
-        for (let i = 0; i < enginerList.length; i++) {
-          if (enginerList[i].longitude != null &&
-            enginerList[i].latitude != null &&
-            enginerList[i+1].longitude != null &&
-            enginerList[i+1].latitude != null &&
-            AMap.GeometryUtil.distance(p1, [enginerList[i].longitude, enginerList[i].latitude]) > AMap.GeometryUtil.distance(p1, [enginerList[i+1].longitude, enginerList[i+1].latitude])) {
-            temp = enginerList[i];
-            enginerList[i] = enginerList[i+1];
-            enginerList[i+1] = temp;
-          }
-        }
+        enginerList.sort(function (a, b) {
+          return AMap.GeometryUtil.distance(p1, [a.longitude, a.latitude]) - AMap.GeometryUtil.distance(p1, [b.longitude, b.latitude])
+        })
         if (enginerList.length > 0) {
-          this.radioValue = enginerList[0].id;
+          this.radioValue = enginerList[0].userName;
         }
 
         this.visible = false;
@@ -217,6 +227,7 @@
         }
       },
       loadTicket(type, pageNo) {
+        this.spinning = true;
         this.pageNo = pageNo;
         getAction(this.ticListUrl, {type: type, pageNo: this.pageNo})
           .then(res => {
@@ -230,6 +241,7 @@
             if (res.code === 510) {
               this.$message.warning(res.message)
             }
+            this.spinning = false;
           })
       }
     },
@@ -243,9 +255,6 @@
     },
     created() {
       this.loadTicket('', this.pageNo);
-      var p1 = [116.434027, 39.941037];
-      var p2 = [116.461665, 39.941564];
-      console.log(AMap.GeometryUtil.distance(p1, p2))
     }
   }
 </script>

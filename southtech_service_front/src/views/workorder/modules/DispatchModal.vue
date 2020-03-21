@@ -92,9 +92,13 @@
         this.edit({});
       },
       edit (record) {
-        this.workOrderDetailIds = record;
         this.form.resetFields();
+        this.model = Object.assign({}, record);
+        this.workOrderDetailIds = this.model.ids;
         this.visible = true;
+        this.$nextTick(() => {
+          this.form.setFieldsValue(pick(this.model, 'serviceEngineerName'));
+        })
       },
       close () {
         this.$emit('close');
