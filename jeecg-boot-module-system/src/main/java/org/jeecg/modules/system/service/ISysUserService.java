@@ -1,15 +1,10 @@
 package org.jeecg.modules.system.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
-import org.apache.ibatis.annotations.Param;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.ibatis.annotations.Param;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.vo.SysUserCacheInfo;
 import org.jeecg.modules.system.entity.SysUser;
@@ -127,6 +122,12 @@ public interface ISysUserService extends IService<SysUser> {
 	 * @return
 	 */
 	public IPage<SysUser> getUserByRoleId(Page<SysUser> page,String roleId, String username);
+
+	/**
+	 * 查询所有用户
+	 * @return
+	 */
+	List<SysUser> queryAll();
 
 	/**
 	 * 根据角色code查询

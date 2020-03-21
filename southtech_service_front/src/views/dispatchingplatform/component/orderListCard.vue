@@ -105,7 +105,7 @@
   export default {
     name: "orderListCard",
     components: {
-      DisPatchModal: () => import('@/views/workorder/modules/DispatchModal')
+      DisPatchModal: () => import('@/views/workorder/modules/JitDispatchModal')
     },
     data() {
       return {
