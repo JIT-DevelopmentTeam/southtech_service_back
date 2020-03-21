@@ -18,6 +18,7 @@ import org.jeecg.modules.system.entity.*;
 import org.jeecg.modules.system.mapper.*;
 import org.jeecg.modules.system.model.SysUserSysDepartModel;
 import org.jeecg.modules.system.service.ISysUserService;
+import org.jeecg.modules.system.vo.EnginerDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -258,6 +259,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		return userMapper.getUserByRoleId(page,roleId,username);
 	}
 
+	// 根据角色code查询
+	@Override
+	public Page<EnginerDTO> getByRoleCode(Page<EnginerDTO> page, String roleCode) {
+		return userMapper.getByRoleCode(page, roleCode);
+	}
 
 	@Override
 	@CacheEvict(value= {CacheConstant.SYS_USERS_CACHE}, key="#username")

@@ -1,11 +1,12 @@
 package org.jeecg.modules.system.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.system.entity.SysUser;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.jeecg.modules.system.model.SysUserSysDepartModel;
+import org.jeecg.modules.system.vo.EnginerDTO;
 
 import java.util.List;
 
@@ -40,6 +41,14 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	 * @return
 	 */
 	IPage<SysUser> getUserByRoleId(Page page, @Param("roleId") String roleId, @Param("username") String username);
+
+	/**
+	 * 根据角色code查询用户
+	 * @param page
+	 * @param roleCode
+	 * @return
+	 */
+	Page<EnginerDTO> getByRoleCode(Page<EnginerDTO> page, @Param("roleCode") String roleCode);
 	
 	/**
 	 * 根据用户名设置部门ID

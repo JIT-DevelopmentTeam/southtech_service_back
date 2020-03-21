@@ -9,12 +9,16 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import org.apache.ibatis.annotations.Param;
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.vo.SysUserCacheInfo;
 import org.jeecg.modules.system.entity.SysUser;
-
-import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.system.model.SysUserSysDepartModel;
+import org.jeecg.modules.system.vo.EnginerDTO;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -123,6 +127,14 @@ public interface ISysUserService extends IService<SysUser> {
 	 * @return
 	 */
 	public IPage<SysUser> getUserByRoleId(Page<SysUser> page,String roleId, String username);
+
+	/**
+	 * 根据角色code查询
+	 * @param page
+	 * @param roleCode
+	 * @return
+	 */
+	Page<EnginerDTO> getByRoleCode(Page<EnginerDTO> page, String roleCode);
 
 	/**
 	 * 通过用户名获取用户角色集合

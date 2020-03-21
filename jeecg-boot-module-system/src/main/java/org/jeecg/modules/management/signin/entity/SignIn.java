@@ -57,5 +57,5 @@ public class SignIn implements Serializable {
     private java.lang.Double latitude;
 	/**工程师*/
 	@Excel(name = "工程师", width = 15)
-	private java.lang.String enginerId;
+	private java.lang.String serviceEngineerName;
 }
