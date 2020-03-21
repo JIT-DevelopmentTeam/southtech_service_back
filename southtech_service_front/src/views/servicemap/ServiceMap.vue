@@ -81,7 +81,7 @@
         windows: [],
         window: '',
         ticketUrl: {
-          list: '/client/client/listPageByWorkOrder'
+          list: '/workorder/workOrder/queryWorkOrderList'
         },
         enginerUrl: {
           list: '/sys/user/enginerList'

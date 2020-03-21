@@ -64,5 +64,9 @@ public class WorkOrderDTO {
      * 纬度
      */
     private java.lang.Double latitude;
+    /**
+     * 工单详细id
+     */
+    private java.lang.String detailId;
 
 }

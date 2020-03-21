@@ -8,17 +8,19 @@
         workOrder.type AS "type",
         workOrder.declaration_time AS "declarationTime",
         workOrder.emergency_level AS "emergencyLevel",
-        client.name AS "clientName",
+        client.NAME AS "clientName",
         client.province AS "province",
         client.city AS "city",
         client.area AS "area",
         client.community AS "community",
         client.address AS "address",
         client.longitude AS "longitude",
-        client.latitude AS "latitude"
+        client.latitude AS "latitude",
+        detail.id AS "detailId"
         FROM
-        ic_work_order workOrder
-        LEFT JOIN tb_client client ON workOrder.client_id = client.id
+        ic_work_order_detail detail
+        LEFT JOIN ic_work_order workOrder ON workOrder.id = detail.work_order_id
+        LEFT JOIN tb_client client ON client.id = workOrder.client_id
         WHERE
         workOrder.status = '1'
         <if test="type != null and type != ''">

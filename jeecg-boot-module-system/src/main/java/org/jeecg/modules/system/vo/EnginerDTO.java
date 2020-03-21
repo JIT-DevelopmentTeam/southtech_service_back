@@ -7,6 +7,8 @@ public class EnginerDTO {
 
     /**工程师id*/
     private String id;
+    /**工程师工号*/
+    private String userName;
     /**名称*/
     private String realname;
     /**经度*/
