@@ -112,4 +112,17 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      */
 	void deleteBatch(@Param("ids") String ids);
 
+    /**
+     * 根据企业应用id获取数据
+     * @param enterpriseId
+     * @return
+     */
+	SysUser getByEnterpriseId(@Param("enterpriseId") String enterpriseId);
+
+    /**
+     * 根据企业应用id更新
+     * @param userParams
+     */
+	void updateByEnterpriseId(@Param("userParams") SysUser userParams);
+
 }

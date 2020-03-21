@@ -158,7 +158,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
     @RequestMapping(value = "/synchronizeClient", method = RequestMethod.GET)
     public Result<?> synchronizeClient() {
         QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<>();
-        clientQueryWrapper.orderByDesc("modify_time");
+        clientQueryWrapper.orderByDesc("modifytime");
         List<Client> clientList = clientService.list(clientQueryWrapper);
         try {
             JSONObject jsonObject;
@@ -365,14 +365,14 @@ public class ClientController extends JeecgController<Client, IClientService> {
 	@RequestMapping(value = "/synchronizeDeviceNumber", method = RequestMethod.GET)
     public Result<?> synchronizeDeviceNumber() {
 	    QueryWrapper<DeviceNumber> deviceNumberQueryWrapper = new QueryWrapper<>();
-	    deviceNumberQueryWrapper.orderByDesc("modify_time");
+	    deviceNumberQueryWrapper.orderByDesc("modifytime");
 	    List<DeviceNumber> deviceNumberList = deviceNumberService.list(deviceNumberQueryWrapper);
 	    try {
             JSONObject jsonObject;
             if (deviceNumberList.isEmpty()) {
                 jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_DEVICENUMBER_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",""));
             } else {
-                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_DEVICENUMBER_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",deviceNumberList.get(0).getModifyTime().getTime()+""));
+                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_DEVICENUMBER_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",deviceNumberList.get(0).getModifytime().getTime()+""));
             }
             JSONArray dataArray = jsonObject.getJSONArray("data");
             DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -390,7 +390,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
                     /*deviceNumber.setDescription(data.getString("describe"));
                     deviceNumber.setSigning(dataFormat.parse(data.getString("signing")));
                     deviceNumber.setQgp(dataFormat.parse(data.getString("QGP")));*/
-                    deviceNumber.setModifyTime(data.getTimestamp("FModifyTime"));
+                    deviceNumber.setModifytime(data.getTimestamp("FModifyTime"));
                     deviceNumber.setClientId(client.getId());
                     addDeviceNumberList.add(deviceNumber);
                 }

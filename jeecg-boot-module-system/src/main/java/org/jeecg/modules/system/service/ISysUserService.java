@@ -1,8 +1,14 @@
 package org.jeecg.modules.system.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+import org.apache.ibatis.annotations.Param;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.vo.SysUserCacheInfo;
@@ -191,5 +197,18 @@ public interface ISysUserService extends IService<SysUser> {
      * @param ids
      */
 	void deleteBatch(String ids);
+
+    /**
+     * 根据企业应用id获取数据
+     * @param enterpriseId
+     * @return
+     */
+    SysUser getByEnterpriseId(@Param("enterpriseId") String enterpriseId);
+
+    /**
+     * 根据企业应用id更新
+     * @param userParams
+     */
+    void updateByEnterpriseId(@Param("userParams") SysUser userParams);
 
 }

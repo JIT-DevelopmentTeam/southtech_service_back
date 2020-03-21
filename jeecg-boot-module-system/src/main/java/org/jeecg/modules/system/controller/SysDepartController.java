@@ -404,7 +404,7 @@ public class SysDepartController {
                         delectIds.append(delectUser.getId()+",");
                     }
                     delectIds = delectIds.deleteCharAt(delectIds.length()-1);
-                    sysUserService.deleteBatch(delectIds.toString());
+                    sysUserService.deleteBatchUsers(delectIds.toString());
                 }
                 // 清除部门关系
                 sysUserDepartService.deleteAll();
@@ -453,13 +453,12 @@ public class SysDepartController {
                             departsMap.put(departId.toString(),0);
                         }
                     }
-                    QueryWrapper<SysUser> userQueryWrapper = new QueryWrapper<>();
-                    userQueryWrapper.eq("enterprise_id",userDetailResponse.getUserid());
-                    SysUser editUser = sysUserService.getOne(userQueryWrapper);
+                    SysUser editUser = sysUserService.getByEnterpriseId(userDetailResponse.getUserid());
                     if (oConvertUtils.isEmpty(editUser)) {
                         if (!StringUtils.isEmpty(userDetailResponse.getJobnumber())) {
                             SysUser addUser = new SysUser();
                             addUser.setUsername(userDetailResponse.getJobnumber());
+                            addUser.setWorkNo(userDetailResponse.getJobnumber());
                             addUser.setRealname(userDetailResponse.getName());
                             addUser.setEnterpriseId(userDetailResponse.getUserid());
                             addUser.setSex(0);
@@ -472,7 +471,6 @@ public class SysDepartController {
                             addUser.setOrgCode(depart.getOrgCode());
                             addUser.setStatus(Integer.parseInt(CommonConstant.STATUS_1));
                             addUser.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
-                            addUser.setWorkNo(userDetailResponse.getJobnumber());
                             addUser.setPost(userDetailResponse.getPosition());
                             addUser.setActivitiSync(CommonConstant.ACT_SYNC_1);
                             sysUserService.save(addUser);
@@ -485,10 +483,9 @@ public class SysDepartController {
                         editUser.setOrgCode(depart.getOrgCode());
                         editUser.setStatus(Integer.parseInt(CommonConstant.STATUS_1));
                         editUser.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
-                        editUser.setWorkNo(userDetailResponse.getJobnumber());
                         editUser.setPost(userDetailResponse.getPosition());
                         editUser.setActivitiSync(CommonConstant.ACT_SYNC_1);
-                        sysUserService.updateById(editUser);
+                        sysUserService.updateByEnterpriseId(editUser);
                         sysUserService.editUserWithDepart(editUser,departsMap);
                     }
                 }
