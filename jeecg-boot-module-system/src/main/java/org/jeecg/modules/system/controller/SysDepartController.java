@@ -454,26 +454,28 @@ public class SysDepartController {
                         }
                     }
                     SysUser editUser = sysUserService.getByEnterpriseId(userDetailResponse.getUserid());
-                    if (oConvertUtils.isEmpty(editUser) && !StringUtils.isEmpty(userDetailResponse.getJobnumber())) {
-                        SysUser addUser = new SysUser();
-                        addUser.setUsername(userDetailResponse.getJobnumber());
-                        addUser.setWorkNo(userDetailResponse.getJobnumber());
-                        addUser.setRealname(userDetailResponse.getName());
-                        addUser.setEnterpriseId(userDetailResponse.getUserid());
-                        addUser.setSex(0);
-                        String salt = oConvertUtils.randomGen(8);
-                        addUser.setSalt(salt);
-                        String passwordEncode = PasswordUtil.encrypt(addUser.getUsername(), "123456", salt);
-                        addUser.setPassword(passwordEncode);
-                        addUser.setEmail(userDetailResponse.getEmail());
-                        addUser.setPhone(userDetailResponse.getMobile());
-                        addUser.setOrgCode(depart.getOrgCode());
-                        addUser.setStatus(Integer.parseInt(CommonConstant.STATUS_1));
-                        addUser.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
-                        addUser.setPost(userDetailResponse.getPosition());
-                        addUser.setActivitiSync(CommonConstant.ACT_SYNC_1);
-                        sysUserService.save(addUser);
-                        sysUserService.addUserWithDepart(addUser,departsMap);
+                    if (oConvertUtils.isEmpty(editUser)) {
+                        if (!StringUtils.isEmpty(userDetailResponse.getJobnumber())) {
+                            SysUser addUser = new SysUser();
+                            addUser.setUsername(userDetailResponse.getJobnumber());
+                            addUser.setWorkNo(userDetailResponse.getJobnumber());
+                            addUser.setRealname(userDetailResponse.getName());
+                            addUser.setEnterpriseId(userDetailResponse.getUserid());
+                            addUser.setSex(0);
+                            String salt = oConvertUtils.randomGen(8);
+                            addUser.setSalt(salt);
+                            String passwordEncode = PasswordUtil.encrypt(addUser.getUsername(), "123456", salt);
+                            addUser.setPassword(passwordEncode);
+                            addUser.setEmail(userDetailResponse.getEmail());
+                            addUser.setPhone(userDetailResponse.getMobile());
+                            addUser.setOrgCode(depart.getOrgCode());
+                            addUser.setStatus(Integer.parseInt(CommonConstant.STATUS_1));
+                            addUser.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
+                            addUser.setPost(userDetailResponse.getPosition());
+                            addUser.setActivitiSync(CommonConstant.ACT_SYNC_1);
+                            sysUserService.save(addUser);
+                            sysUserService.addUserWithDepart(addUser,departsMap);
+                        }
                     } else {
                         editUser.setRealname(userDetailResponse.getName());
                         editUser.setEmail(userDetailResponse.getEmail());
