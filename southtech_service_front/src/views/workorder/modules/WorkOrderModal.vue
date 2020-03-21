@@ -61,12 +61,14 @@
               <j-date placeholder="请选择申报时间" v-decorator="[ 'declarationTime', validatorRules.declarationTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="8">
+        </a-row>
+        <a-row class="form-row" :gutter="16">
+            <a-col :lg="16">
             <a-form-item label="附件" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-upload v-decorator="['annex']" :trigger-change="true"></j-upload>
+              <j-upload v-decorator="['annex',validatorRules.annex]" :trigger-change="true" :fileType="'image'" :text="'上传附件'"></j-upload>
             </a-form-item>
           </a-col>
-        </a-row>
+          </a-row>
 
         <!-- 子表单区域 -->
         <a-tabs defaultActiveKey="1" >
@@ -159,6 +161,7 @@
         emergencyLevel:{rules: [{ required: true, message: '请输入紧急程度!' }]},
         customerServiceName:{rules: [{ required: true, message: '请输入客服!' }]},
         declarationTime:{rules: [{ required: true, message: '请输入申报时间!' }]},
+        annex:{}
         },
         url: {
           add: "/workorder/workOrder/add",
