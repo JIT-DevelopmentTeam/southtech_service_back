@@ -343,4 +343,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	    userMapper.deleteBatch(ids);
     }
 
+    @Override
+    public SysUser getByEnterpriseId(String enterpriseId) {
+        return userMapper.getByEnterpriseId(enterpriseId);
+    }
+
+    @Override
+    @Transactional
+    public void updateByEnterpriseId(SysUser userParams) {
+        userMapper.updateByEnterpriseId(userParams);
+    }
+
 }

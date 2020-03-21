@@ -192,6 +192,7 @@
           title:'同步',
           content: `同步信息需要时间,您确定要同步部门和员工信息吗?`,
             onOk: () => {
+              this.loading = true;
               getAction(this.url.synchronize,null).then((res) => {
                 if (res.success) {
                   this.$message.success(res.message);
@@ -199,6 +200,9 @@
                 } else {
                   this.$message.error(res.message);
                 }
+                this.loading = false;
+              }).finally(() => {
+                this.loading = false;
               });
             }
         });
