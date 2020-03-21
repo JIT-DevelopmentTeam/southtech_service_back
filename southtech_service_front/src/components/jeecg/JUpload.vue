@@ -44,6 +44,10 @@
       }
     },
     props:{
+      name:{
+        type:String,
+        required:true
+      },
       text:{
         type:String,
         required:false,
@@ -106,7 +110,7 @@
         for(var a=0;a<arr.length;a++){
           fileList.push({
             uid:uidGenerator(),
-            name:getFileName(arr[a]),
+            name:this.name+uidGenerator(),
             status: 'done',
             url: this.urlDownload+arr[a],
             response:{
