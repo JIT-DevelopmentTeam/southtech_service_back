@@ -3,11 +3,9 @@
     <template slot="content">
       <div style="width: 110px; height: 200px; overflow: auto;">
         <a-radio-group @change="onChange" v-model="radioValue">
-          <a-radio :style="radioStyle" :value="item.id" v-for="(item, index) in enginerList" :key="index">{{ item.realname }}</a-radio>
-
-<!--          <a-radio :style="radioStyle" :value="1">欧阳呐呐</a-radio>-->
-<!--          <a-radio :style="radioStyle" :value="2">张三</a-radio>-->
-<!--          <a-radio :style="radioStyle" :value="3">你好呀</a-radio>-->
+          <a-radio :style="radioStyle" :value="item.id" v-for="(item, index) in enginerList" :key="index">{{
+            item.realname }}
+          </a-radio>
         </a-radio-group>
       </div>
       <a-divider/>
@@ -156,8 +154,23 @@
       },
       // ------------------------------------------
       cardClick(item) {
-
-        this.radioValue = 1;
+        let enginerList = this.enginerList;
+        let temp = {};
+        let p1 = [item.longitude, item.latitude];
+        for (let i = 0; i < enginerList.length; i++) {
+          if (enginerList[i].longitude != null &&
+            enginerList[i].latitude != null &&
+            enginerList[i+1].longitude != null &&
+            enginerList[i+1].latitude != null &&
+            AMap.GeometryUtil.distance(p1, [enginerList[i].longitude, enginerList[i].latitude]) > AMap.GeometryUtil.distance(p1, [enginerList[i+1].longitude, enginerList[i+1].latitude])) {
+            temp = enginerList[i];
+            enginerList[i] = enginerList[i+1];
+            enginerList[i+1] = temp;
+          }
+        }
+        if (enginerList.length > 0) {
+          this.radioValue = enginerList[0].id;
+        }
 
         this.visible = false;
         setTimeout(function () {
@@ -226,19 +239,13 @@
           return this.ticketList
         }
         return this.ticketList.filter(e => e.type === this.orderType);
-      },
-      sortEnginer(cusLngLat) {
-        let enginerList = this.enginerList;
-        for (let i = 0; i < enginerList.length; i++) {
-
-        }
       }
     },
     created() {
       this.loadTicket('', this.pageNo);
       var p1 = [116.434027, 39.941037];
       var p2 = [116.461665, 39.941564];
-      console.log(AMap.GeometryUtil.distance(p1,p2))
+      console.log(AMap.GeometryUtil.distance(p1, p2))
     }
   }
 </script>
