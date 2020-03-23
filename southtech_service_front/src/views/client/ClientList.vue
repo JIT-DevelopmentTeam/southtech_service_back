@@ -119,6 +119,9 @@
       <a-tab-pane tab="设备档案" key="2" forceRender>
         <device-number-list :mainId="selectedMainId" />
       </a-tab-pane>
+      <a-tab-pane tab="微信用户" key="3" forceRender>
+        <wx-user-list :mainId="selectedMainId" />
+      </a-tab-pane>
     </a-tabs>
 
     <client-modal ref="modalForm" @ok="modalFormOk"></client-modal>
@@ -132,6 +135,7 @@
   import { getAction } from '@/api/manage'
   import ContactList from './ContactList'
   import DeviceNumberList from './DeviceNumberList'
+  import WxUserList from './WxUserList'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
@@ -142,6 +146,7 @@
       JDictSelectTag,
       ContactList,
       DeviceNumberList,
+      WxUserList,
       ClientModal
     },
     data () {

@@ -25,22 +25,14 @@ public class ERPTokenUtils {
      * @return
      */
     public static void setToken() {
-        try {
-            JSONObject jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.GET_TOKEN_URL.replace("AUTHORIZATION",ERPInterfaceConstant.AUTHORIZATIONCODE));
-            if (oConvertUtils.isNotEmpty(jsonObject.get("token"))) {
-                if (oConvertUtils.isEmpty(redisUtil.get(ERPInterfaceConstant.TOKEN_KEY))) {
-                    if (StringUtils.isNotBlank(jsonObject.getString("token"))) {
-                        redisUtil.set(ERPInterfaceConstant.TOKEN_KEY,jsonObject.getString("token"),jsonObject.getLongValue("effective_Time"));
-                    }
-                } else {
-                    if (!redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString().equals(jsonObject.getString("token"))) {
-                        redisUtil.set(ERPInterfaceConstant.TOKEN_KEY,jsonObject.getString("token"),jsonObject.getLongValue("effective_Time"));
-                    }
-                }
+        if (oConvertUtils.isEmpty(redisUtil.get(ERPInterfaceConstant.TOKEN_KEY))) {
+            try {
+                JSONObject jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.GET_TOKEN_URL.replace("AUTHORIZATION",ERPInterfaceConstant.AUTHORIZATIONCODE));
+                redisUtil.set(ERPInterfaceConstant.TOKEN_KEY,jsonObject.getString("token"),jsonObject.getLongValue("effective_Time"));
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error("获取APIToken出错!");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.error("获取APIToken出错!");
         }
     }
 
