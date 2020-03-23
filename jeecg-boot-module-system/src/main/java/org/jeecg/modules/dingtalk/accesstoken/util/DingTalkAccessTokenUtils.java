@@ -26,25 +26,21 @@ public class DingTalkAccessTokenUtils {
      * @return
      */
     public static void setToken() {
-        try {
-            DefaultDingTalkClient client = new DefaultDingTalkClient(DingTalkConstant.GET_TOKEN_URL);
-            OapiGettokenRequest request = new OapiGettokenRequest();
-            request.setAppkey(DingTalkConstant.APP_KEY);
-            request.setAppsecret(DingTalkConstant.APP_SECRET);
-            request.setHttpMethod("GET");
-            OapiGettokenResponse response = client.execute(request);
-            if (response.getErrcode() == 0) {
-                if (oConvertUtils.isEmpty(redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY))) {
+        if (oConvertUtils.isEmpty(redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY))) {
+            try {
+                DefaultDingTalkClient client = new DefaultDingTalkClient(DingTalkConstant.GET_TOKEN_URL);
+                OapiGettokenRequest request = new OapiGettokenRequest();
+                request.setAppkey(DingTalkConstant.APP_KEY);
+                request.setAppsecret(DingTalkConstant.APP_SECRET);
+                request.setHttpMethod("GET");
+                OapiGettokenResponse response = client.execute(request);
+                if (response.getErrcode() == 0) {
                     redisUtil.set(DingTalkConstant.ACCESS_TOKEN_KEY,response.getAccessToken(),response.getExpiresIn());
-                } else {
-                    if (!redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString().equals(response.getAccessToken())) {
-                        redisUtil.set(DingTalkConstant.ACCESS_TOKEN_KEY,response.getAccessToken(),response.getExpiresIn());
-                    }
                 }
+            } catch (ApiException e) {
+                e.printStackTrace();
+                log.error("获取钉钉Token出错!");
             }
-        } catch (ApiException e) {
-            e.printStackTrace();
-            log.error("获取钉钉Token出错!");
         }
     }
 
