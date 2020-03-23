@@ -1,12 +1,13 @@
 import { http } from '@/utils/request.js'
 
 /* 获取对应数据字段列表 */
-export function getDicList(treeName) {
+export function getDicList(dicCode) {
 	return http({
-		url: '/f/mobile/dic/list',
+		url: '/mobile/dic/getDictItemByCode',
 		params: {
-			treeName: treeName
-		}
+			dicCode: dicCode
+		},
+		method: 'get'
 	})
 }
 

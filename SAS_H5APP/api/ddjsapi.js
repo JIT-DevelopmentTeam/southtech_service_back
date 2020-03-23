@@ -10,11 +10,12 @@ export function GetJsapiTicket(params) {
     })
 }
 
-//获取token（鉴权）
-export function GetAccessToken() {
+//获取UserId（鉴权）
+export function GetUserInfo(params) {
     return http({
-        url:"/f/dingtalk/index/getAccessToken",
-        method:"get"
+        url:"/mobile/index/getUserInfo",
+        method:"get",
+		params:params
     })
 }
 

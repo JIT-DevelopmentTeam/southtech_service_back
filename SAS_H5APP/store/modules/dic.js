@@ -65,21 +65,21 @@ const actions = {
 	/* 钉钉 */
 	GetTypeList({commit,state}, payload){
 		getDicList(payload).then(response => {
-			commit("setTypeList",response.data.body.dicList)
+			commit("setTypeList",response.data.result)
 		}).catch(error => {
 			console.log(error);
 		})
 	},
 	GetStatusList({commit,state}, payload){
 		getDicList(payload).then(response => {
-			commit("setStatusList",response.data.body.dicList)
+			commit("setStatusList",response.data.result)
 		}).catch(error => {
 			console.log(error);
 		})
 	},
 	GetFaultLocaList({commit, state}, payload) {
 		getDicList(payload).then(response => {
-			commit("setFaultLocaList",response.data.body.dicList)
+			commit("setFaultLocaList",response.data.result)
 		}).catch(error => {
 			console.log(error);
 		})

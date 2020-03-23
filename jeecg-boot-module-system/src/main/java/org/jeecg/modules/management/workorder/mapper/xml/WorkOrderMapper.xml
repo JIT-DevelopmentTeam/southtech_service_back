@@ -28,4 +28,26 @@
         </if>
     </select>
 
+    <select id="queryMobileList" resultType="org.jeecg.modules.management.workorder.vo.MobileWorkOrderDTO">
+        SELECT
+            client.`name` AS "clientName",
+            contact.`name` AS "contactName",
+            contact.mobile_phone AS "contactPhone",
+            client.province AS "province",
+            client.city AS "city",
+            client.area AS "area",
+            client.community AS "community",
+            client.address AS "address",
+            workOrder.`status` AS "status",
+            workOrder.type AS "type",
+            detail.assigned_time AS "assignedTime",
+            workOrder.id AS "id",
+            workOrder.number AS "number"
+        FROM
+            ic_work_order_detail detail
+            LEFT JOIN ic_work_order workOrder ON workOrder.id = detail.work_order_id
+            LEFT JOIN tb_client client ON client.id = workOrder.client_id
+            LEFT JOIN tb_contact contact ON contact.client_id = client.id
+    </select>
+
 </mapper>

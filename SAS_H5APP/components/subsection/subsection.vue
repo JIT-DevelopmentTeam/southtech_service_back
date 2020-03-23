@@ -49,13 +49,13 @@
 				let item = this.$store.getters['dic/getStatusList']
 				let items = []
 				item.forEach((list) => {
-					items.push(list.name) 
+					items.push(list.text) 
 				})
 				return items.splice(1)
 			}
 		},
 		beforeMount() {
-			this.$store.dispatch('workOrder/GetDataList', this.$store.getters['getUserId']);
+			// this.$store.dispatch('workOrder/GetDataList', this.$store.getters['getUserId']);
 		}
 	}
 </script>

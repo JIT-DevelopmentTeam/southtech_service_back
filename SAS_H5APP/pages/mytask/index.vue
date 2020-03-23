@@ -18,9 +18,9 @@
 			subSection: () => import('@/components/subsection/subsection.vue')
 		},
 		onLoad() {
-			this.$store.dispatch('dic/GetStatusList', '工单状态').then(res=>{ 
-				this.$store.dispatch('dic/GetTypeList', '工单类型').then(res=>{
-					this.$store.dispatch('dic/GetFaultLocaList', '故障部位')
+			this.$store.dispatch('dic/GetStatusList', 'work_order_status').then(res=>{ 
+				this.$store.dispatch('dic/GetTypeList', 'work_order_type').then(res=>{
+					this.$store.dispatch('dic/GetFaultLocaList', 'work_order_detail_fault_location')
 				})
 			})
 		}

@@ -166,17 +166,9 @@
 		},
 		onLoad() {
 			this.$store.dispatch("GET_CODE", this.$corpId).then(async res => {
-				await this.$store.dispatch("GET_TOKEN")
+				var obj = {'code': this.$store.getters['getCode']}
+				await this.$store.dispatch("GET_USER_INFO", obj)
 			})
-
-			// uni.chooseLocation({
-			//     success: function (res) {
-			//         console.log('位置名称：' + res.name);
-			//         console.log('详细地址：' + res.address);
-			//         console.log('纬度：' + res.latitude);
-			//         console.log('经度：' + res.longitude);
-			//     }
-			// });
 		},
 		methods: {
 			clickItem(pageType, url) {
