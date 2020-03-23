@@ -47,7 +47,7 @@
               ></a-input>
             </a-form-item>
             <a-form-item label="回访评分" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-rate v-decorator="[ 'score', validatorRules.score]" v-model="value" />
+              <a-rate v-decorator="[ 'score', validatorRules.score]"  />
               <!-- <a-input v-decorator="[ 'score', validatorRules.score]" placeholder="请输入回访评分"></a-input> -->
             </a-form-item>
             <a-form-item label="回访方式" :labelCol="labelCol" :wrapperCol="wrapperCol">

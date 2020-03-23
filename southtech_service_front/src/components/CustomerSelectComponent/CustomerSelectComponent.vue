@@ -1,6 +1,12 @@
 <template>
   <div>
-    <a-button type @click="visible=true" icon="user" :disabled="disable" @change="handleSearch">{{butonText}}</a-button>
+    <a-button
+      type
+      @click="visible=true"
+      icon="user"
+      :disabled="disable"
+      @change="handleSearch"
+    >{{butonText}}</a-button>
     <a-modal width="60vw" :visible="visible" title="选择客户" @cancel="handleCancel" @ok="handleOK">
       <div class="searchContainer">
         <a-input placeholder="输入关键词搜索" v-model="keyword" @change="handleSearch"></a-input>
@@ -127,9 +133,13 @@ export default {
       ]
     }
   },
+  model: {
+    prop: 'selectCustomers',
+    event: 'selectChange'
+  },
   props: {
     value: {
-      type: Object | Array
+      type: Object | Array,
     },
     multiSelect: {
       type: Boolean,
@@ -137,8 +147,8 @@ export default {
         return false
       }
     },
-    disable:{
-        type:Boolean
+    disable: {
+      type: Boolean
     }
   },
   computed: {
@@ -158,6 +168,9 @@ export default {
       return title
     }
   },
+  created () {
+      this.loadData();
+  },
   methods: {
     show() {
       this.selectedRows = []
@@ -171,24 +184,25 @@ export default {
     handleOK() {
       let result = this.multiSelect ? this.selectedRows : this.selectedRows[0]
       result = result || {}
-      this.$emit('input', result)
+      this.$emit('selectChange', result)
       this.triggerChange(result)
       this.visible = false
     },
-    handleCancel(){
-        this.visible=false
-        this.selectedRows=[]
+    handleCancel() {
+      this.visible = false
+      this.selectedRows = []
     },
-    triggerChange(value){
-        this.$emit('change',Object.assign({},this.$data,value))
+    triggerChange(value) {
+      this.$emit('change', Object.assign({}, this.$data, value))
     },
     onSelectChange(selectedRowKeys, selectionRows) {
       this.selectedMainId = selectedRowKeys[0]
       this.selectedRowKeys = selectedRowKeys
 
       let addrows = selectionRows.filter(r => !this.selectedRows.includes(r))
-        
-      this.selectedRows = this.multiSelect&&this.selectedRows.length>0? this.selectedRows.concat(addrows):selectionRows;
+
+      this.selectedRows =
+        this.multiSelect && this.selectedRows.length > 0 ? this.selectedRows.concat(addrows) : selectionRows
     },
     // onClearSelected() {
     //   this.selectedRowKeys = []

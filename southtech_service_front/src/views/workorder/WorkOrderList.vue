@@ -50,10 +50,9 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <!-- <a-button type="primary" icon="download" @click="handleExportXls('工单信息')">导出</a-button>
-      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
-        <a-button type="primary" icon="import">导入</a-button>
-      </a-upload> -->
+      <a-button type="primary" v-has="'workOrder:returnVisits'" v-if="selectedRowKeys.length > 0" icon="message">回访意见</a-button>
+      <a-button type="primary" v-has="'workOrder:finish'" v-if="selectedRowKeys.length > 0" @click="setStatus(3)" icon="check">完成</a-button>
+      <a-button type="primary" v-has="'workOrder:close'" v-if="selectedRowKeys.length > 0" @click="setStatus(4)" icon="close">关闭</a-button>
     </div>
 
     <!-- table区域-begin -->
@@ -72,7 +71,7 @@
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
-        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type:'radio'}"
+        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type:'checkbox'}"
         :customRow="clickThenSelect"
         @change="handleTableChange">
 
@@ -119,6 +118,9 @@
       <a-tab-pane tab="工单明细" key="1" >
         <work-order-detail-list :mainId="selectedMainId" />
       </a-tab-pane>
+      <a-tab-pane tab="工单进度" key="2" >
+        <work-order-progress-page :mainId="selectedMainId" />
+      </a-tab-pane>
     </a-tabs>
 
     <workOrder-modal ref="modalForm" @ok="modalFormOk"></workOrder-modal>
@@ -129,8 +131,9 @@
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import WorkOrderModal from './modules/WorkOrderModal'
-  import { getAction } from '@/api/manage'
+  import { getAction,postAction } from '@/api/manage'
   import WorkOrderDetailList from './WorkOrderDetailList'
+  import WorkOrderProgressPage from './WorkOrderProgressPage'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
@@ -140,6 +143,7 @@
     components: {
       JDictSelectTag,
       WorkOrderDetailList,
+      WorkOrderProgressPage,
       WorkOrderModal
     },
     data () {
@@ -177,7 +181,7 @@
             }
           },
           {
-            title:'接口方式',
+            title:'接入方式',
             align:"center",
             dataIndex: 'accessMethod',
             customRender:(text)=>{
@@ -209,6 +213,18 @@
                 return ''
               }else{
                 return filterMultiDictText(this.dictOptions['contactId'], text+"")
+              }
+            }
+          },
+          {
+            title:'联系方式',
+            align:"center",
+            dataIndex: 'contactId',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return filterMultiDictText(this.dictOptions['mobilePhone'], text+"")
               }
             }
           },
@@ -254,6 +270,7 @@
           deleteBatch: "/workorder/workOrder/deleteBatch",
           exportXlsUrl: "/workorder/workOrder/exportXls",
           importExcelUrl: "workorder/workOrder/importExcel",
+          setStatusBatch:"/workorder/workOrder/setStatusBatch"
         },
         dictOptions:{
          status:[],
@@ -262,7 +279,8 @@
          clientId:[],
          contactId:[],
          emergencyLevel:[],
-         customerServiceName:[]
+         customerServiceName:[],
+         mobilePhone:[]
         },
         /* 分页参数 */
         ipagination:{
@@ -310,6 +328,11 @@
         initDictOptions('tb_contact,name,id').then((res) => {
           if (res.success) {
             this.$set(this.dictOptions, 'contactId', res.result)
+          }
+        })
+        initDictOptions('tb_contact,mobile_phone,id').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'mobilePhone', res.result)
           }
         })
         initDictOptions('work_order_emergency_level').then((res) => {
@@ -364,6 +387,40 @@
           }
           this.loading = false;
         })
+      },
+      setStatus(status) {
+        if (this.selectedRowKeys.length <= 0) {
+          this.$message.warning('请选择一条记录！');
+          return;
+        } else {
+          var ids = "";
+          for (var a = 0; a < this.selectedRowKeys.length; a++) {
+            ids += this.selectedRowKeys[a] + ",";
+          }
+        }
+        let message = '';
+        switch (status) {
+          case 3:
+            message += '您确定要完成选中工单吗?';
+            break;
+          case 4:
+             message += '您确定要关闭选中工单吗?';
+            break;
+        }
+        this.$confirm({
+          title:message,
+          onOk:() =>{
+            let url = this.url.setStatusBatch+"?ids="+this.selectedRowKeys.toString()+"&status="+status
+            postAction(url,null).then((res) => {
+              if (res.success) {
+                this.$message.success(res.message);
+                this.loadData();
+              } else {
+                this.$message.error(res.message);
+              }
+            });
+          }
+        });
       }
 
     }

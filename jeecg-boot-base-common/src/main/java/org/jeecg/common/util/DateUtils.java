@@ -4,6 +4,7 @@ import java.beans.PropertyEditorSupport;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -618,5 +619,29 @@ public class DateUtils extends PropertyEditorSupport {
 		calendar.setTime(getDate());
 		return calendar.get(Calendar.YEAR);
 	}
+
+    /**
+     * @Desc 获取两个时间之间的间隔天数
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    public static String getBetweenDays(Date startTime, Date endTime) {
+        int betweenDays = 0;
+        long start = startTime.getTime();
+        long end = endTime.getTime();
+
+        betweenDays = (int) (Math.abs(end - start)/(24*3600*1000));
+
+        return String.valueOf(betweenDays + 1);
+    }
+
+    private static Date strToDateLong(String strDate) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        ParsePosition pos = new ParsePosition(0);
+        Date strtodate = formatter.parse(strDate, pos);
+        return strtodate;
+    }
+
 
 }

@@ -4,12 +4,10 @@ import java.io.Serializable;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import org.jeecg.common.aspect.annotation.Dict;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
-import java.util.Date;
 
 /**
  * @Description: 工单明细
@@ -66,4 +64,10 @@ public class WorkOrderDetail implements Serializable {
 	private java.lang.String peers;
 	/**所属工单*/
 	private java.lang.String workOrderId;
+	/**指派人*/
+	private java.lang.String assigneeName;
+    /**指派时间*/
+    private java.util.Date assignedTime;
+    /**计划完成时间*/
+    private java.util.Date plannedCompletionTime;
 }

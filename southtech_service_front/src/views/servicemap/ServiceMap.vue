@@ -2,16 +2,24 @@
   <div id="components-layout-demo-basic">
     <a-layout>
       <a-layout-sider>
-        <sac-card title="服务工单" :list="ticketList" @checkboxChange="ticketSel"></sac-card>
-        <sac-card title="服务工程师" :list="enginerList" @checkboxChange="engSel"></sac-card>
+        <sac-card ref="ticket" title="服务工单" :url='ticketUrl' v-model="ticketMarkers"></sac-card>
+        <sac-card ref="enginer" title="服务工程师" :url='enginerUrl' v-model="enginerMarkers"></sac-card>
       </a-layout-sider>
       <a-layout>
         <div :style="{width: '100%', height: '100%'}">
-          <el-amap vid="amap" :zoom="11" :plugin="plugin" :center="center">
-            <el-amap-marker v-for="(titem, index) in ticketMarkers" :key="index" :position="titem.position"
-                            :vid="index" :title="titem.name" :clickable="true" icon="~@/assets/customerLocal.png"></el-amap-marker>
-            <el-amap-marker v-for="(eitem, index) in enginerMarkers" :key="index" :position="eitem.position"
-                            :vid="index" :title="eitem.name" :clickable="true" icon="~@/assets/enginerLocal.png"></el-amap-marker>
+          <el-amap vid="servicemap" :zoom="zoom" :plugin="plugin" :center="center" :amap-manager="amapManager">
+            <el-amap-marker v-for="(titem, index) in ticketMarkers" :key="index"
+                            :position="[titem.longitude,titem.latitude]"
+                            :vid="index" :title="'客户名称：' + titem.name" :clickable="true" :icon="customerIcon"
+                            :offset="[-16, -30]" :events="titem.events"></el-amap-marker>
+
+            <el-amap-marker v-for="(eitem, index) in enginerMarkers" :key="index"
+                            :position="[eitem.longitude,eitem.latitude]"
+                            :vid="index" :title="'工程师：' + eitem.name" :clickable="true" :icon="enginerIcon"
+                            :offset="[-16, -30]"></el-amap-marker>
+
+            <el-amap-info-window v-if="window" :position="window.position" :visible="window.visible"
+                                 :content="window.content"></el-amap-info-window>
           </el-amap>
         </div>
       </a-layout>
@@ -20,6 +28,9 @@
 </template>
 
 <script>
+  import {AMapManager} from "vue-amap"
+
+  let amapManager = new AMapManager();
   export default {
     name: "ServiceMap",
     components: {
@@ -28,114 +39,52 @@
     data() {
       let self = this;
       return {
-        center: [0, 0],
-        plugin: [{
-          convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
-          buttonPosition: 'RB',    //定位按钮停靠位置，默认：'LB'，左下角
-          panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
-          zoomToAccuracy: true,//定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
-          extensions: 'all',
-          pName: 'Geolocation',
-          events: {
-            init(o) {
-              // o 是高德地图定位插件实例
-              o.getCurrentPosition((status, result) => {
-                if (result && result.position) {
-                  let lng = result.position.lng;
-                  let lat = result.position.lat;
-                  self.center = [lng, lat];
-                  self.$nextTick();
-                }
-              });
+        customerIcon: require('../../assets/customerIcon.png'),
+        enginerIcon: require('../../assets/enginerIcon.png'),
+        center: [109.12014,32.441281],
+        oldCenter: [109.12014,32.441281],// 记录最初始的经纬度
+        amapManager,
+        zoom: 5,
+        plugin: [
+          /*{
+            convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
+            buttonPosition: 'RB',    //定位按钮停靠位置，默认：'LB'，左下角
+            panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
+            zoomToAccuracy: true,//定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
+            extensions: 'all',
+            pName: 'Geolocation',
+            events: {
+              init(o) {
+                // o 是高德地图定位插件实例
+                o.getCurrentPosition((status, result) => {
+                  if (result && result.position) {
+                    let lng = result.position.lng;
+                    let lat = result.position.lat;
+                    self.center = [lng, lat];
+                    self.oldCenter = self.center;
+                    self.$nextTick();
+                  }
+                });
+              }
             }
-          }
-        },
-        {
-          pName: 'Scale'
-        }],
-        ticketList: [
+          },*/
           {
-            name: '佛山创意产业园',
-            position: [113.097795,23.013805],
-            address: '广东省佛山市禅城区张槎街道19 Megacera佛山创意产业园(季华四路)',
-            checked: false
-          },
-          {
-            name: '佛山新DNA',
-            position: [113.107846,22.993916],
-            address: '广东省佛山市禅城区石湾镇街道天御尚城',
-            checked: false
-          },
-          {
-            name: '乐从镇天佑城',
-            position: [113.107514,22.947229],
-            address: '广东省佛山市乐从镇',
-            checked: false
-          },
-          {
-            name: 'D',
-            position: [],
-            address: '',
-            checked: false
-          },
-          {
-            name: 'E',
-            position: [],
-            address: '',
-            checked: false
-          }
-        ],
-        enginerList: [
-          {
-            name: 'F',
-            position: [],
-            address: '',
-            checked: false
-          },
-          {
-            name: 'G',
-            position: [],
-            address: '',
-            checked: false
-          },
-          {
-            name: 'H',
-            position: [],
-            address: '',
-            checked: false
-          },
-          {
-            name: 'I',
-            position: [],
-            address: '',
-            checked: false
-          },
-          {
-            name: 'J',
-            position: [],
-            address: '',
-            checked: false
+            pName: 'Scale'
           }
         ],
         ticketMarkers: [],
-        enginerMarkers: []
+        enginerMarkers: [],
+        windows: [],
+        window: '',
+        ticketUrl: {
+          list: '/client/client/listPageByWorkOrder'
+        },
+        enginerUrl: {
+          list: '/sys/user/enginerList'
+        }
       }
     },
     methods: {
-      ticketSel(obj) {
-        console.log('checked = ticket --> ', obj)
-        if (obj.checked) {
-          this.ticketMarkers.push(obj);
-        } else {
-          let index = this.ticketMarkers.indexOf(obj);
-          if (index > -1) {
-            this.ticketMarkers.splice(index, 1);
-          }
-        }
-      },
-      engSel(obj) {
-        console.log('checked = eng --> ', obj)
-      }
     },
   }
 </script>
@@ -159,9 +108,10 @@
   }
 
   #components-layout-demo-basic .ant-layout-sider {
-    background: #3ba0e9;
-    color: #fff;
-    line-height: 120px;
+    background: #fff;
+    color: #000;
+    /*line-height: 120px;*/
+    line-height: 50px;
     flex: none !important;
     max-width: 300px !important;
     min-width: 300px !important;

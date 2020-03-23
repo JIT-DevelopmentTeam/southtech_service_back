@@ -135,6 +135,11 @@ public class SysUser implements Serializable {
     private String telephone;
 
     /**
+     * 企业应用id
+     */
+    private String enterpriseId;
+
+    /**
      * 创建人
      */
     private String createBy;

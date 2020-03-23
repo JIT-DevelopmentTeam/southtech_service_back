@@ -9,6 +9,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cn.hutool.core.exceptions.ValidateException;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
@@ -74,7 +76,13 @@ public class StageController extends JeecgController<Stage, IStageService> {
 	 */
 	@PostMapping(value = "/add")
 	public Result<?> add(@RequestBody Stage stage) {
-		stageService.save(stage);
+
+		try {
+			stageService.save(stage);
+		}catch (ValidateException ex){
+			return Result.error(ex.getMessage());
+		}
+
 		return Result.ok("添加成功！");
 	}
 	

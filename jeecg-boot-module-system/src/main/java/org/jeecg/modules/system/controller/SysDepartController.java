@@ -448,13 +448,13 @@ public class SysDepartController {
                         }
                     }
                     QueryWrapper<SysUser> userQueryWrapper = new QueryWrapper<>();
-                    userQueryWrapper.eq("username",userDetailResponse.getJobnumber());
+                    userQueryWrapper.eq("enterprise_id",userDetailResponse.getUserid());
                     SysUser editUser = sysUserService.getOne(userQueryWrapper);
                     if (oConvertUtils.isEmpty(editUser)) {
                         SysUser addUser = new SysUser();
-                        addUser.setId(UUIDGenerator.generate());
                         addUser.setUsername(userDetailResponse.getJobnumber());
                         addUser.setRealname(userDetailResponse.getName());
+                        addUser.setEnterpriseId(userDetailResponse.getUserid());
                         addUser.setSex(0);
                         String salt = oConvertUtils.randomGen(8);
                         addUser.setSalt(salt);
