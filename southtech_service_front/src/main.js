@@ -43,6 +43,7 @@ import JeecgComponents from '@/components/jeecg/index'
 // 引入vue-amap
 import VueAMap from 'vue-amap'
 import Gantt from '@/components/Gantt'
+import moment from 'moment'
 
 
 Vue.config.productionTip = false
@@ -61,6 +62,9 @@ Vue.use(JeecgComponents);
 Vue.use(VueAMap)
 Vue.use(Gantt);
 Vue.component('Gantt', Gantt)
+moment.locale('cn')
+Vue.prototype.$moment = moment
+
 
 // 初始化vue-amap
 VueAMap.initAMapApiLoader({

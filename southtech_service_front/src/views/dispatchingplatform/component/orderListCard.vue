@@ -35,7 +35,7 @@
                   <span>报障时间：{{ item.declarationTime }}</span>
                 </a-col>
                 <a-col :span="6">
-                  <span class="time">过去4小时</span>
+                  <span class="time">{{ calTime(item.declarationTime) }}</span>
                 </a-col>
               </a-row>
               <a-row>
@@ -101,6 +101,7 @@
 <script>
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
   import {getAction} from '@/api/manage'
+  import {calculationTime} from '@/utils/moment'
 
   export default {
     name: "orderListCard",
@@ -254,10 +255,16 @@
           return this.ticketList
         }
         return this.ticketList.filter(e => e.type === this.orderType);
+      },
+      calTime(dataTime) {
+        return dataTime => {
+          return calculationTime(dataTime);
+        }
       }
     },
     created() {
       this.loadTicket('', this.pageNo);
+      console.log(this)
     }
   }
 </script>
