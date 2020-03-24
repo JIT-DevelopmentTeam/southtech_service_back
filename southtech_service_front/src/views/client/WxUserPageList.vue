@@ -1,6 +1,6 @@
 <template>
   <a-card :bordered="false">
-      <!-- 查询区域 -->
+    <!-- 查询区域 -->
     <div class="table-page-search-wrapper">
       <a-form layout="inline" @keyup.enter.native="searchQuery">
         <a-row :gutter="24">
@@ -32,16 +32,10 @@
       </a-form>
     </div>
     <!-- 查询区域-END -->
-
+    
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <a-button @click="synchronize" v-has="'wxUser:synchronize'" type="primary" icon="cloud-download">同步</a-button>
-      <!-- <a-dropdown v-if="selectedRowKeys.length > 0">
-        <a-menu slot="overlay">
-          <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
-        </a-menu>
-        <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /></a-button>
-      </a-dropdown> -->
+       <a-button @click="synchronize" v-has="'wxUser:synchronize'" type="primary" icon="cloud-download">同步</a-button>
     </div>
 
     <!-- table区域-begin -->
@@ -60,7 +54,8 @@
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
-        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type:'radio'}"
+        :customRow="clickThenSelect"
         @change="handleTableChange">
 
         <template slot="htmlSlot" slot-scope="text">
@@ -85,16 +80,24 @@
 
         <span slot="action" slot-scope="text, record">
           <a @click="handleEdit(record)">编辑</a>
-          <a-divider type="vertical" />
-          <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
-            <a>删除</a>
-          </a-popconfirm>
+
+          <!-- <a-divider type="vertical" />
+          <a-dropdown>
+            <a class="ant-dropdown-link">更多 <a-icon type="down" /></a>
+            <a-menu slot="overlay">
+              <a-menu-item>
+                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
+                  <a>删除</a>
+                </a-popconfirm>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown> -->
         </span>
 
       </a-table>
     </div>
 
-    <wxUser-modal ref="modalForm" @ok="modalFormOk" :mainId="mainId"></wxUser-modal>
+    <wxUser-modal ref="modalForm" @ok="modalFormOk"></wxUser-modal>
   </a-card>
 </template>
 
@@ -102,50 +105,21 @@
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import WxUserModal from './modules/WxUserModal'
+  import { getAction } from '@/api/manage'
+  
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
-
-
   export default {
-    name: "WxUserList",
+    name: "WxUserPageList",
     mixins:[JeecgListMixin],
-    components: { WxUserModal },
-    props:{
-      mainId:{
-        type:String,
-        default:'',
-        required:false
-      }
-    },
-    watch:{
-      mainId:{
-        immediate: true,
-        handler(val) {
-          if(!this.mainId){
-            this.clearList()
-          }else{
-            this.queryParam['clientId'] = val
-            this.loadData(1);
-          }
-        }
-      }
+    components: {
+      WxUserModal
     },
     data () {
       return {
-        description: '微信用户管理',
-        disableMixinCreated:true,
+        description: '设备档案管理页面',
         // 表头
         columns: [
-          {
-            title: '#',
-            dataIndex: '',
-            key:'rowIndex',
-            width:60,
-            align:"center",
-            customRender:function (t,r,index) {
-              return parseInt(index)+1;
-            }
-          },
           {
             title:'昵称',
             align:"center",
@@ -199,21 +173,53 @@
         dictOptions:{
          clientId:[]
         },
+        /* 分页参数 */
+        ipagination:{
+          current: 1,
+          pageSize: 10,
+          pageSizeOptions: ['5', '10', '50'],
+          showTotal: (total, range) => {
+            return range[0] + "-" + range[1] + " 共" + total + "条"
+          },
+          showQuickJumper: true,
+          showSizeChanger: true,
+          total: 0
+        },
+        selectedMainId:''
 
       }
     },
+    computed: {
+      importExcelUrl: function(){
+        return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
+      }
+    },
     methods: {
-      clearList(){
-        this.dataSource=[]
-        this.selectedRowKeys=[]
-        this.ipagination.current = 1
-      },
       initDictConfig(){
         initDictOptions('tb_client,name,id').then((res) => {
           if (res.success) {
             this.$set(this.dictOptions, 'clientId', res.result)
           }
         })
+      },
+      clickThenSelect(record) {
+        return {
+          on: {
+            click: () => {
+              this.onSelectChange(record.id.split(","), [record]);
+            }
+          }
+        }
+      },
+      onClearSelected() {
+        this.selectedRowKeys = [];
+        this.selectionRows = [];
+        this.selectedMainId=''
+      },
+      onSelectChange(selectedRowKeys, selectionRows) {
+        this.selectedMainId=selectedRowKeys[0]
+        this.selectedRowKeys = selectedRowKeys;
+        this.selectionRows = selectionRows;
       },
       synchronize() {
         this.$confirm({
@@ -232,7 +238,7 @@
               });
             }
         });
-      }
+      },
     }
   }
 </script>

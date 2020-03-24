@@ -99,7 +99,11 @@
 				// "disableScroll": true
 			}
 		}
-	],
+	    ,{
+            "path" : "pages/failuredeclaration/FailureDeclaration",
+            "style" : {}
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "售后服务平台",

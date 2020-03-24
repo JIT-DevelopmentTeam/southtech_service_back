@@ -1,5 +1,4 @@
 package org.jeecg.modules.management.client.controller;
-import java.util.Date;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -26,8 +25,11 @@ import org.jeecg.modules.management.erp.erpinterface.ERPInterfaceConstant;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
 import org.jeecg.modules.wechat.constant.WechatConstant;
+import org.jeecg.modules.wechat.entity.WxUserEntity;
+import org.jeecg.modules.wechat.util.WxUserUtils;
 import org.jeewx.api.core.exception.WexinReqException;
-import org.jeewx.api.wxuser.user.JwUserAPI;
+import org.jeewx.api.core.req.WeiXinReqService;
+import org.jeewx.api.core.req.model.user.UserInfoListGet;
 import org.jeewx.api.wxuser.user.model.Wxuser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -41,8 +43,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.jeewx.api.wxuser.user.JwUserAPI.getWxuser;
 
- /**
+
+/**
  * @Description: 客户信息
  * @Author: jeecg-boot
  * @Date:   2020-03-10
@@ -426,7 +430,13 @@ public class ClientController extends JeecgController<Client, IClientService> {
                                          @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                          @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                          HttpServletRequest req) {
+         if (StringUtils.isNotBlank(wxUser.getNickname())) {
+             wxUser.setNickname(wxUser.getNickname().trim());
+         }
          QueryWrapper<WxUser> queryWrapper = QueryGenerator.initQueryWrapper(wxUser, req.getParameterMap());
+         if (StringUtils.isNotBlank(wxUser.getNickname())) {
+             queryWrapper.like("nickname",wxUser.getNickname());
+         }
          Page<WxUser> page = new Page<WxUser>(pageNo, pageSize);
          IPage<WxUser> pageList = wxUserService.page(page, queryWrapper);
          return Result.ok(pageList);
@@ -483,34 +493,30 @@ public class ClientController extends JeecgController<Client, IClientService> {
      @GetMapping(value = "/synchronizeWxUser")
      public Result<?> synchronizeWxUser() {
          try {
-             List<Wxuser> wxuserList = JwUserAPI.getAllWxuser(redisUtil.get(WechatConstant.ACCESS_TOKEN_KEY).toString(),null);
-             if (!wxuserList.isEmpty()) {
-                 List<WxUser> saveOrUpdateWxUserList = new ArrayList<>();
-                 for (Wxuser wxuser : wxuserList) {
-                     QueryWrapper<WxUser> wxUserQueryWrapper = new QueryWrapper<>();
-                     wxUserQueryWrapper.eq("open_id",wxuser.getOpenid());
-                     WxUser editWxUser = wxUserService.getOne(wxUserQueryWrapper);
-                     if (oConvertUtils.isEmpty(editWxUser)) {
-                         WxUser addWxUser = new WxUser();
-                         addWxUser.setOpenId(wxuser.getOpenid());
-                         addWxUser.setNickname(wxuser.getNickname());
-                         addWxUser.setSex(wxuser.getSex());
-                         addWxUser.setCity(wxuser.getCity());
-                         addWxUser.setCountry(wxuser.getCountry());
-                         addWxUser.setProvince(wxuser.getProvince());
-                         addWxUser.setRemark(wxuser.getRemark());
-                         saveOrUpdateWxUserList.add(addWxUser);
-                     } else {
-                         editWxUser.setNickname(wxuser.getNickname());
-                         editWxUser.setSex(wxuser.getSex());
-                         editWxUser.setCity(wxuser.getCity());
-                         editWxUser.setCountry(wxuser.getCountry());
-                         editWxUser.setProvince(wxuser.getProvince());
-                         editWxUser.setRemark(wxuser.getRemark());
-                         saveOrUpdateWxUserList.add(editWxUser);
-                     }
+             List<WxUserEntity> wxuserList = WxUserUtils.getAllWxuser(redisUtil.get(WechatConstant.ACCESS_TOKEN_KEY).toString(),null);
+             for (WxUserEntity wxUserEntity : wxuserList) {
+                 QueryWrapper<WxUser> wxUserQueryWrapper = new QueryWrapper<>();
+                 wxUserQueryWrapper.eq("open_id", wxUserEntity.getOpenid());
+                 WxUser editWxUser = wxUserService.getOne(wxUserQueryWrapper);
+                 if (oConvertUtils.isEmpty(editWxUser)) {
+                     WxUser addWxUser = new WxUser();
+                     addWxUser.setOpenId(wxUserEntity.getOpenid());
+                     addWxUser.setNickname(wxUserEntity.getNickname());
+                     addWxUser.setSex(wxUserEntity.getSex());
+                     addWxUser.setCity(wxUserEntity.getCity());
+                     addWxUser.setCountry(wxUserEntity.getCountry());
+                     addWxUser.setProvince(wxUserEntity.getProvince());
+                     addWxUser.setRemark(wxUserEntity.getRemark());
+                     wxUserService.save(addWxUser);
+                 } else {
+                     editWxUser.setNickname(wxUserEntity.getNickname());
+                     editWxUser.setSex(wxUserEntity.getSex());
+                     editWxUser.setCity(wxUserEntity.getCity());
+                     editWxUser.setCountry(wxUserEntity.getCountry());
+                     editWxUser.setProvince(wxUserEntity.getProvince());
+                     editWxUser.setRemark(wxUserEntity.getRemark());
+                     wxUserService.updateById(editWxUser);
                  }
-                 wxUserService.saveOrUpdateBatch(saveOrUpdateWxUserList);
              }
          } catch (WexinReqException e) {
              e.printStackTrace();

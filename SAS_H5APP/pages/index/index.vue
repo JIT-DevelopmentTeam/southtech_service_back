@@ -45,7 +45,7 @@
 								icon: "iconrizhiyichang",
 								color: "#be78f2",
 								pageType: 'page',
-								url: ''
+								url: '/pages/failuredeclaration/FailureDeclaration'
 							}
 						]
 					},

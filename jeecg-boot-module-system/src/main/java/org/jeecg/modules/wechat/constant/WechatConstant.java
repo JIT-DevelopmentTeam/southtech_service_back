@@ -7,10 +7,10 @@ package org.jeecg.modules.wechat.constant;
 public class WechatConstant {
 
     // AppID
-    public static final String APP_ID = "";
+    public static final String APP_ID = "wx35360545b97a547b";
 
     // Secret
-    public static final String SECRET = "";
+    public static final String SECRET = "ae325b78c21d83a49295ae2749e09d46";
 
     public static final String ACCESS_TOKEN_KEY = "wechatToken";
 

@@ -16,7 +16,7 @@ public class TokenJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
         DingTalkAccessTokenUtils.setToken();
-        //WechatTokenUtils.setToken();
+        WechatTokenUtils.setToken();
         ERPTokenUtils.setToken();
     }
 

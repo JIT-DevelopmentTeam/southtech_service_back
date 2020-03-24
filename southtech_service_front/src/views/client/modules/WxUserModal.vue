@@ -11,24 +11,34 @@
       <a-form :form="form">
 
         <a-form-item label="昵称" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'nickname', validatorRules.nickname]" placeholder="请输入昵称"></a-input>
+          <a-input v-decorator="[ 'nickname', validatorRules.nickname]" :disabled="true" placeholder="请输入昵称"></a-input>
         </a-form-item>
         <a-form-item label="性别" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="radio" v-decorator="['sex']" :trigger-change="true" dictCode="" placeholder="请选择性别"/>
+          <j-dict-select-tag type="radio" v-decorator="['sex']" :trigger-change="true" :disabled="true"  dictCode="sex" placeholder="请选择性别"/>
         </a-form-item>
         <a-form-item label="城市" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'city', validatorRules.city]" placeholder="请输入城市"></a-input>
+          <a-input v-decorator="[ 'city', validatorRules.city]" :disabled="true" placeholder="请输入城市"></a-input>
         </a-form-item>
         <a-form-item label="国家" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'country', validatorRules.country]" placeholder="请输入国家"></a-input>
+          <a-input v-decorator="[ 'country', validatorRules.country]" :disabled="true" placeholder="请输入国家"></a-input>
         </a-form-item>
         <a-form-item label="省份" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'province', validatorRules.province]" placeholder="请输入省份"></a-input>
+          <a-input v-decorator="[ 'province', validatorRules.province]" :disabled="true" placeholder="请输入省份"></a-input>
         </a-form-item>
         <a-form-item label="备注" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'remark', validatorRules.remark]" placeholder="请输入备注"></a-input>
+          <a-input v-decorator="[ 'remark', validatorRules.remark]" :disabled="true" placeholder="请输入备注"></a-input>
         </a-form-item>
-
+        <a-form-item label="备注" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'remark', validatorRules.remark]" :disabled="true" placeholder="请输入备注"></a-input>
+        </a-form-item>
+        <a-form-item label="客户" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <j-search-select-tag
+            placeholder="请选择客户"
+            v-decorator="['clientId',validatorRules.clientId]"
+            dict="tb_client,name,id"
+            :async="true">
+          </j-search-select-tag>
+        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
@@ -39,11 +49,14 @@
   import { httpAction } from '@/api/manage'
   import pick from 'lodash.pick'
   import JDictSelectTag from "@/components/dict/JDictSelectTag"
+  import JSearchSelectTag from '@/components/dict/JSearchSelectTag'
+
 
   export default {
     name: "WxUserModal",
     components: {
       JDictSelectTag,
+      JSearchSelectTag
     },
     props:{
       mainId:{
@@ -76,6 +89,7 @@
         country:{},
         province:{},
         remark:{},
+        clientId:{ rules:[{ required:true, message:'请选择客户!'}] }
         },
         url: {
           add: "/client/client/addWxUser",
@@ -118,7 +132,6 @@
                method = 'put';
             }
             let formData = Object.assign(this.model, values);
-            formData['clientId'] = this.mainId
             console.log("表单提交数据",formData)
             httpAction(httpurl,formData,method).then((res)=>{
               if(res.success){
