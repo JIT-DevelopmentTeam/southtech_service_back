@@ -33,6 +33,7 @@
             client.`name` AS "clientName",
             contact.`name` AS "contactName",
             contact.mobile_phone AS "contactPhone",
+            contact.email AS "email",
             client.province AS "province",
             client.city AS "city",
             client.area AS "area",
@@ -48,6 +49,14 @@
             LEFT JOIN ic_work_order workOrder ON workOrder.id = detail.work_order_id
             LEFT JOIN tb_client client ON client.id = workOrder.client_id
             LEFT JOIN tb_contact contact ON contact.client_id = client.id
+        WHERE
+            1=1
+            <if test="userName != null and userName !=''">
+                AND detail.service_engineer_name = #{userName}
+            </if>
+            <if test="status != null and status != ''">
+                AND workOrder.status = #{status}
+            </if>
     </select>
 
 </mapper>

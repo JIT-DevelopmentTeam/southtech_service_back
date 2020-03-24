@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
+import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDTO;
 import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 
 import java.io.Serializable;
@@ -47,4 +48,11 @@ public interface IWorkOrderService extends IService<WorkOrder> {
 	 * @return
 	 */
 	Page<WorkOrderDTO> queryListByType(Page<WorkOrderDTO> page, String type);
+
+	/**
+	 * 钉钉-查询所有工单
+	 * @param page
+	 * @return
+	 */
+	Page<MobileWorkOrderDTO> queryMobileList(Page<MobileWorkOrderDTO> page, String userName, String status);
 }

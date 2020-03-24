@@ -18,6 +18,8 @@ public class MobileWorkOrderDTO {
     private String contactName;
     // 电话
     private String contactPhone;
+    // 邮箱
+    private String email;
     // 省
     private String province;
     // 市

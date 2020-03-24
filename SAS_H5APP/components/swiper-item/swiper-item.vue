@@ -3,19 +3,19 @@
 		<view class="example-body">
 			<step-device :options="stageList" active-color="#007AFF" :active="active" direction="column">
 				<template v-slot:todo="{todo,index}">
-					<view @click="toRepair(todo.id,ticketId, todo.stageStatus, index)">
+					<view @click="toRepair(todo.id,ticketId, todo.finishTime, index)">
 						<view class="sameLine">
 							<view class="uni-steps__column-title" :style="{color:index <=active ? index == active ?activeColor : goColor :deactiveColor}">
 								{{todo.name}}
 								<!-- <span class="iconfont iconnaozhong alarmClock" ></span> -->
 								<!-- <span class="descstyle">{{dateTime(todo.date)}}</span> -->
 							</view>
-							<view class="uni-steps__column-desc" v-if="todo.stageProcess != undefined && todo.stageProcess.completedDate != undefined">
-								{{ formatDate(todo.stageProcess.completedDate) }}	
+							<view class="uni-steps__column-desc" v-if="todo.finishTime != undefined">
+								{{ formatDate(todo.finishTime) }}	
 							</view>
 						</view>
 						<view class="sameLine fiexRight">
-							<span v-if="todo.stageStatus === 1">
+							<span v-if="todo.finishTime !== null">
 								<span class="iconfont iconchenggong iconSuccess" ></span>
 							</span>
 							<span v-else>
@@ -47,7 +47,7 @@
 				}
 			},
 			ticketType: {
-				type: Number,
+				type: String,
 				default () {
 					return ""
 				}
@@ -68,10 +68,12 @@
 			}
 		},
 		methods: {
-			toRepair(stageId,ticketId,stageStatus, index) {
+			toRepair(stageId,ticketId,finishTime, index) {
+				let stageStatus = 0;
+				if(finishTime !== null) {stageStatus = 1}
 				if(!this.isNavigateTo){return;}
 				if (index > 0) {
-					if (this.stageList[index-1].stageStatus === 0) {
+					if (this.stageList[index-1].finishTime === null) {
 						uni.showToast({
 							title: '请按照阶段顺序执行！',
 							mask: true,
@@ -99,19 +101,17 @@
 			},
 			stageList() {
 				let stageLists = this.$store.getters['stage/getStageList']
-				this.active = 0
 				stageLists.forEach((list, index) => {
-					if (list.current == 1) {
-						this.active = index
+					if (list.finishTime !== null) {
+						this.active = index+1
 					}
 				})
 				return stageLists
 			}
 		},
 		created() {
-			let ticketType = this.ticketType
 			let ticketId = this.ticketId
-			var payload = {'ticketType': ticketType, 'ticketId': ticketId}
+			var payload = {'workOrderId': ticketId}
 			this.$store.dispatch('stage/GetDataList', payload)
 		}
 	}

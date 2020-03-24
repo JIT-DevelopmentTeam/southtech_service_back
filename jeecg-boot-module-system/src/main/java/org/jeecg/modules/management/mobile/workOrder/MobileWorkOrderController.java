@@ -1,9 +1,9 @@
 package org.jeecg.modules.management.mobile.workOrder;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.jeecg.common.api.vo.Result;
-import org.jeecg.modules.management.workorder.entity.WorkOrder;
+import org.jeecg.modules.management.workorder.service.IWorkOrderService;
+import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDTO;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +20,19 @@ public class MobileWorkOrderController {
     @Autowired
     private ISysUserService sysUserService;
 
+    @Autowired
+    private IWorkOrderService workOrderService;
+
     @RequestMapping(value = "/workOrderList")
     public Result<?> workOrderList(@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
                                    @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
                                    HttpServletRequest req) {
+        Result<Page<MobileWorkOrderDTO>> result = new Result<Page<MobileWorkOrderDTO>>();
+        Page<MobileWorkOrderDTO> pageList = new Page<>(pageNo, pageSize);
         SysUser user = sysUserService.getByEnterpriseId(req.getParameter("userId"));
-        QueryWrapper<WorkOrder> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("", user.getUsername());
-        Page<WorkOrder> page = new Page<WorkOrder>(pageNo, pageSize);
-        return Result.ok();
+        pageList = workOrderService.queryMobileList(pageList, user.getUsername(), req.getParameter("status"));
+        result.setSuccess(true);
+        result.setResult(pageList);
+        return result;
     }
 }

@@ -2,16 +2,16 @@ package org.jeecg.modules.management.stage.service.impl;
 
 import cn.hutool.core.exceptions.ValidateException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.dozer.DozerBeanMapper;
-import org.jeecg.common.api.vo.Result;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.jeecg.modules.management.stage.entity.Stage;
 import org.jeecg.modules.management.stage.mapper.StageMapper;
 import org.jeecg.modules.management.stage.service.IStageService;
+import org.jeecg.modules.management.stage.vo.MobileStageDTO;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import java.util.List;
 
 /**
  * @Description: 阶段信息
@@ -24,6 +24,9 @@ public class StageServiceImpl extends ServiceImpl<StageMapper, Stage> implements
 
     @Autowired
     ISysDictService sysDictService;
+
+    @Autowired
+    private StageMapper stageMapper;
 
 
 
@@ -50,5 +53,15 @@ public class StageServiceImpl extends ServiceImpl<StageMapper, Stage> implements
         
 
         return super.save(entity);
+    }
+
+    /**
+     * 根据工单id查询进度列表
+     * @param workOrderId
+     * @return
+     */
+    @Override
+    public List<MobileStageDTO> queryStageByWorkOrderId(String workOrderId) {
+        return stageMapper.queryStageByWorkOrderId(workOrderId);
     }
 }

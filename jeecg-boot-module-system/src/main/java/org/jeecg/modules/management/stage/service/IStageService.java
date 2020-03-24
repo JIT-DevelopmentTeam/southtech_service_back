@@ -1,7 +1,10 @@
 package org.jeecg.modules.management.stage.service;
 
-import org.jeecg.modules.management.stage.entity.Stage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.management.stage.entity.Stage;
+import org.jeecg.modules.management.stage.vo.MobileStageDTO;
+
+import java.util.List;
 
 /**
  * @Description: 阶段信息
@@ -10,5 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @Version: V1.0
  */
 public interface IStageService extends IService<Stage> {
+
+    List<MobileStageDTO> queryStageByWorkOrderId(String workOrderId);
 
 }

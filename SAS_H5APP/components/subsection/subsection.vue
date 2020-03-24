@@ -3,17 +3,20 @@
 		<uni-segmented-control class="borderStyle" :current="current" :values="items" @clickItem="onClickItem" style-type="button" active-color="#09a0f7">
 		</uni-segmented-control>
 		<scroll-view :scroll-top="scrollTop" scroll-y="true" class="scroll-Y" @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll">
-			<card v-for="(item,index) in displayList" :info="item" :key="index"></card>
+			<card v-for="(item,index) in dataSource" :info="item" :key="index"></card>
+			<uni-load-more :status="'loading'" v-show="load"></uni-load-more>
 		</scroll-view>
 	</view>
 </template>
 
 <script>
+	import { mapGetters } from 'vuex'
 	export default {
 		name: 'subSection',
 		components: {
 			uniSegmentedControl: () => import('@dcloudio/uni-ui/lib/uni-segmented-control/uni-segmented-control.vue'), 
-			card: () => import('@/components/card/card.vue')
+			card: () => import('@/components/card/card.vue'),
+			uniLoadMore: () => import('@dcloudio/uni-ui/lib/uni-load-more/uni-load-more.vue')
 		},
 		data() {
 			return {
@@ -21,13 +24,27 @@
 				scrollTop: 0,
 				old: {
 					scrollTop: 0
-				}
+				},
+				load: false,
+				pageNo: 1,
+				pageSize: 5,
+				dataSource: [],
+				total: 0
 			}
 		},
 		methods: {
 			onClickItem(e) {
 				if (this.current !== e.currentIndex) {
 					this.current = e.currentIndex;
+					this.dataSource = [];
+					this.pageNo = 1;
+					let obj = {
+						userId: '15752589952308491',
+						status: this.current+2+"",
+						pageNo: this.pageNo,
+						pageSize: this.pageSize
+					}
+					this.loadTicketList(obj)
 				}
 			},
 			upper() {
@@ -35,16 +52,35 @@
 			},
 			lower() {
 				// console.log("到底了");
+				if (this.dataSource.length != this.total) {
+					this.load = true;
+					this.pageNo += 1;
+					let obj = {
+						userId: '15752589952308491',
+						status: this.current+2+"",
+						pageNo: this.pageNo,
+						pageSize: this.pageSize
+					}
+					this.loadTicketList(obj);
+				}
 			},
 			scroll() {
 				// console.log("滚动了");
 			},
+			async loadTicketList(obj) {
+				await this.$store.dispatch('workOrder/GetDataList', obj).then(res=>{
+					this.total = res.total
+					let result = res.list
+					result.forEach(item => {
+						this.dataSource.push(item)
+						this.load = false;
+					})
+					const dataList = this.dataSource.slice(0);
+					this.$store.commit('workOrder/setTicketList', dataList)
+				});
+			}
 		},
 		computed:{
-			displayList(){
-				let item = this.$store.getters['workOrder/getTicketList']
-				return item.filter(e=>e.ticketStatus===this.current + 2)
-			},
 			items() {
 				let item = this.$store.getters['dic/getStatusList']
 				let items = []
@@ -54,7 +90,14 @@
 				return items.splice(1)
 			}
 		},
-		beforeMount() {
+		created() {
+			let obj = {
+				userId: '15752589952308491',
+				status: this.current+2+"",
+				pageNo: this.pageNo,
+				pageSize: this.pageSize
+			}
+			this.loadTicketList(obj);
 			// this.$store.dispatch('workOrder/GetDataList', this.$store.getters['getUserId']);
 		}
 	}

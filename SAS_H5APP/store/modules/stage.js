@@ -50,9 +50,8 @@ const mutations = {
 const actions = {
 	/* 钉钉 */
 	GetDataList({commit,state},payload){
-		getStageList(payload.ticketType, payload.ticketId).then(response => {
-			commit("setStageList",response.data.body.pageList)
-			commit("setSign_Out", response.data.body.stageLogList)
+		getStageList(payload).then(response => {
+			commit("setStageList",response.data.result)
 		}).catch(error => {
 			console.log(error);
 		})

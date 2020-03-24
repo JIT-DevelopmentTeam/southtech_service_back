@@ -35,7 +35,7 @@
 				}
 			},
 			ticketType: {
-				type: Number,
+				type: String,
 				default () {
 					return ""
 				}

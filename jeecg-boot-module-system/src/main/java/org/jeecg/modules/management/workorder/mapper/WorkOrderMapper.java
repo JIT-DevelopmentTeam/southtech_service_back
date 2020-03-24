@@ -29,6 +29,6 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder> {
      * @param page
      * @return
      */
-    List<MobileWorkOrderDTO> queryMobileList(Page<MobileWorkOrderDTO> page);
+    List<MobileWorkOrderDTO> queryMobileList(Page<MobileWorkOrderDTO> page, @Param(value = "userName") String userName, @Param(value = "status") String status);
 
 }

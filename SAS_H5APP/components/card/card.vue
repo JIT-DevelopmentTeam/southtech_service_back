@@ -3,25 +3,25 @@
 		<uni-card class="uniCard" note="true">
 			<view class="info">
 				<view class="line">
-					<view class="label">{{ info.client.name }}</view>
+					<view class="label">{{ info.clientName }}</view>
 				</view>
 				<view class="line">
 					<span class="iconfont iconhuizhengongzuoliang iconStyle"></span>
-					<view class="label sameLine">联系人：{{ info.client.contact }}</view>
-					<view class="label sameLine">{{ info.client.telephone }}</view>
+					<view class="label sameLine">联系人：{{ info.contactName }}</view>
+					<view class="label sameLine">{{ info.contactPhone }}</view>
 				</view>
 				<view class="line">
-					<location :labelStyle="label" :label="info.client.area" :left_right="left_right"></location>
+					<location :labelStyle="label" :label="info.province+info.city+info.area+info.community+info.address" :left_right="left_right"></location>
 				</view>
 			</view>
 			<view class="btn">
 				<model-label :modelLabel="formatModel"></model-label>
-				<phone :phoneNum="info.client.telephone"></phone>
+				<phone :phoneNum="info.contactPhone"></phone>
 			</view>
 			<template v-slot:footer>
 				<view class="footer-box">
-					<view class="label">{{ formatDate(info.ticketAssignTime) }}</view>
-					<view class="label right">{{ calTime(formatDate(info.ticketAssignTime)) }}</view>
+					<view class="label">{{ formatDate(info.assignedTime) }}</view>
+					<view class="label right">{{ calTime(formatDate(info.assignedTime)) }}</view>
 				</view>
 			</template>
 		</uni-card>
@@ -67,7 +67,7 @@
 				let dic = this.$store.getters['dic/getTypeList']
 				let result
 				if (dic != '') {
-					result = dic.filter(e=>e.key == this.info.ticketModelId)[0].value
+					result = dic.filter(e=>e.value == this.info.type)[0].text
 				} else {
 					result = ''
 				}

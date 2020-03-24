@@ -27,10 +27,18 @@ const mutations = {
 
 const actions = {
 	GetDataList({commit,state}, payload){
-		getWorkOrderList(payload).then(response => {
-			commit("setTicketList",response.data.body.ticketList)
-		}).catch(error => {
-			console.log(error);
+		return new Promise((resolve, reject) => {
+			getWorkOrderList(payload).then(response => {
+				// commit("setTicketList",response.data.result.records)
+				let res = {
+					list: response.data.result.records,
+					total: response.data.result.total
+				}
+				resolve(res)
+			}).catch(error => {
+				console.log(error);
+				reject()
+			})
 		})
 		
 	},
