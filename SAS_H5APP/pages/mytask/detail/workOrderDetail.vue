@@ -3,7 +3,7 @@
 		<uni-card class="uniCard" note="true">
 			<view class="info">
 				<view class="line">
-					<view class="label">{{getTicket.client.name}}</view>
+					<view class="label">{{getTicket.clientName}}</view>
 				</view>
 				<view class="line">
 					<view class="sameLine">
@@ -11,7 +11,7 @@
 							工单编号：
 						</view>
 						<view class="label sameLine fontsmall">
-							{{getTicket.ticketNum}}
+							{{getTicket.number}}
 						</view>
 					</view>
 					<view class="sameLine">
@@ -19,7 +19,7 @@
 							分配时间：
 						</view>
 						<view class="label sameLine fontsmall">
-							{{formatDate(getTicket.ticketAssignTime)}}
+							{{formatDate(getTicket.assignedTime)}}
 						</view>
 					</view>
 				</view>
@@ -33,7 +33,7 @@
 						<view class="label sameLine fontsmall bold">
 							客户地址：
 						</view>
-						<location :labelStyle="labelStyle" :label="getTicket.client.area" :left_right="left_right"></location>
+						<location :labelStyle="labelStyle" :label="getTicket.province+getTicket.city+getTicket.area+getTicket.community+getTicket.address" :left_right="left_right"></location>
 					</view>
 				</view>
 				<view class="line">
@@ -42,7 +42,7 @@
 							主联系人：
 						</view>
 						<view class="label sameLine fontsmall">
-							{{getTicket.client.contact}}
+							{{getTicket.contactName}}
 						</view>
 					</view>
 					<view class="sameLine">
@@ -60,14 +60,14 @@
 							联系方式：
 						</view>
 						<view class="label sameLine fontsmall">
-							{{getTicket.client.telephone}}
+							{{getTicket.contactPhone}}
 						</view>
 					</view>
-					<phone :phoneNum="getTicket.client.telephone"></phone>
+					<phone :phoneNum="getTicket.contactPhone"></phone>
 				</view>
 			</template>
 		</uni-card>
-		<segment-control :ticketId="getTicket.id" :ticketType="getTicket.ticketModelId"></segment-control>
+		<segment-control :ticketId="getTicket.id" :ticketType="getTicket.type"></segment-control>
 	</view>
 </template>
 
@@ -108,7 +108,7 @@
 			},
 			formatModel() {
 				let dic = this.$store.getters['dic/getTypeList']
-				return dic.filter(e=>e.key == this.getTicket.ticketModelId)[0].value
+				return dic.filter(e=>e.value == this.getTicket.type)[0].text
 			}
 		},
 		methods: {

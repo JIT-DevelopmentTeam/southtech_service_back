@@ -2,4 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.management.stage.mapper.StageMapper">
 
+    <select id="queryStageByWorkOrderId" resultType="org.jeecg.modules.management.stage.vo.MobileStageDTO">
+        SELECT
+            progress.id AS "id",
+            progress.finish_time AS "finishTime",
+            stage.stage_name AS "name",
+            stage.check_in AS "checkIn",
+            stage.check_out AS "checkOut",
+            stage.take_picture AS "takePicture",
+            stage.cost_template AS "costTemplate",
+            stage.archive AS "archive",
+            stage.state_information AS "stateInformation",
+            stage.trigger_message AS "triggerMessage",
+            stage.trigger_receivable AS "triggerReceivable",
+            stage.attachment AS "attachment",
+            stage.job_description AS "jobDescription"
+        FROM
+            ic_work_order_progress progress
+            LEFT JOIN ic_work_order wo ON wo.id = progress.work_order_id
+            LEFT JOIN tb_stage stage ON stage.id = progress.stage_id
+            WHERE
+            1=1
+            <if test="workOrderId != null and workOrderId != ''">
+                AND progress.work_order_id = #{workOrderId}
+            </if>
+            ORDER BY stage.order_index
+    </select>
 </mapper>

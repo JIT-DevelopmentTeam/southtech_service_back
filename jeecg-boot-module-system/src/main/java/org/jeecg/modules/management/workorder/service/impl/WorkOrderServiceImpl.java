@@ -13,6 +13,7 @@ import org.jeecg.modules.management.workorder.mapper.WorkOrderDetailMapper;
 import org.jeecg.modules.management.workorder.mapper.WorkOrderMapper;
 import org.jeecg.modules.management.workorder.mapper.WorkOrderProgressMapper;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
+import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDTO;
 import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -110,5 +111,15 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     @Override
     public Page<WorkOrderDTO> queryListByType(Page<WorkOrderDTO> page, String type) {
         return page.setRecords(workOrderMapper.queryListByType(page, type));
+    }
+
+    /**
+     * 钉钉-查询所有工单
+     * @param page
+     * @return
+     */
+    @Override
+    public Page<MobileWorkOrderDTO> queryMobileList(Page<MobileWorkOrderDTO> page, String userName, String status) {
+        return page.setRecords(workOrderMapper.queryMobileList(page, userName, status));
     }
 }

@@ -4,7 +4,7 @@
 			<uni-card class="uniCard">
 				<view class="info">
 					<view class="line">
-						<view class="label">{{getTicket.client.name}}</view>
+						<view class="label">{{getTicket.clientName}}</view>
 					</view>
 					<view class="line">
 						<view class="sameLine">
@@ -12,7 +12,7 @@
 								工单编号：
 							</view>
 							<view class="label sameLine fontsmall">
-								{{getTicket.ticketNum}}
+								{{getTicket.number}}
 							</view>
 						</view>
 						<view class="sameLine">
@@ -20,7 +20,7 @@
 								分配时间：
 							</view>
 							<view class="label sameLine fontsmall">
-								{{formatDate(getTicket.ticketAssignTime)}}
+								{{formatDate(getTicket.assignedTime)}}
 							</view>
 						</view>
 					</view>
@@ -29,7 +29,7 @@
 							<view class="label sameLine fontsmall bold">
 								客户地址：
 							</view>
-							<location :labelStyle="labelStyle" :label="getTicket.client.area" :left_right="left_right"></location>
+							<location :labelStyle="labelStyle" :label="getTicket.province+getTicket.city+getTicket.area+getTicket.community+getTicket.address" :left_right="left_right"></location>
 						</view>
 					</view>
 				</view>
@@ -42,18 +42,18 @@
 		<form @submit="formSubmit" @reset="formReset">
 			<view class="context">
 				<conf-div title="工作要求:">
-					<span class="label">{{stage.memo}}</span>
+					<span class="label">{{stage.jobDescription}}</span>
 				</conf-div>
-				<conf-div title="当前所在位置:">
-					<location :labelStyle="labelStyle" :label="getTicket.client.area" :left_right="left_right"></location>
-				</conf-div>
+				<!-- <conf-div title="当前所在位置:">
+					<location :labelStyle="labelStyle" :label="getTicket.address" :left_right="left_right"></location>
+				</conf-div> -->
 				<conf-div title="同行人员:">
 					<view class="big">
 						<span class="label user">{{person}}</span>
 						<span class="iconfont icontianjiayonghu iconStyle Btn" @click="stageStatus != 1 ? selectUser() : ''"></span>
 					</view>
 				</conf-div>
-				<view v-if="stage.signFlag === 1">
+				<view v-if="stage.checkIn === 1">
 					<conf-div title="签到时间:" :required="required">
 						<view class="time">
 							<picker mode="date" :value="signInDate" @change="bindInDateChange" :disabled="stageStatus != 1 ? false : true">
@@ -65,7 +65,7 @@
 						</view>
 					</conf-div>
 				</view>
-				<view v-if="stage.photoFlag === 1">
+				<view v-if="stage.takePicture === 1">
 					<conf-div title="现场拍照(最多只能上传9张):" :required="required">
 						<chooseImage :num="9" :size="150" :isSave="false" saveStr="chooseImage" :isClear="hasChooseImg" :imageList="imageList"
 						 :photoList.sync="photoList" @uploadPhotoSuccess="uploadPhotoSuccess" @deletePhotoSuccess="deletePhotoSuccess"
@@ -99,20 +99,20 @@
 				<conf-div title="是否保质期内:">
 					<radio-btn :items="yes_no" @radioChange="yes_noChange" :stageStatus="stageStatus" type="isQGP"></radio-btn>
 				</conf-div>
-				<view v-if="stage.tmplateFlag === 1">
+				<view v-if="stage.costTemplate === 1">
 					<conf-div title="费用合计(元):">
 						<input placeholder="请输入费用合计(元)" type="number" v-model="cost" :disabled="stageStatus ==1 ? true : false"/>
 					</conf-div>
 				</view>
 				<conf-div title="客户邮箱:">
-					<span class="label">{{getTicket.client.email}}</span>
+					<span class="label">{{getTicket.email}}</span>
 				</conf-div>
-				<view v-if="stage.submitAttach === 1">
+				<view v-if="stage.attachment === 1">
 					<conf-div title="附件(最多只能上传9份):" :required="required">
 						<Attachment mode="create" :canUploadFile="true" :showProcess="true" :attachmentList.sync="attachmentList" @uploadSuccess="uploadSuccess" @deleteSuccess="deleteSuccess" :stageStatus="stageStatus" :fileArr="fileArr"></Attachment>
 					</conf-div>
 				</view>
-				<view v-if="stage.signOutFlag === 1">
+				<view v-if="stage.checkOut === 1">
 					<conf-div title="签出时间:" :required="required">
 						<view class="time">
 							<picker mode="date" :value="signOutDate" @change="bindOutDateChange" :disabled="stageStatus != 1 ? false : true">

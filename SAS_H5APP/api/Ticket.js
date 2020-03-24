@@ -12,23 +12,18 @@ export function getDicList(dicCode) {
 }
 
 /* 获取阶段列表 */
-export function getStageList(ticketType, ticketId) {
+export function getStageList(params) {
 	return http({
-		url: '/f/mobile/stage/getStagelist',
-		params: {
-			ticketType: ticketType,
-			ticketId: ticketId
-		}
+		url: '/mobile/stage/queryStageByWorkOrderId',
+		params: params
 	})
 }
 
 /* 获取工单列表 */
-export function getWorkOrderList(userId) {
+export function getWorkOrderList(params) {
 	return http({
-		url: '/f/mobile/ticket/list',
-		params: {
-			userId: userId
-		}
+		url: '/mobile/workOrder/workOrderList',
+		params: params
 	})
 }
 
