@@ -1,17 +1,15 @@
 package org.jeecg.modules.management.file.entity;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Data;
 import org.jeecgframework.poi.excel.annotation.Excel;
-import org.jeecg.common.aspect.annotation.Dict;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @Description: 文件表
@@ -52,6 +50,9 @@ public class File implements Serializable {
 	/**文件名*/
 	@Excel(name = "文件名", width = 15)
     private String filename;
+	/**原文件名*/
+	@Excel(name = "原文件名", width = 15)
+    private String originalFilename;
 	/**文件路径*/
 	@Excel(name = "文件路径", width = 15)
     private String url;
