@@ -15,7 +15,7 @@
       <div class="content" @scroll="hscroll($event)">
         <a-spin :spinning="spinning">
           <div id="card" @click="cardClick(item)" v-for="(item, index) in showList" :key="index">
-            <a-card v-bind:class="{actived:item.id===activeItem.id}">
+            <a-card v-bind:class="{actived:item.detailId===activeItem.detailId}">
               <a-row>
                 <a-col :span="12">
                   <span class="title">{{ workTypeText.getText( item.type ) }}</span>

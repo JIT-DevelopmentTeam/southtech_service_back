@@ -29,7 +29,8 @@
 							<view class="label sameLine fontsmall bold">
 								客户地址：
 							</view>
-							<location :labelStyle="labelStyle" :label="getTicket.province+getTicket.city+getTicket.area+getTicket.community+getTicket.address" :left_right="left_right"></location>
+							<location :labelStyle="labelStyle" :label="getTicket.province+getTicket.city+getTicket.area+getTicket.community+getTicket.address"
+							 :left_right="left_right"></location>
 						</view>
 					</view>
 				</view>
@@ -47,29 +48,25 @@
 				<!-- <conf-div title="当前所在位置:">
 					<location :labelStyle="labelStyle" :label="getTicket.address" :left_right="left_right"></location>
 				</conf-div> -->
-				<conf-div title="同行人员:">
+				<!-- <conf-div title="同行人员:">
 					<view class="big">
 						<span class="label user">{{person}}</span>
 						<span class="iconfont icontianjiayonghu iconStyle Btn" @click="stageStatus != 1 ? selectUser() : ''"></span>
 					</view>
-				</conf-div>
-				<view v-if="stage.checkIn === 1">
+				</conf-div> -->
+				<view v-if="stage.checkIn === 'true'">
 					<conf-div title="签到时间:" :required="required">
-						<view class="time">
-							<picker mode="date" :value="signInDate" @change="bindInDateChange" :disabled="stageStatus != 1 ? false : true">
-								<view class="label timeLabel">{{signInDate}}</view>
-							</picker>
-							<picker mode="time" :value="signInTime" @change="bindInTimeChange" :disabled="stageStatus != 1 ? false : true">
-								<view class="label timeLabel">{{signInTime}}</view>
-							</picker>
-						</view>
+						<time-selector showType="yearToMinute" beginDate="1970-01-01" endDate="2030-12-31" beginTime="06:00:00" endTime="23:59:59"
+						 @btnConfirm="bindInTimeConfirm">
+							<text>当前选择：{{ signInTime }}</text>
+						</time-selector>
 					</conf-div>
 				</view>
-				<view v-if="stage.takePicture === 1">
+				<view v-if="stage.takePicture === 'true'">
 					<conf-div title="现场拍照(最多只能上传9张):" :required="required">
 						<chooseImage :num="9" :size="150" :isSave="false" saveStr="chooseImage" :isClear="hasChooseImg" :imageList="imageList"
 						 :photoList.sync="photoList" @uploadPhotoSuccess="uploadPhotoSuccess" @deletePhotoSuccess="deletePhotoSuccess"
-						 :stageStatus="stageStatus" :photoArr="photoArr" :picRequestRUl="picRequestRUl"/>
+						 :stageStatus="stageStatus" :photoArr="photoArr" :picRequestRUl="picRequestRUl" />
 					</conf-div>
 				</view>
 				<conf-div title="完成情况:">
@@ -99,29 +96,32 @@
 				<conf-div title="是否保质期内:">
 					<radio-btn :items="yes_no" @radioChange="yes_noChange" :stageStatus="stageStatus" type="isQGP"></radio-btn>
 				</conf-div>
-				<view v-if="stage.costTemplate === 1">
+				<view v-if="stage.costTemplate === 'true'">
 					<conf-div title="费用合计(元):">
 						<input placeholder="请输入费用合计(元)" type="number" v-model="cost" :disabled="stageStatus ==1 ? true : false"/>
 					</conf-div>
 				</view>
-				<conf-div title="客户邮箱:">
+				<!-- <conf-div title="客户邮箱:">
 					<span class="label">{{getTicket.email}}</span>
-				</conf-div>
-				<view v-if="stage.attachment === 1">
+				</conf-div> -->
+				<view v-if="stage.attachment === 'true'">
 					<conf-div title="附件(最多只能上传9份):" :required="required">
 						<Attachment mode="create" :canUploadFile="true" :showProcess="true" :attachmentList.sync="attachmentList" @uploadSuccess="uploadSuccess" @deleteSuccess="deleteSuccess" :stageStatus="stageStatus" :fileArr="fileArr"></Attachment>
 					</conf-div>
 				</view>
-				<view v-if="stage.checkOut === 1">
+				<view v-if="stage.checkOut === 'true'">
 					<conf-div title="签出时间:" :required="required">
-						<view class="time">
-							<picker mode="date" :value="signOutDate" @change="bindOutDateChange" :disabled="stageStatus != 1 ? false : true">
-								<view class="label timeLabel">{{signOutDate}}</view>
-							</picker>
-							<picker mode="time" :value="signOutTime" @change="bindOutTimeChange" :disabled="stageStatus != 1 ? false : true">
-								<view class="label timeLabel">{{signOutTime}}</view>
-							</picker>
-						</view>
+							<time-selector
+							    showType="yearToMinute"
+							    beginDate="1970-01-01"
+							    endDate="2030-12-31"
+							    beginTime="06:00:00"
+							    endTime="23:59:59"
+							    @btnConfirm="bindOutTimeConfirm" 
+							>
+							    <text>当前选择：{{ signOutTime }}</text>
+							</time-selector>
+						<!-- </view> -->
 					</conf-div>
 				</view>
 				<view v-if="stageStatus != 1">
@@ -229,8 +229,10 @@
 				timeStamp: "", //签名的方法的参数
 				nonceStr: "",
 				signature: "",
-				signInDate: '',
-				signOutDate: ''
+				signInLongitude: 0.0,
+				signInLatitude: 0.0,
+				signOutLongitude: 0.0,
+				signOutLatitude: 0.0
 			}
 		},
 		components: {
@@ -243,14 +245,11 @@
 			chooseImage: () => import('@/components/xyz-choose-image/xyz-choose-image.vue'),
 			Attachment: () => import('@/components/jin-attachment/jin-attachment.vue'),
 			modelLabel: () => import('@/components/model-label/model-label.vue'),
-			flPicker: () => import('@/components/fl-picker/fl-picker.vue')
+			flPicker: () => import('@/components/fl-picker/fl-picker.vue'),
+			timeSelector: () => import('@/components/wing-time-selector/wing-time-selector.vue')
 		},
 		onLoad(option) {
 			console.log(option);
-			this.signInDate = this.$moment().format('YYYY-MM-DD').toString()
-			this.signInTime = this.$moment().format('HH:mm').toString()
-			this.signOutDate = this.$moment().format('YYYY-MM-DD').toString()
-			this.signOutTime = this.$moment().format('HH:mm').toString()
 			this.id = option.id
 			this.ticketId = option.ticketId
 			this.stageStatus = option.stageStatus
@@ -258,82 +257,80 @@
 			this.stageLists = this.$store.getters['stage/getStageList']
 			this.stage = this.stageLists.filter(e=>e.id === this.id)[0]
 			console.log(this.stage);
-			if (this.stage.stageProcess != undefined) {
-				this.person = this.stage.stageProcess.person
-				this.person_DD_ID = this.stage.stageProcess.personDDId
-				var stageLogList = this.$store.getters['stage/getSign_Out'].filter(e=>e.stageId === this.id)
-				var maxSignDate = 0
-				var maxOutDate = 0
-				for (var i = 0; i < stageLogList.length; i++) {
-					if (stageLogList[i].signTime > maxSignDate) {
-						maxSignDate = stageLogList[i].signTime;
-						maxOutDate = stageLogList[i].outTime;
-					}
-				}
-				var signIn = format(maxSignDate).split(' ')
-				var signOut = format(maxOutDate).split(' ')
-				this.signInDate = signIn[0]
-				this.signInTime = signIn[1]
-				this.signOutDate = signOut[0]
-				this.signOutTime = signOut[1]
-				this.faultJudgement = this.stage.stageProcess.memo
-				this.completion.forEach((i) => {
-					if (i.value == this.stage.stageProcess.completeStatus) {
-						i.checked = true
-					}
-				})
+			// if (this.stage.stageProcess != undefined) {
+			// 	this.person = this.stage.stageProcess.person
+			// 	this.person_DD_ID = this.stage.stageProcess.personDDId
+			// 	var stageLogList = this.$store.getters['stage/getSign_Out'].filter(e=>e.stageId === this.id)
+			// 	var maxSignDate = 0
+			// 	var maxOutDate = 0
+			// 	for (var i = 0; i < stageLogList.length; i++) {
+			// 		if (stageLogList[i].signTime > maxSignDate) {
+			// 			maxSignDate = stageLogList[i].signTime;
+			// 			maxOutDate = stageLogList[i].outTime;
+			// 		}
+			// 	}
+			// 	var signIn = format(maxSignDate).split(' ')
+			// 	var signOut = format(maxOutDate).split(' ')
+			// 	this.signInTime = signIn[1]
+			// 	this.signOutTime = signOut[1]
+			// 	this.faultJudgement = this.stage.stageProcess.memo
+			// 	this.completion.forEach((i) => {
+			// 		if (i.value == this.stage.stageProcess.completeStatus) {
+			// 			i.checked = true
+			// 		}
+			// 	})
 				
-				var photoList = this.stage.stageProcess.photoList
-				if (photoList != undefined) {
-					for (let i = 0; i < photoList.length; i++) {
-						var path = this.$IP + photoList[i].path
-						var obj ={id: photoList[i].id, path: path}
-						this.imageList.push(obj)
-						var photoArr = {id: photoList[i].id, fileName: photoList[i].fileName, path: photoList[i].path}
-						this.photoArr.push(photoArr)
-						this.fileImag = this.photoArr
-					}
-				}
+			// 	var photoList = this.stage.stageProcess.photoList
+			// 	if (photoList != undefined) {
+			// 		for (let i = 0; i < photoList.length; i++) {
+			// 			var path = this.$IP + photoList[i].path
+			// 			var obj ={id: photoList[i].id, path: path}
+			// 			this.imageList.push(obj)
+			// 			var photoArr = {id: photoList[i].id, fileName: photoList[i].fileName, path: photoList[i].path}
+			// 			this.photoArr.push(photoArr)
+			// 			this.fileImag = this.photoArr
+			// 		}
+			// 	}
 				
-				var filesList = this.stage.stageProcess.filesList
-				if (filesList != undefined) {
-					for (let i = 0; i < filesList.length; i++) {
-						var file = {'id': filesList[i].id, 'fileName': filesList[i].fileName, 'index': i, 'process': 100, 'type': 'file'}
-						this.attachmentList.push(file)
-						var fileArr = {'id': filesList[i].id, 'fileName': filesList[i].fileName, 'path': filesList[i].path}
-						this.fileArr.push(fileArr)
-						this.fileList = this.fileArr
-					}
-				}
-			}
-			if (this.stage.malfunction != undefined) {
-				let faultLocaList = this.faultLocaList
-				let faultType = this.stage.malfunction.faultType.split(',')
-				for (let i in faultType) {
-					for (let j in faultLocaList) {
-						if (faultType[i] == faultLocaList[j].id) {
-							if (this.faultLocaDefault == '') {
-								this.faultLocaDefault = faultLocaList[j].value
-							} else {
-								this.faultLocaDefault += "," + faultLocaList[j].value
-							}
-						}
-					}
-				}
-			}
+			// 	var filesList = this.stage.stageProcess.filesList
+			// 	if (filesList != undefined) {
+			// 		for (let i = 0; i < filesList.length; i++) {
+			// 			var file = {'id': filesList[i].id, 'fileName': filesList[i].fileName, 'index': i, 'process': 100, 'type': 'file'}
+			// 			this.attachmentList.push(file)
+			// 			var fileArr = {'id': filesList[i].id, 'fileName': filesList[i].fileName, 'path': filesList[i].path}
+			// 			this.fileArr.push(fileArr)
+			// 			this.fileList = this.fileArr
+			// 		}
+			// 	}
+			// }
+			// if (this.stage.malfunction != undefined) {
+			// 	let faultLocaList = this.faultLocaList
+			// 	let faultType = this.stage.malfunction.faultType.split(',')
+			// 	for (let i in faultType) {
+			// 		for (let j in faultLocaList) {
+			// 			if (faultType[i] == faultLocaList[j].id) {
+			// 				if (this.faultLocaDefault == '') {
+			// 					this.faultLocaDefault = faultLocaList[j].value
+			// 				} else {
+			// 					this.faultLocaDefault += "," + faultLocaList[j].value
+			// 				}
+			// 			}
+			// 		}
+			// 	}
+			// }
 			
-			this.yes_no.forEach((i) => {
-				if (i.value == this.getTicket.warrantyPeriod) {
-					i.checked = true
-					this.isQGP = i.value
-				}
-			})
+			// this.yes_no.forEach((i) => {
+			// 	if (i.value == this.getTicket.warrantyPeriod) {
+			// 		i.checked = true
+			// 		this.isQGP = i.value
+			// 	}
+			// })
 			
-			this.completion.forEach((i) => {
-				if (i.checked) {
-					this.completeStatus = i.value
-				}
-			})
+			// this.completion.forEach((i) => {
+			// 	if (i.checked) {
+			// 		this.completeStatus = i.value
+			// 	}
+			// })
 		},
 		computed: {
 			getTicket() {
@@ -355,23 +352,23 @@
 		methods: {
 			formSubmit(e) {
 				var rule = []
-				if (this.stage.signFlag === 1) {
+				if (this.stage.checkIn === 'true') {
 					var singinRule = {value:this.signInTime, checkType:'String', errorMsg:'签到时间不能为空'}
 					rule.push(singinRule)
 				}
-				if (this.stage.photoFlag === 1) {
-					var photoRule = {value:this.fileImag, checkType:'length', errorMsg:'必须拍照'}
-					rule.push(photoRule)
-				}
+				// if (this.stage.takePicture === 'true') {
+				// 	var photoRule = {value:this.fileImag, checkType:'length', errorMsg:'必须拍照'}
+				// 	rule.push(photoRule)
+				// }
 				if (this.formatModel == '故障预判') {
 					var faultJudgementRule = {value:this.faultJudgement, checkType:'String', errorMsg:'故障预判不能为空'}
 					rule.push(faultJudgementRule)
 				}
-				if (this.stage.submitAttach === 1) {
-					var fileRule = {value:this.fileList, checkType:'length', errorMsg:'必须上传附件'}
-					rule.push(fileRule)
-				}
-				if (this.stage.signOutFlag === 1) {
+				// if (this.stage.attachment === 'true') {
+				// 	var fileRule = {value:this.fileList, checkType:'length', errorMsg:'必须上传附件'}
+				// 	rule.push(fileRule)
+				// }
+				if (this.stage.checkOut === 'true') {
 					var singoutRule = {value:this.signOutTime, checkType:'String', errorMsg:'签出时间不能为空'}
 					rule.push(singoutRule)
 				}
@@ -386,21 +383,21 @@
 				}
 			},
 			formReset(e) {
-				if (this.fileImag != undefined) {
-					for (let i = 0; i < this.fileImag.length; i++) {
-						this.delUploader(this.fileImag[i].id)
-					}
-				}
-				if (this.fileList != undefined) {
-					for (let i = 0; i < this.fileList.length; i++) {
-						this.delUploader(this.fileList[i].id)
-					}
-				}
-				uni.navigateBack({
-					delta:1
-				})
-				var payload = {'ticketType': this.ticketType, 'ticketId': this.ticketId}
-				this.$store.dispatch('stage/GetDataList', payload)
+				// if (this.fileImag != undefined) {
+				// 	for (let i = 0; i < this.fileImag.length; i++) {
+				// 		this.delUploader(this.fileImag[i].id)
+				// 	}
+				// }
+				// if (this.fileList != undefined) {
+				// 	for (let i = 0; i < this.fileList.length; i++) {
+				// 		this.delUploader(this.fileList[i].id)
+				// 	}
+				// }
+				// uni.navigateBack({
+				// 	delta:1
+				// })
+				// var payload = {'ticketType': this.ticketType, 'ticketId': this.ticketId}
+				// this.$store.dispatch('stage/GetDataList', payload)
 			},
 			selectUser() {
 				console.log('选择人员');
@@ -408,98 +405,181 @@
 					url: this.$url
 				}
 				GetJsapiTicket(params).then(res => {
-					this.timeStamp = res.data.body.timeStamp;
-					this.nonceStr = res.data.body.nonceStr;
-					this.signature = res.data.body.signature;
+					this.timeStamp = res.data.result.timeStamp;
+					this.nonceStr = res.data.result.nonceStr;
+					this.signature = res.data.result.signature;
 					this.GETDDUSER()
 				}).catch(err => {
 					
 				})
 			},
-			bindInDateChange(e) {
-				this.signInDate = e.detail.value
+			bindInTimeConfirm(e) {
+				this.signInTime = e.key;
+				let params = {
+					url: this.$url
+				}
+				GetJsapiTicket(params).then(res => {
+					this.timeStamp = res.data.result.timeStamp;
+					this.nonceStr = res.data.result.nonceStr;
+					this.signature = res.data.result.signature;
+					this.getLocation('signIn')
+				}).catch(err => {
+					
+				})
 			},
-			bindInTimeChange(e) {
-				this.signInTime = e.detail.value
+			bindOutTimeConfirm(e) {
+				this.signOutTime = e.key;
+				let params = {
+					url: this.$url
+				}
+				GetJsapiTicket(params).then(res => {
+					this.timeStamp = res.data.result.timeStamp;
+					this.nonceStr = res.data.result.nonceStr;
+					this.signature = res.data.result.signature;
+					this.getLocation('signOut')
+				}).catch(err => {
+					
+				})
 			},
-			bindOutDateChange(e) {
-				this.signOutDate = e.detail.value
-			},
-			bindOutTimeChange(e) {
-				this.signOutTime = e.detail.value
+			getLocation(type) {
+				var _this = this;
+				_this.DDConfig();
+				dd.ready(() => {
+					dd.device.geolocation.get({
+					    targetAccuracy : 200,
+					    coordinate : 1,
+					    withReGeocode : true,
+					    useCache:true, //默认是true，如果需要频繁获取地理位置，请设置false
+					    onSuccess : function(result) {
+							alert(result)
+							if (type === 'signIn') {
+								this.signInLongitude = result.longitude;
+								this.signInLatitude = result.latitude;
+							} else {
+								this.signOutLongitude = result.longitude;
+								this.signOutLatitude = result.latitude;
+							}
+					        /* 高德坐标 result 结构
+					        {
+					            longitude : Number,
+					            latitude : Number,
+					            accuracy : Number,
+					            address : String,
+					            province : String,
+					            city : String,
+					            district : String,
+					            road : String,
+					            netType : String,
+					            operatorType : String,
+					            errorMessage : String,
+					            errorCode : Number,
+					            isWifiEnabled : Boolean,
+					            isGpsEnabled : Boolean,
+					            isFromMock : Boolean,
+					            provider : wifi|lbs|gps,
+					            isMobileEnabled : Boolean
+					        }
+					        */
+					    },
+					    onFail : function(err) {}
+					});
+				});
 			},
 			async commitInfo(){
-				this.delUploader(this.del_photoId)/* 删除图片 */
-				this.delUploader(this.del_fileId)/* 删除文件 */
 				let formData = new FormData();
-				var imageInfo = this.fileImag;
-				var  imageId = ""; var imageName = ""; var imagePath = "";
-				if( imageInfo != null){
+				formData.append("progressId", this.id);
+				// formData.append("userId", this.$store.getters['getUserId']);
+				formData.append("userId", '15752589952308491');
+				formData.append("checkIn", this.signInTime);
+				formData.append("completeStatus", this.completeStatus);
+				formData.append("checkOut", this.signOutTime);
+				formData.append("signInLongitude", this.signInLongitude);
+				formData.append("signInLatitude", this.signInLatitude);
+				formData.append("signOutLongitude", this.signOutLongitude);
+				formData.append("signOutLatitude", this.signOutLatitude);
+				let imageInfo = this.fileImag;
+				if (imageInfo != null) {
 					for (var i = 0; i < imageInfo.length; i++) {
-						if(imageInfo.length-1 === i){
-							imageId = imageId + imageInfo[i].id;
-							imageName = imageName + imageInfo[i].fileName;
-							imagePath = imagePath + imageInfo[i].path;
-						}else{
-							imageId = imageId + imageInfo[i].id+",";
-							imageName = imageName + imageInfo[i].fileName+",";
-							imagePath = imagePath + imageInfo[i].path + ",";
-						}
+						console.log(imageInfo[i]);
 					}
 				}
-				formData.append("photoId",imageId);
-				formData.append("phototName",imageName);
-				formData.append("photoPath", imagePath);
-				formData.append('participant', this.person)/* 同行人员 */
-				formData.append('participantDDId', this.person_DD_ID)/* 同行人员钉钉ID */
-				formData.append('signInTime', this.signInDate + ' ' + this.signInTime)/* 签到时间 */
-				formData.append('completeStatus', this.completeStatus)/* 完成情况 */
-				formData.append('faultJudgement', this.faultJudgement)/* 故障判断 */
-				formData.append('cost', this.cost)/* 费用合计 */
-				formData.append('signOutTime', this.signOutDate + ' ' + this.signOutTime)/* 签出时间 */
-				var  fileId = "";
-				var fileName = "";
-				var filePath = "";
-				var  fileList = this.fileList;
-				if( fileList != null){
-					for (var i = 0; i < fileList.length; i++) {
-						if(fileList.length-1 === i){
-							fileId = fileId + fileList[i].id;
-							fileName = fileName + fileList[i].fileName; 
-							filePath = filePath + fileList[i].path; 
-						}else{
-							fileId = fileId + fileList[i].id+",";
-							fileName = fileName + fileList[i].fileName+","; 
-							filePath = filePath + fileList[i].path + ","; 
-						}
-					}
-				}
-				formData.append('fileIds', fileId);
-				formData.append('fileNames', fileName);
-				formData.append('filePath', filePath);
-				let header = {
-					'ticketId': this.ticketId,
-					'stageId': this.id
-				}
-				ticketRepairSave(formData, header).then(response => {
-					console.log(response);
-					if (response.status === 200) {
-						uni.showToast({
-							title: '保存成功',
-							duration: 500,
-							mask: true,
-							complete: () => {
-								uni.navigateBack({
-									delta:1
-								});
-								var payload = {'ticketType': this.ticketType, 'ticketId': this.ticketId}
-								this.$store.dispatch('stage/GetDataList', payload)
-							}
-						})
-					}
-				}).catch(error => {
-					console.log(error);
-				})
+				
+				// ticketRepairSave(formData).then(res => {
+					
+				// })
+				
+				
+				// this.delUploader(this.del_photoId)/* 删除图片 */
+				// this.delUploader(this.del_fileId)/* 删除文件 */
+				// let formData = new FormData();
+				// var imageInfo = this.fileImag;
+				// var  imageId = ""; var imageName = ""; var imagePath = "";
+				// if( imageInfo != null){
+				// 	for (var i = 0; i < imageInfo.length; i++) {
+				// 		if(imageInfo.length-1 === i){
+				// 			imageId = imageId + imageInfo[i].id;
+				// 			imageName = imageName + imageInfo[i].fileName;
+				// 			imagePath = imagePath + imageInfo[i].path;
+				// 		}else{
+				// 			imageId = imageId + imageInfo[i].id+",";
+				// 			imageName = imageName + imageInfo[i].fileName+",";
+				// 			imagePath = imagePath + imageInfo[i].path + ",";
+				// 		}
+				// 	}
+				// }
+				// formData.append("photoId",imageId);
+				// formData.append("phototName",imageName);
+				// formData.append("photoPath", imagePath);
+				// formData.append('participant', this.person)/* 同行人员 */
+				// formData.append('participantDDId', this.person_DD_ID)/* 同行人员钉钉ID */
+				// formData.append('signInTime', this.signInTime)/* 签到时间 */
+				// formData.append('completeStatus', this.completeStatus)/* 完成情况 */
+				// formData.append('faultJudgement', this.faultJudgement)/* 故障判断 */
+				// formData.append('cost', this.cost)/* 费用合计 */
+				// formData.append('signOutTime', this.signOutTime)/* 签出时间 */
+				// var  fileId = "";
+				// var fileName = "";
+				// var filePath = "";
+				// var  fileList = this.fileList;
+				// if( fileList != null){
+				// 	for (var i = 0; i < fileList.length; i++) {
+				// 		if(fileList.length-1 === i){
+				// 			fileId = fileId + fileList[i].id;
+				// 			fileName = fileName + fileList[i].fileName; 
+				// 			filePath = filePath + fileList[i].path; 
+				// 		}else{
+				// 			fileId = fileId + fileList[i].id+",";
+				// 			fileName = fileName + fileList[i].fileName+","; 
+				// 			filePath = filePath + fileList[i].path + ","; 
+				// 		}
+				// 	}
+				// }
+				// formData.append('fileIds', fileId);
+				// formData.append('fileNames', fileName);
+				// formData.append('filePath', filePath);
+				// let header = {
+				// 	'ticketId': this.ticketId,
+				// 	'stageId': this.id
+				// }
+				// ticketRepairSave(formData, header).then(response => {
+				// 	console.log(response);
+				// 	if (response.status === 200) {
+				// 		uni.showToast({
+				// 			title: '保存成功',
+				// 			duration: 500,
+				// 			mask: true,
+				// 			complete: () => {
+				// 				uni.navigateBack({
+				// 					delta:1
+				// 				});
+				// 				var payload = {'ticketType': this.ticketType, 'ticketId': this.ticketId}
+				// 				this.$store.dispatch('stage/GetDataList', payload)
+				// 			}
+				// 		})
+				// 	}
+				// }).catch(error => {
+				// 	console.log(error);
+				// })
 			},
 			uploadPhotoSuccess(result, entityList) {
 				if(result.statusCode == 200) {
@@ -607,7 +687,7 @@
 					timeStamp: _this.timeStamp,
 					nonceStr: _this.nonceStr,
 					signature: _this.signature,
-					jsApiList: ["biz.contact.complexPicker"]
+					jsApiList: ["biz.contact.complexPicker","device.geolocation.get"]
 				});
 			}
 		}

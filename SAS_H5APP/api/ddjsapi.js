@@ -4,7 +4,7 @@ import { http } from '@/utils/request.js'
 //获取jsapi_ticket（鉴权）
 export function GetJsapiTicket(params) {
     return http({
-        url:"/f/dingtalk/index/getJsapiTicket",
+        url:"/mobile/index/getJsapiTicket",
         method:"get",
         params:params
     })
