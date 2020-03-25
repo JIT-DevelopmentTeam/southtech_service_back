@@ -101,9 +101,6 @@
 						<input placeholder="请输入费用合计(元)" type="number" v-model="cost" :disabled="stageStatus ==1 ? true : false"/>
 					</conf-div>
 				</view>
-				<!-- <conf-div title="客户邮箱:">
-					<span class="label">{{getTicket.email}}</span>
-				</conf-div> -->
 				<view v-if="stage.attachment === 'true'">
 					<conf-div title="附件(最多只能上传9份):" :required="required">
 						<Attachment mode="create" :canUploadFile="true" :showProcess="true" :attachmentList.sync="attachmentList" @uploadSuccess="uploadSuccess" @deleteSuccess="deleteSuccess" :stageStatus="stageStatus" :fileArr="fileArr"></Attachment>

@@ -66,7 +66,7 @@ export default {
 		return {
 			imgList: [],
 			base64: '',
-			uploadPhotoUrl: this.$IP + '/f/mobile/upload/uploadPicture', //替换成你的后端接收文件地址
+			uploadPhotoUrl: this.$IP + '/mobile/upload/uploadPicture', //替换成你的后端接收文件地址
 			fileImage:[],
 			commitList: []
 		};
