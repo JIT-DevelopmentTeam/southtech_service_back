@@ -2,7 +2,7 @@
   <a-card :bordered="false">
     <div class="gridContainer">
       <!-- 工单类型树 -->
-      <div class="treeDiv">
+      <div>
         <a-tree :treeData="workOrderTypeTree" @select="handleTreeSelect"></a-tree>
       </div>
       <div>
@@ -128,7 +128,6 @@ export default {
   data() {
     return {
       description: '阶段信息管理页面',
-      selectCustom:{},
       // 表头
       columns: [
         {
@@ -287,9 +286,8 @@ export default {
         }
       })
     },
-    handleTreeSelect(selectedKeys, e) {
-      this.queryParam.workOrderType = selectedKeys[0]
-      this.loadData()
+    handleTreeSelect(selectedKeys,e){
+      
     }
   }
 }
@@ -300,8 +298,5 @@ export default {
 .gridContainer {
   display: grid;
   grid-template-columns: 10% 80%;
-}
-.treeDiv{
-  overflow-y: auto;
 }
 </style>

@@ -51,39 +51,40 @@
         </a-form-item>
         <div class="swichGroup">
           <a-form-item label="需要签到" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
-            <a-switch v-decorator="[ 'checkIn', validatorRules.checkIn]"></a-switch>
+            <a-switch v-decorator="[ 'checkIn', { valuePropName: 'checked' }]"></a-switch>
             <!-- <a-input v-decorator="[ 'checkIn', validatorRules.checkIn]" placeholder="请输入需要签到"></a-input> -->
           </a-form-item>
           <a-form-item label="需要签出" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
-            <a-switch v-decorator="[ 'checkOut', validatorRules.checkIn]"></a-switch>
+            <a-switch v-decorator="[ 'checkOut', { valuePropName: 'checked' }]"></a-switch>
             <!-- <a-input v-decorator="[ 'checkOut', validatorRules.checkOut]" placeholder="请输入需要签出"></a-input> -->
           </a-form-item>
           <a-form-item label="需要拍照" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
-            <a-switch  v-decorator="[ 'takePicture', validatorRules.takePicture]"></a-switch>
+            <a-switch  v-decorator="[ 'takePicture', { valuePropName: 'checked' }]"></a-switch>
             <!-- <a-input v-decorator="[ 'takePicture', validatorRules.takePicture]" placeholder="请输入需要拍照"></a-input> -->
           </a-form-item>
           <a-form-item label="需要费用模板" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
-            <a-switch v-decorator="[ 'costTemplate', validatorRules.checkIn]"></a-switch>
+            <a-switch v-decorator="[ 'costTemplate', { valuePropName: 'checked' }]"></a-switch>
+            
             <!-- <a-input v-decorator="[ 'costTemplate', validatorRules.costTemplate]" placeholder="请输入需要费用模板"></a-input> -->
           </a-form-item>
           <a-form-item label="需要原件归档" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
-            <a-switch v-decorator="[ 'archive', validatorRules.checkIn]"></a-switch>
+            <a-switch v-decorator="[ 'archive', { valuePropName: 'checked' }]"></a-switch>
             <!-- <a-input v-decorator="[ 'archive', validatorRules.archive]" placeholder="请输入需要原件归档"></a-input> -->
           </a-form-item>
           <a-form-item label="资料状态" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
-            <a-switch v-decorator="[ 'stateInformation', validatorRules.checkIn]"></a-switch>
+            <a-switch v-decorator="[ 'stateInformation', { valuePropName: 'checked' }]"></a-switch>
             <!-- <a-input v-decorator="[ 'stateInformation', validatorRules.stateInformation]" placeholder="请输入资料状态"></a-input> -->
           </a-form-item>
           <a-form-item label="触发消息" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
-            <a-switch v-decorator="[ 'triggerMessage', validatorRules.checkIn]"></a-switch>
+            <a-switch v-decorator="[ 'triggerMessage', { valuePropName: 'checked' }]"></a-switch>
             <!-- <a-input v-decorator="[ 'triggerMessage', validatorRules.triggerMessage]" placeholder="请输入触发消息"></a-input> -->
           </a-form-item>
           <a-form-item label="触发应收" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
-            <a-switch v-decorator="[ 'triggerReceivable', validatorRules.checkIn]"></a-switch>
+            <a-switch v-decorator="[ 'triggerReceivable', { valuePropName: 'checked' }]"></a-switch>
             <!-- <a-input v-decorator="[ 'triggerReceivable', validatorRules.triggerReceivable]" placeholder="请输入触发应收"></a-input> -->
           </a-form-item>
           <a-form-item label="提交附件" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
-            <a-switch v-decorator="[ 'attachment', validatorRules.checkIn]"></a-switch>
+            <a-switch v-decorator="[ 'attachment', { valuePropName: 'checked' }]"></a-switch>
             <!-- <a-input v-decorator="[ 'attachment', validatorRules.attachment]" placeholder="请输入提交附件"></a-input> -->
           </a-form-item>
         </div>
@@ -186,6 +187,18 @@ export default {
       this.edit({})
     },
     edit(record) {
+      
+      var keys=Object.keys(record);
+
+      keys.forEach(k => {
+        const value=record[k]
+
+        if(value==="true"||value==="false"){
+          record[k]=value==="true";
+        }
+
+      });
+
       this.form.resetFields()
       this.model = Object.assign({}, record)
       this.visible = true

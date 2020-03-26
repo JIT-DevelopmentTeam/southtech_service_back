@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * @Description: 阶段信息
  * @Author: jeecg-boot
- * @Date:   2020-03-13
+ * @Date:   2020-03-16
  * @Version: V1.0
  */
 @Service
@@ -50,7 +50,7 @@ public class StageServiceImpl extends ServiceImpl<StageMapper, Stage> implements
             throw new ValidateException(errText);
         }
 
-        
+
 
         return super.save(entity);
     }
