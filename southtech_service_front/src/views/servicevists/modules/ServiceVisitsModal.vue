@@ -11,13 +11,11 @@
     <div class="modalContain">
       <a-spin :spinning="confirmLoading">
         <a-form :form="form">
-          <a-row>
+          <!-- <a-row>
             <a-col :span="3" >
               <a-form-item><a-button @click="saveData" type="primary">保存</a-button></a-form-item>
-              
             </a-col>
-          </a-row>
-
+          </a-row> -->
           <a-row>
             <a-col :span="8">
               <a-form-item label="工单单号" :labelCol="labelCol" :wrapperCol="wrapperCol">
@@ -110,7 +108,7 @@
           </a-row>
         </a-form>
       </a-spin>
-      <ServiceViitsList ref="ServiceViitsList" :workOrderNum="workOrder.number" />
+      <!-- <ServiceViitsList ref="ServiceViitsList" :workOrderNum="workOrder.number" /> -->
     </div>
   </a-modal>
 </template>
@@ -124,7 +122,7 @@ import JSelectUserByDep from '@/components/jeecgbiz/JSelectUserByDep'
 import JDictSelectTag from '@/components/dict/JDictSelectTag'
 import JSearchSelectTag from '@/components/dict/JSearchSelectTag'
 import JEditor from '@/components/jeecg/JEditor'
-import ServiceViitsList from '../ServiceVisitsList'
+// import ServiceViitsList from '../ServiceVisitsList'
 
 export default {
   name: 'ServiceVisitsModal',
@@ -134,7 +132,7 @@ export default {
     JDictSelectTag,
     JSearchSelectTag,
     JEditor,
-    ServiceViitsList
+    // ServiceViitsList
   },
   props: {
     workOrder: {
@@ -182,7 +180,7 @@ export default {
   methods: {
     add() {
       this.edit({})
-      this.$refs.ServiceViitsList.LoadData()
+      // this.$refs.ServiceViitsList.LoadData()
     },
     edit(record) {
       this.form.resetFields()
@@ -214,9 +212,6 @@ export default {
       this.visible = false
     },
     handleOk() {
-      this.close()
-    },
-    saveData() {
       const that = this
       // 触发表单验证
       this.form.validateFields((err, values) => {
@@ -242,13 +237,47 @@ export default {
               }
             })
             .finally(() => {
-              console.log(this.$refs.ServiceViitsList)
-              this.$refs.ServiceViitsList.LoadData()
+              // console.log(this.$refs.ServiceViitsList)
+              // this.$refs.ServiceViitsList.LoadData()
               that.confirmLoading = false
             })
         }
       })
+      this.close()
     },
+    // saveData() {
+    //   const that = this
+    //   // 触发表单验证
+    //   this.form.validateFields((err, values) => {
+    //     if (!err) {
+    //       that.confirmLoading = true
+    //       let httpurl = ''
+    //       let method = ''
+    //       if (!this.model.id) {
+    //         httpurl += this.url.add
+    //         method = 'post'
+    //       } else {
+    //         httpurl += this.url.edit
+    //         method = 'put'
+    //       }
+    //       let formData = Object.assign(this.model, values)
+    //       console.log('表单提交数据', formData)
+    //       httpAction(httpurl, formData, method)
+    //         .then(res => {
+    //           if (res.success) {
+    //             that.$message.success(res.message)
+    //           } else {
+    //             that.$message.warning(res.message)
+    //           }
+    //         })
+    //         .finally(() => {
+    //           // console.log(this.$refs.ServiceViitsList)
+    //           // this.$refs.ServiceViitsList.LoadData()
+    //           that.confirmLoading = false
+    //         })
+    //     }
+    //   })
+    // },
     handleCancel() {
       this.close()
     },
@@ -274,7 +303,6 @@ export default {
 </script>
 <style scoped>
 .modalContain {
-  height: 100vh;
   overflow-y: auto;
 }
 .ant-col-sm-5 {
