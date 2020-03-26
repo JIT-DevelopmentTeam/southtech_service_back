@@ -37,7 +37,12 @@
           </a-col>
           <a-col :lg="8">
            <a-form-item label="联系人" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-dict-select-tag v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" :trigger-change="true" :dictCode="contactCondition()"/>
+              <j-dict-select-tag v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" :trigger-change="true" :dictCode="contactCondition()" @change="selectContact($event)"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="8">
+           <a-form-item label="联系电话" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-input placeholder="请选择联系人" :value="contact != null ? contact.mobilePhone : ''" :disabled="true"></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -237,6 +242,11 @@
           this.client.id = this.model.clientId;
           this.workOrderType = this.model.type;
           let params = {id:this.model.id}
+          getAction(this.url.getContactById+"?id="+record.contactId,null).then((res) => {
+            if (res.success) {
+              this.contact = res.result;
+            }
+          })
           //初始化订单明细列表
           getAction(this.url.workOrderDetailList,params).then((res)=>{
             if(res.success){
@@ -364,7 +374,17 @@
       },
       selectClientInSelect(id) {
         this.client.id = id;
-      }
+      },
+      selectContact(value) {
+        getAction(this.url.getContactById+"?id="+value,null).then((res) => {
+          if (res.success) {
+            this.contact = res.result;
+            this.form.setFieldsValue({
+                contactId: this.contact.id
+            });
+          }
+        });
+      },
     }
   }
 </script>
