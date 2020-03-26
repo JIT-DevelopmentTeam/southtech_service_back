@@ -1,24 +1,26 @@
 <template>
-	<uni-card class="uniCard">
-		<view>
-			<view class="inline">设备档案：</view>
-			<view class="inline">佛山何立波_TPG8026*3.8-V</view>
-		</view>
-	    <view>
-	    	<view class="inline">服务工程师：</view>
-	    	<view class="inline">莫伟杰</view>
-	    </view>
-		<view class="gird">
+	<view @click="dClick(info.detailId, info.progressId, info.isCompleted)">
+		<uni-card class="uniCard">
 			<view>
-				<view class="inline">当前阶段：</view>
-				<view class="inline">故障预判</view>
+				<view class="inline">设备档案：</view>
+				<view class="inline">{{ info.deviceName }}</view>
 			</view>
-			<view>
-				<view class="inline">完成状态：</view>
-				<view class="inline">完成</view>
+		    <view>
+		    	<view class="inline">服务工程师：</view>
+		    	<view class="inline">{{info.enginerName}}</view>
+		    </view>
+			<view class="gird">
+				<view>
+					<view class="inline">当前阶段：</view>
+					<view class="inline">{{info.currentProgress}}</view>
+				</view>
+				<view>
+					<view class="inline">完成状态：</view>
+					<view class="inline">{{info.isCompleted}}</view>
+				</view>
 			</view>
-		</view>
-	</uni-card>
+		</uni-card>
+	</view>
 </template>
 
 <script>
@@ -28,22 +30,36 @@
 			uniCard: () => import('@dcloudio/uni-ui/lib/uni-card/uni-card.vue'), 
 		},
 		props: {
+			info: {
+				type: Object
+			},
 			ticketId: {
-				type: String 
-			}
+				type: String,
+				default () {
+					return ""
+				}
+			},
+			ticketType: {
+				type: String,
+				default () {
+					return ""
+				}
+			},
 		},
 		data() {
 			return {
-				dataSource: []
 			}
 		},
 		created() {
-			let params = {
-				workOrderId: this.ticketId
+		},
+		methods: {
+			dClick(detailId, progressId, isCompleted) {
+				let stageStatus = 0;
+				if(isCompleted !== null && isCompleted === "1") {stageStatus = 1}
+				uni.navigateTo({
+					url: '../../mytask/repair/workOrderRepair?id=' + progressId + "&ticketId=" + this.ticketId + "&stageStatus=" + stageStatus + "&ticketType=" + this.ticketType + "&detailId=" + detailId
+				})
 			}
-			this.$store.dispatch('workOrder/GetWorkOrderDetail', params).then(res => {
-				
-			})
 		}
 	}
 </script>

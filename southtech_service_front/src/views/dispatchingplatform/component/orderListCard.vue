@@ -26,6 +26,11 @@
               </a-row>
               <a-row>
                 <a-col :span="24">
+                  <span>工单编号：{{ item.number }}</span>
+                </a-col>
+              </a-row>
+              <a-row>
+                <a-col :span="24">
                   <a-icon type="crown" theme="filled"/>
                   <span>{{ item.clientName }}</span>
                 </a-col>

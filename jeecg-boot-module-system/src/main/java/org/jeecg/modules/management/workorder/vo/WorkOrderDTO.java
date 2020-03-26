@@ -68,5 +68,9 @@ public class WorkOrderDTO {
      * 工单详细id
      */
     private java.lang.String detailId;
+    /**
+     * 工单编号
+     */
+    private java.lang.String number;
 
 }

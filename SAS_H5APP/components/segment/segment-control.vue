@@ -12,7 +12,7 @@
 				<step-item :ticketId="ticketId" :ticketType="ticketType" :isNavigateTo="isNavigateTo"></step-item>
 			</view>
 			<view v-else>
-				<detail-card :ticketId="ticketId"></detail-card>
+				<detail-card v-for="(item, index) in dataSource" :key="index" :info="item" :ticketId="ticketId" :ticketType="ticketType"></detail-card>
 			</view>
         </view>
     </view>
@@ -49,6 +49,7 @@
 			return {
 				items: ['项目阶段','工单明细'],
 				current: 0,
+				dataSource: []
 			}
 	    },
 	    methods: {
@@ -62,6 +63,14 @@
 			/* dataList(){
 				
 			} */
+		},
+		created() {
+			let params = {
+				workOrderId: this.ticketId
+			}
+			this.$store.dispatch('workOrder/GetWorkOrderDetail', params).then(res => {
+				this.dataSource = res
+			})
 		}
 	}
 </script>

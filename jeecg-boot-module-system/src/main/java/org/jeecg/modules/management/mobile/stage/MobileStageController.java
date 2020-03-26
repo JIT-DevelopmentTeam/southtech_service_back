@@ -39,8 +39,8 @@ public class MobileStageController {
     @RequestMapping(value = "/progressReport", method = RequestMethod.POST)
     public Result<?> progressReport(@RequestParam Map<String, Object> params) {
         SysUser user = sysUserService.getByEnterpriseId(params.get("userId").toString());
-        signInSave("1", params, user, signInService);
-        signInSave("2", params, user, signInService);
+//        signInSave("1", params, user, signInService);
+//        signInSave("2", params, user, signInService);
         return Result.ok();
     }
 

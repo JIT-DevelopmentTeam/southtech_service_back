@@ -6,6 +6,7 @@
         SELECT
         workOrder.id AS "id",
         workOrder.type AS "type",
+        workOrder.number AS "number",
         workOrder.declaration_time AS "declarationTime",
         workOrder.emergency_level AS "emergencyLevel",
         client.NAME AS "clientName",

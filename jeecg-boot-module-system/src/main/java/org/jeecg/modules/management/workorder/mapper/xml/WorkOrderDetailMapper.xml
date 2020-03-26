@@ -22,6 +22,7 @@
 			device.`name` AS "deviceName",
 			user.realname AS "enginerName",
 			progress.`name` AS "currentProgress",
+			progress.id AS "progressId",
 			report.isCompleted AS "isCompleted"
 		FROM
 			ic_work_order_detail detail

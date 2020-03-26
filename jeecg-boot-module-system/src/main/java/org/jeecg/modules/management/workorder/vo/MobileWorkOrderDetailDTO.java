@@ -13,6 +13,8 @@ public class MobileWorkOrderDetailDTO {
     private String enginerName;
     // 当前阶段
     private String currentProgress;
+    // 进度id
+    private String progressId;
     // 完成状态
     private String isCompleted;
 
