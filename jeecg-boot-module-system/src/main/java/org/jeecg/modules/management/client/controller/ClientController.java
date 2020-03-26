@@ -1,4 +1,5 @@
 package org.jeecg.modules.management.client.controller;
+import java.util.Date;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -16,12 +17,18 @@ import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.management.client.entity.Client;
 import org.jeecg.modules.management.client.entity.Contact;
 import org.jeecg.modules.management.client.entity.DeviceNumber;
+import org.jeecg.modules.management.client.entity.WxUser;
 import org.jeecg.modules.management.client.service.IClientService;
 import org.jeecg.modules.management.client.service.IContactService;
 import org.jeecg.modules.management.client.service.IDeviceNumberService;
+import org.jeecg.modules.management.client.service.IWxUserService;
 import org.jeecg.modules.management.erp.erpinterface.ERPInterfaceConstant;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
+import org.jeecg.modules.wechat.constant.WechatConstant;
+import org.jeewx.api.core.exception.WexinReqException;
+import org.jeewx.api.wxuser.user.JwUserAPI;
+import org.jeewx.api.wxuser.user.model.Wxuser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -54,6 +61,9 @@ public class ClientController extends JeecgController<Client, IClientService> {
 
 	@Autowired
 	private IDeviceNumberService deviceNumberService;
+
+     @Autowired
+     private IWxUserService wxUserService;
 
      @Autowired
      private RedisUtil redisUtil;
@@ -158,14 +168,14 @@ public class ClientController extends JeecgController<Client, IClientService> {
     @RequestMapping(value = "/synchronizeClient", method = RequestMethod.GET)
     public Result<?> synchronizeClient() {
         QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<>();
-        clientQueryWrapper.orderByDesc("modify_time");
+        clientQueryWrapper.orderByDesc("modifytime");
         List<Client> clientList = clientService.list(clientQueryWrapper);
         try {
             JSONObject jsonObject;
             if (clientList.isEmpty()) {
-                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_CLIENT_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",""));
+                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.LIST_CLIENT_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",""));
             } else {
-                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_CLIENT_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",clientList.get(0).getModifyTime().getTime()+""));
+                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.LIST_CLIENT_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",clientList.get(0).getModifytime().getTime()+""));
             }
             JSONArray dataArray = jsonObject.getJSONArray("data");
             DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -176,7 +186,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
                 client.setName(data.getString("FName"));
                 client.setType("1");
                 client.setCreateTime(dataFormat.parse(data.getString("FRegDate")));
-                client.setModifyTime(data.getTimestamp("FModifyTime"));
+                client.setModifytime(data.getTimestamp("FModifyTime"));
                 clientService.save(client);
                 // TODO ERP联系人
             }
@@ -365,14 +375,14 @@ public class ClientController extends JeecgController<Client, IClientService> {
 	@RequestMapping(value = "/synchronizeDeviceNumber", method = RequestMethod.GET)
     public Result<?> synchronizeDeviceNumber() {
 	    QueryWrapper<DeviceNumber> deviceNumberQueryWrapper = new QueryWrapper<>();
-	    deviceNumberQueryWrapper.orderByDesc("modify_time");
+	    deviceNumberQueryWrapper.orderByDesc("modifytime");
 	    List<DeviceNumber> deviceNumberList = deviceNumberService.list(deviceNumberQueryWrapper);
 	    try {
             JSONObject jsonObject;
             if (deviceNumberList.isEmpty()) {
-                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_DEVICENUMBER_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",""));
+                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.LIST_DEVICENUMBER_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",""));
             } else {
-                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.LIST_DEVICENUMBER_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",deviceNumberList.get(0).getModifyTime().getTime()+""));
+                jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.LIST_DEVICENUMBER_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",deviceNumberList.get(0).getModifytime().getTime()+""));
             }
             JSONArray dataArray = jsonObject.getJSONArray("data");
             DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -390,7 +400,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
                     /*deviceNumber.setDescription(data.getString("describe"));
                     deviceNumber.setSigning(dataFormat.parse(data.getString("signing")));
                     deviceNumber.setQgp(dataFormat.parse(data.getString("QGP")));*/
-                    deviceNumber.setModifyTime(data.getTimestamp("FModifyTime"));
+                    deviceNumber.setModifytime(data.getTimestamp("FModifyTime"));
                     deviceNumber.setClientId(client.getId());
                     addDeviceNumberList.add(deviceNumber);
                 }
@@ -405,5 +415,111 @@ public class ClientController extends JeecgController<Client, IClientService> {
     }
 
     /*--------------------------------子表处理-设备编号-end----------------------------------------------*/
+
+     /*--------------------------------子表处理-微信用户-begin----------------------------------------------*/
+     /**
+      * 查询子表信息 会传入主表ID
+      * @return
+      */
+     @GetMapping(value = "/listWxUserByMainId")
+     public Result<?> listWxUserByMainId(WxUser wxUser,
+                                         @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+                                         @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                         HttpServletRequest req) {
+         QueryWrapper<WxUser> queryWrapper = QueryGenerator.initQueryWrapper(wxUser, req.getParameterMap());
+         Page<WxUser> page = new Page<WxUser>(pageNo, pageSize);
+         IPage<WxUser> pageList = wxUserService.page(page, queryWrapper);
+         return Result.ok(pageList);
+     }
+
+     /**
+      * 添加
+      * @param wxUser
+      * @return
+      */
+     @PostMapping(value = "/addWxUser")
+     public Result<?> addWxUser(@RequestBody WxUser wxUser) {
+         wxUserService.save(wxUser);
+         return Result.ok("添加成功！");
+     }
+
+     /**
+      * 编辑
+      * @param wxUser
+      * @return
+      */
+     @PutMapping(value = "/editWxUser")
+     public Result<?> editWxUser(@RequestBody WxUser wxUser) {
+         wxUserService.updateById(wxUser);
+         return Result.ok("编辑成功!");
+     }
+
+     /**
+      * 通过id删除
+      * @param id
+      * @return
+      */
+     @DeleteMapping(value = "/deleteWxUser")
+     public Result<?> deleteWxUser(@RequestParam(name="id",required=true) String id) {
+         wxUserService.removeById(id);
+         return Result.ok("删除成功!");
+     }
+
+     /**
+      * 批量删除
+      * @param ids
+      * @return
+      */
+     @DeleteMapping(value = "/deleteBatchWxUser")
+     public Result<?> deleteBatchWxUser(@RequestParam(name="ids",required=true) String ids) {
+         this.wxUserService.removeByIds(Arrays.asList(ids.split(",")));
+         return Result.ok("批量删除成功!");
+     }
+
+     /**
+      * 同步用户
+      * @return
+      */
+     @GetMapping(value = "/synchronizeWxUser")
+     public Result<?> synchronizeWxUser() {
+         try {
+             List<Wxuser> wxuserList = JwUserAPI.getAllWxuser(redisUtil.get(WechatConstant.ACCESS_TOKEN_KEY).toString(),null);
+             if (!wxuserList.isEmpty()) {
+                 List<WxUser> saveOrUpdateWxUserList = new ArrayList<>();
+                 for (Wxuser wxuser : wxuserList) {
+                     QueryWrapper<WxUser> wxUserQueryWrapper = new QueryWrapper<>();
+                     wxUserQueryWrapper.eq("open_id",wxuser.getOpenid());
+                     WxUser editWxUser = wxUserService.getOne(wxUserQueryWrapper);
+                     if (oConvertUtils.isEmpty(editWxUser)) {
+                         WxUser addWxUser = new WxUser();
+                         addWxUser.setOpenId(wxuser.getOpenid());
+                         addWxUser.setNickname(wxuser.getNickname());
+                         addWxUser.setSex(wxuser.getSex());
+                         addWxUser.setCity(wxuser.getCity());
+                         addWxUser.setCountry(wxuser.getCountry());
+                         addWxUser.setProvince(wxuser.getProvince());
+                         addWxUser.setRemark(wxuser.getRemark());
+                         saveOrUpdateWxUserList.add(addWxUser);
+                     } else {
+                         editWxUser.setNickname(wxuser.getNickname());
+                         editWxUser.setSex(wxuser.getSex());
+                         editWxUser.setCity(wxuser.getCity());
+                         editWxUser.setCountry(wxuser.getCountry());
+                         editWxUser.setProvince(wxuser.getProvince());
+                         editWxUser.setRemark(wxuser.getRemark());
+                         saveOrUpdateWxUserList.add(editWxUser);
+                     }
+                 }
+                 wxUserService.saveOrUpdateBatch(saveOrUpdateWxUserList);
+             }
+         } catch (WexinReqException e) {
+             e.printStackTrace();
+             log.error("获取微信用户出错!");
+             return Result.error("同步失败!");
+         }
+         return Result.ok("同步成功!");
+     }
+
+     /*--------------------------------子表处理-微信用户-end----------------------------------------------*/
 
 }

@@ -17,7 +17,7 @@
                           style="line-height: 2; display: block; text-align: left; margin: 0 20px;">
           <a-list itemLayout="horizontal" :dataSource="dataSource" :split="false">
             <a-list-item slot="renderItem" slot-scope="item, index">
-              <a-checkbox :value="item.name">{{ item.name }}</a-checkbox>
+              <a-checkbox :value="item.clientName ? item.clientName : item.realname">{{ item.clientName ? item.clientName : item.realname }}</a-checkbox>
             </a-list-item>
           </a-list>
           <!--        <a-row v-for="(item, index) in list" :key="index">-->
@@ -61,21 +61,22 @@
         pageSize: 10,
         columns: [],
         dataSource: [],
-        spinning: false
+        spinning: false,
+        total: 0
       }
     },
     methods: {
       onChange(checkedList) {
         this.indeterminate = !!checkedList.length && checkedList.length < this.dataSource.length;
         this.checkAll = checkedList.length === this.dataSource.length;
-        const selectList = this.dataSource.filter(e => checkedList.includes(e.name))
+        const selectList = this.dataSource.filter(e => checkedList.includes(e.clientName ? e.clientName : e.realname))
         this.$emit('input', selectList)
       },
       onCheckAllChange(e) {
         let list = this.dataSource
         let checkedList = []
         for (let i = 0; i < list.length; i++) {
-          checkedList.push(list[i].name)
+          checkedList.push(list[i].clientName ? list[i].clientName : list[i].realname)
         }
         Object.assign(this, {
           checkedList: e.target.checked ? checkedList : [],
@@ -95,23 +96,27 @@
         var loading = false;
         //滚动条到底部的条件
         if (scrollTop + windowHeight == scrollHeight) {
-          if (loading) return;
-          loading = true;
-          this.spinning = true;
-          //写后台加载数据的函数
-          console.log("距顶部" + scrollTop + "可视区高度" + windowHeight + "滚动条总高度" + scrollHeight);
-          setTimeout(() => {
-            this.pageNo += 1;
-            this.loadData(this.pageNo);
-            loading = false;
-            this.spinning = false;
-          }, 2000)
+          if (this.total != this.dataSource.length) {
+            if (loading) return;
+            loading = true;
+            this.spinning = true;
+            //写后台加载数据的函数
+            console.log("距顶部" + scrollTop + "可视区高度" + windowHeight + "滚动条总高度" + scrollHeight);
+            setTimeout(() => {
+              this.pageNo += 1;
+              this.loadData(this.pageNo);
+              loading = false;
+              this.spinning = false;
+            }, 2000)
+          }
+
         }
       },
       loadData(pageNo) {
         getAction(this.url.list, {pageNo: pageNo})
           .then(res => {
             if (res.success) {
+              this.total = res.result.total;
               let list = res.result.records;
               list.forEach(item => {
                 this.dataSource.push(item);

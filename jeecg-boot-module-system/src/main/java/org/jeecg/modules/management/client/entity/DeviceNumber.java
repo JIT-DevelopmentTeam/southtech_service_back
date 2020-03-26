@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import org.jeecg.common.aspect.annotation.Dict;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.jeecg.modules.management.BaseEntity;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import java.util.Date;
@@ -19,7 +20,7 @@ import java.util.Date;
  */
 @Data
 @TableName("tb_device_number")
-public class DeviceNumber implements Serializable {
+public class DeviceNumber extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     
 	/**主键*/
@@ -66,9 +67,6 @@ public class DeviceNumber implements Serializable {
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private java.util.Date signing;
-	/**时间戳*/
-	@Excel(name = "时间戳", width = 15)
-	private java.sql.Timestamp modifyTime;
 	/**所属客户*/
 	private java.lang.String clientId;
 }

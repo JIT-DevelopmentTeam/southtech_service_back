@@ -30,6 +30,9 @@ public class DingTalkConstant {
     public static final String USER_DETAIL_URL = "https://oapi.dingtalk.com/user/get";
 
     // 新增代办任务
-    public static final String ADD_WORK_RECORD_URL = "https://oapi.dingtalk.com/topapi/workrecord/add?access_token=ACCESS_TOKEN";
+    public static final String ADD_WORK_RECORD_URL = "https://oapi.dingtalk.com/topapi/workrecord/add";
+
+    // 获取用户userId
+    public static final String GET_USER_INFO = "https://oapi.dingtalk.com/user/getuserinfo";
 
 }

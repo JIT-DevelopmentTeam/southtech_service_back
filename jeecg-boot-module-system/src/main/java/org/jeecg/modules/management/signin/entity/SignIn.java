@@ -1,17 +1,14 @@
 package org.jeecg.modules.management.signin.entity;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Data;
 import org.jeecgframework.poi.excel.annotation.Excel;
-import org.jeecg.common.aspect.annotation.Dict;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
 
 /**
  * @Description: 签到签出
@@ -58,4 +55,7 @@ public class SignIn implements Serializable {
 	/**纬度*/
 	@Excel(name = "纬度", width = 15)
     private java.lang.Double latitude;
+	/**工程师*/
+	@Excel(name = "工程师", width = 15)
+	private java.lang.String serviceEngineerName;
 }

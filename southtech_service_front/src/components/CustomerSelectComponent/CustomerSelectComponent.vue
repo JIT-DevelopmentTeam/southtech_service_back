@@ -189,6 +189,7 @@ export default {
       this.visible = false
     },
     handleCancel() {
+        
       this.visible = false
       this.selectedRows = []
     },

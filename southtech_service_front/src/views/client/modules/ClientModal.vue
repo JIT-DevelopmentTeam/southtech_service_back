@@ -67,43 +67,13 @@
         
         <a-row class="form-row" :gutter="16">
           <a-col :lg="8">
-             <a-form-item label="最近联系时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-date placeholder="请选择最近联系时间" v-decorator="[ 'lastContactTime', validatorRules.lastContactTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
             <a-form-item label="行业" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-dict-select-tag type="list" v-decorator="['industry']" :trigger-change="true" dictCode="client_industry" placeholder="请选择行业"/>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
-            <a-form-item label="社会信用代码" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input v-decorator="[ 'creditCode', validatorRules.creditCode]" placeholder="请输入社会信用代码"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
             <a-form-item label="性质" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-dict-select-tag type="list" v-decorator="['property']" :trigger-change="true" dictCode="client_property" placeholder="请选择性质"/>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
-            <a-form-item label="法人代表" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input v-decorator="[ 'legalPerson', validatorRules.legalPerson]" placeholder="请输入法人代表"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
-            <a-form-item label="注册资金" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input-number v-decorator="[ 'registeredCapital', validatorRules.registeredCapital]" placeholder="请输入注册资金" style="width: 100%"/>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
-            <a-form-item label="成立日期" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-date placeholder="请选择成立日期" v-decorator="[ 'establishmentDate', validatorRules.establishmentDate]" :trigger-change="true" style="width: 100%"/>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
-            <a-form-item label="网址" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input v-decorator="[ 'webSite', validatorRules.webSite]" placeholder="请输入网址"></a-input>
             </a-form-item>
           </a-col>
         </a-row>
@@ -167,21 +137,8 @@
         community:{rules: [{ required: true, message: '请输入镇!' }]},
         address:{},
         userId:{rules: [{ required: true, message: '请选择所属用户!' }]},
-        lastContactTime:{},
         industry:{},
-        creditCode:{},
         property:{},
-        legalPerson:{},
-        registeredCapital:{},
-        establishmentDate:{},
-        webSite:{
-          rules:[
-            {
-                pattern: /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/,
-                message: '请输入正确格式的网址!'
-            }
-            ]
-        },
         longitude:{},
         latitude:{},
         },
@@ -206,7 +163,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'number','name','type','sourceId','province','city','area','community','address','userId','lastContactTime','industry','creditCode','property','legalPerson','registeredCapital','establishmentDate','webSite','longitude','latitude'))
+          this.form.setFieldsValue(pick(this.model,'number','name','type','sourceId','province','city','area','community','address','userId','industry','property','longitude','latitude'))
         })
       },
       close () {
@@ -249,7 +206,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'number','name','type','sourceId','province','city','area','community','address','userId','lastContactTime','industry','creditCode','property','legalPerson','registeredCapital','establishmentDate','webSite','longitude','latitude'))
+        this.form.setFieldsValue(pick(row,'number','name','type','sourceId','province','city','area','community','address','userId','lastContactTime','industry','property','longitude','latitude'))
       },
       getLocationByAddress() {
         let formValus = this.form.getFieldsValue();

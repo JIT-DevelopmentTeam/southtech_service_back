@@ -90,5 +90,11 @@ public class SysUserDepartServiceImpl extends ServiceImpl<SysUserDepartMapper, S
 		}
 		return new ArrayList<SysUser>();
 	}
-	
+
+    @Override
+    public void deleteAll() {
+        baseMapper.deleteAll();
+    }
+
+
 }

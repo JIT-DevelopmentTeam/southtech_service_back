@@ -10,8 +10,8 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
 
-        <a-form-item label="设备编号" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['deviceNumber']" :trigger-change="true" dictCode="" placeholder="请选择设备编号"/>
+        <a-form-item label="设备档案" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-dict-select-tag type="list" v-decorator="['deviceNumber']" :trigger-change="true" dictCode="" placeholder="请选择设备档案"/>
         </a-form-item>
         <a-form-item label="服务工程师" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'serviceEngineerId', validatorRules.serviceEngineerId]" placeholder="请输入服务工程师"></a-input>
@@ -74,7 +74,7 @@
 
         confirmLoading: false,
         validatorRules:{
-        deviceNumber:{rules: [{ required: true, message: '请输入设备编号!' }]},
+        deviceNumber:{rules: [{ required: true, message: '请输入设备档案!' }]},
         serviceEngineerId:{rules: [{ required: true, message: '请输入服务工程师!' }]},
         faultLocation:{rules: [{ required: true, message: '请输入故障部位!' }]},
         description:{},

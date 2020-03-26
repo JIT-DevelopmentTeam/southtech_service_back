@@ -1,11 +1,12 @@
 package org.jeecg.modules.system.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.system.entity.SysUser;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.jeecg.modules.system.model.SysUserSysDepartModel;
+import org.jeecg.modules.system.vo.EnginerDTO;
 
 import java.util.List;
 
@@ -40,6 +41,20 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	 * @return
 	 */
 	IPage<SysUser> getUserByRoleId(Page page, @Param("roleId") String roleId, @Param("username") String username);
+
+	/**
+	 * 根据角色code查询用户
+	 * @param page
+	 * @param roleCode
+	 * @return
+	 */
+	Page<EnginerDTO> getByRoleCode(Page<EnginerDTO> page, @Param("roleCode") String roleCode);
+
+	/**
+	 * 查询所有用户
+	 * @return
+	 */
+	List<SysUser> queryAll();
 	
 	/**
 	 * 根据用户名设置部门ID
@@ -96,4 +111,24 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * @Description: 批量删除角色与权限关系
      */
 	void deleteBathRolePermissionRelation(@Param("roleIdArray") String[] roleIdArray);
+
+    /**
+     * 批量删除非admin用户
+     * @param ids
+     */
+	void deleteBatch(@Param("ids") String ids);
+
+    /**
+     * 根据企业应用id获取数据
+     * @param enterpriseId
+     * @return
+     */
+	SysUser getByEnterpriseId(@Param("enterpriseId") String enterpriseId);
+
+    /**
+     * 根据企业应用id更新
+     * @param userParams
+     */
+	void updateByEnterpriseId(@Param("userParams") SysUser userParams);
+
 }

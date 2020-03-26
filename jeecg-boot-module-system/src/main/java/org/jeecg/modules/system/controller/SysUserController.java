@@ -20,10 +20,14 @@ import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.PasswordUtil;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.system.entity.*;
+import org.jeecg.modules.system.entity.SysDepart;
+import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.entity.SysUserDepart;
+import org.jeecg.modules.system.entity.SysUserRole;
 import org.jeecg.modules.system.model.DepartIdModel;
 import org.jeecg.modules.system.model.SysUserSysDepartModel;
 import org.jeecg.modules.system.service.*;
+import org.jeecg.modules.system.vo.EnginerDTO;
 import org.jeecg.modules.system.vo.SysDepartUsersVO;
 import org.jeecg.modules.system.vo.SysUserRoleVO;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
@@ -88,6 +92,12 @@ public class SysUserController {
         result.setSuccess(true);
         result.setResult(pageList);
         return result;
+    }
+
+    @RequestMapping(value = "/queryAll", method = RequestMethod.GET)
+    public Result<?> queryAll() {
+        List<SysUser> sysUserList = sysUserService.queryAll();
+        return Result.ok(sysUserList);
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST)
@@ -923,29 +933,14 @@ public class SysUserController {
     }
 
     @RequestMapping(value = "/enginerList", method = RequestMethod.GET)
-    public Result<?> queryPageByEnginerList(SysUser user, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+    public Result<?> queryPageByEnginerList(EnginerDTO enginerDTO, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, HttpServletRequest req) {
-        QueryWrapper<SysRole> queryWrapperRole = new QueryWrapper<>();
-        queryWrapperRole.eq("role_code", "service_engineer");
-        SysRole role = sysRoleService.getOne(queryWrapperRole);
-        Page<SysUser> page = new Page<SysUser>(pageNo, pageSize);
-        IPage<SysUser> pageList = sysUserService.getUserByRoleId(page, role.getId(), null);
-        List<Map<String, Object>> mapList = new ArrayList<>();
-        for (int i = 0; i < pageList.getRecords().size(); i++) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("name", pageList.getRecords().get(i).getRealname());
-            map.put("longitude", "");
-            map.put("latitude", "");
-            map.put("province", "");
-            map.put("city", "");
-            map.put("area", "");
-            map.put("community", "");
-            map.put("address", "");
-            mapList.add(map);
-        }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("records", mapList);
-        return Result.ok(jsonObject);
+        Result<Page<EnginerDTO>> result = new Result<>();
+        Page<EnginerDTO> pageList = new Page<>(pageNo, pageSize);
+        pageList = sysUserService.getByRoleCode(pageList, "service_engineer");
+        result.setSuccess(true);
+        result.setResult(pageList);
+        return result;
     }
 
 }

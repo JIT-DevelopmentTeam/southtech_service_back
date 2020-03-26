@@ -3,8 +3,7 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <!-- <a-button v-if="mainId" @click="handleAdd" type="primary" icon="plus">新增</a-button> -->
-      <a-button type="primary" v-if="selectedRowKeys.length > 0" v-has="'workOrder:dispatch'" @click="dispatch" icon="select">派工</a-button>
-      <a-button type="primary" @click="test">测试</a-button>
+      <a-button type="primary" v-if="selectedRowKeys.length > 0 && mainStatus == 1" v-has="'workOrder:dispatch'" @click="dispatch" icon="select">派工</a-button>
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
@@ -64,7 +63,7 @@
     </div>
 
     <workOrderDetail-modal ref="modalForm" @ok="modalFormOk" :mainId="mainId"></workOrderDetail-modal>
-    <DisPatchModal ref="dispatchModalForm" @ok="modalFormOk" :mainId="mainId"></DisPatchModal>
+    <DisPatchModal ref="dispatchModalForm" @ok="dispatchModalFormOk" :mainId="mainId"></DisPatchModal>
   </a-card>
 </template>
 
@@ -86,6 +85,11 @@
         type:String,
         default:'',
         required:false
+      },
+      mainStatus:{
+        type:String,
+        default:null,
+        required:false
       }
     },
     watch:{
@@ -100,7 +104,12 @@
             this.initDictConfig();
           }
         }
-      }
+      },
+      mainStatus:{
+        immediate: true,
+        handler(val) {
+        }
+      },
     },
     data () {
       return {
@@ -119,7 +128,7 @@
             }
           },
           {
-            title:'设备编号',
+            title:'设备档案',
             align:"center",
             dataIndex:"deviceNumber",
             customRender:(text)=>{
@@ -235,12 +244,17 @@
             ids += this.selectedRowKeys[a] + ",";
           }
         }
-        this.$refs.dispatchModalForm.edit(ids);
+        var record = {
+          ids: ids,
+          serviceEngineerName: null
+        }
+        this.$refs.dispatchModalForm.edit(record);
         this.$refs.dispatchModalForm.title = "派工";
         this.$refs.dispatchModalForm.disableSubmit = false;
       },
-      test() {
-        console.log(this.$refs);
+      dispatchModalFormOk() {
+        this.loadData();
+        this.$emit('ok');
       }
     }
   }

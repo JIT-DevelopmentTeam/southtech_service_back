@@ -1,41 +1,49 @@
 package org.jeecg.modules.management.workorder.controller;
 
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.SecurityUtils;
-import org.jeecg.common.system.query.QueryGenerator;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.dingtalk.api.DefaultDingTalkClient;
+import com.dingtalk.api.DingTalkClient;
+import com.dingtalk.api.request.OapiWorkrecordAddRequest;
+import com.dingtalk.api.response.OapiWorkrecordAddResponse;
+import com.taobao.api.ApiException;
 import lombok.extern.slf4j.Slf4j;
-import org.jeecg.common.system.base.controller.JeecgController;
+import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.system.base.controller.JeecgController;
+import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.DateUtils;
+import org.jeecg.common.util.RedisUtil;
+import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.management.client.entity.Client;
 import org.jeecg.modules.management.client.service.IClientService;
+import org.jeecg.modules.management.workorder.entity.WorkOrder;
+import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
 import org.jeecg.modules.management.workorder.entity.WorkOrderProgress;
+import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderProgressService;
+import org.jeecg.modules.management.workorder.service.IWorkOrderService;
+import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 import org.jeecg.modules.management.workorder.vo.WorkOrderPage;
+import org.jeecg.modules.message.entity.SysMessageTemplate;
+import org.jeecg.modules.message.service.ISysMessageTemplateService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
-import org.jeecg.modules.management.workorder.entity.WorkOrder;
-import org.jeecg.modules.management.workorder.service.IWorkOrderService;
-import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
 
 
 /**
@@ -64,6 +72,12 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
      @Autowired
      private ISysUserService sysUserService;
 
+     @Autowired
+     private ISysMessageTemplateService sysMessageTemplateService;
+
+     @Autowired
+     private RedisUtil redisUtil;
+
 
 	/*---------------------------------主表处理-begin-------------------------------------*/
 
@@ -81,6 +95,8 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
 		QueryWrapper<WorkOrder> queryWrapper = QueryGenerator.initQueryWrapper(workOrder, req.getParameterMap());
+        queryWrapper.orderByAsc("status");
+        queryWrapper.orderByDesc("create_time");
         if (StringUtils.isNotBlank(req.getParameter("clientName"))) {
             QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<Client>();
             clientQueryWrapper.like("name",req.getParameter("clientName").trim());
@@ -300,13 +316,11 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                                                   String peers) {
         String[] idsArray = workOrderDetailIds.split(",");
         LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        WorkOrder workOrder = null;
+        SysUser serviceEngineer = sysUserService.getUserByName(serviceEngineerName);
+        WorkOrderDetail findParent = workOrderDetailService.getById(idsArray[0]);
+        WorkOrder workOrder = workOrderService.getById(findParent.getWorkOrderId());
         for (String id : idsArray) {
             WorkOrderDetail workOrderDetail = workOrderDetailService.getById(id);
-            workOrder = workOrderService.getById(workOrderDetail.getWorkOrderId());
-            if (!StringUtils.equals("1",workOrder.getStatus())){
-                return Result.error("派工失败,请检查工单状态是否为待分派!");
-            }
             workOrderDetail.setServiceEngineerName(serviceEngineerName);
             try {
                 workOrderDetail.setDispatchTime(DateUtils.parseDate(dispatchTime,"yyyy-MM-dd HH:mm:ss"));
@@ -320,7 +334,6 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             workOrderDetail.setAssigneeName(loginUser.getUsername());
             workOrderDetail.setAssignedTime(DateUtils.getDate());
             workOrderDetailService.updateById(workOrderDetail);
-
         }
         List<WorkOrderDetail> workOrderDetailList = workOrderDetailService.selectByMainId(workOrder.getId());
         boolean isFinish = true;
@@ -342,6 +355,34 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             }
             workOrderService.updateById(workOrder);
         }
+        // 钉钉发起待办
+        Client client = clientService.getById(workOrder.getClientId());
+        List<SysMessageTemplate> messageTemplateList = sysMessageTemplateService.selectByCode("dingTalk_dispatch_remind");
+        if (!messageTemplateList.isEmpty()) {
+            DingTalkClient dingTalkClient = new DefaultDingTalkClient(DingTalkConstant.ADD_WORK_RECORD_URL);
+            OapiWorkrecordAddRequest req = new OapiWorkrecordAddRequest();
+            req.setUserid(serviceEngineer.getEnterpriseId());
+            req.setCreateTime(System.currentTimeMillis());
+            req.setTitle("待办");
+            // TODO 跳转应用
+            req.setUrl("https://www.baidu.com");
+            List<OapiWorkrecordAddRequest.FormItemVo> list2 = new ArrayList<>();
+            OapiWorkrecordAddRequest.FormItemVo obj3 = new OapiWorkrecordAddRequest.FormItemVo();
+            list2.add(obj3);
+            obj3.setTitle(messageTemplateList.get(0).getTemplateName());
+            obj3.setContent(messageTemplateList.get(0).getTemplateContent().replace("${clientServiceName}",loginUser.getRealname()).replace("${clientName}",client.getName()));
+            req.setFormItemList(list2);
+            try {
+                OapiWorkrecordAddResponse rsp = dingTalkClient.execute(req, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
+                if (rsp.isSuccess()) {
+                    log.info("钉钉派单待办提醒发送成功!");
+                } else {
+                    log.info("钉钉派单待办提醒发送失败,错误码:"+rsp.getCode()+",错误信息:"+rsp.getErrmsg());
+                }
+            } catch (ApiException e) {
+                e.printStackTrace();
+            }
+        }
 	    return Result.ok("派工成功!");
     }
 
@@ -362,5 +403,17 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 
      /*--------------------------------子表处理-工单进度-end----------------------------------------------*/
 
+
+    @GetMapping(value = "/queryWorkOrderList")
+    public Result<Page<WorkOrderDTO>> queryWorkOrderList(WorkOrderDTO workOrderDTO, @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+                                        @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+                                        HttpServletRequest req) {
+        Result<Page<WorkOrderDTO>> result = new Result<>();
+        Page<WorkOrderDTO> pageList = new Page<>(pageNo, pageSize);
+        pageList = workOrderService.queryListByType(pageList, req.getParameter("type"));
+        result.setSuccess(true);
+        result.setResult(pageList);
+        return result;
+    }
 
 }

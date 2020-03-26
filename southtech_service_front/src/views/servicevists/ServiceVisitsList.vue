@@ -3,32 +3,36 @@
     <!-- 查询区域 -->
     <div class="table-page-search-wrapper">
       <a-form layout="inline" @keyup.enter.native="searchQuery">
-        <a-row :gutter="24">
-
-        </a-row>
+        <a-row :gutter="24"></a-row>
       </a-form>
     </div>
     <!-- 查询区域-END -->
-    
+
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
+      <!-- <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button> -->
       <a-button type="primary" icon="download" @click="handleExportXls('回访记录')">导出</a-button>
-      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
+      <!-- <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
-      </a-upload>
+      </a-upload>-->
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
-          <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
+          <a-menu-item key="1" @click="batchDel">
+            <a-icon type="delete" />删除
+          </a-menu-item>
         </a-menu>
-        <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /></a-button>
+        <a-button style="margin-left: 8px">
+          批量操作
+          <a-icon type="down" />
+        </a-button>
       </a-dropdown>
     </div>
 
     <!-- table区域-begin -->
     <div>
       <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
-        <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{ selectedRowKeys.length }}</a>项
+        <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择
+        <a style="font-weight: 600">{{ selectedRowKeys.length }}</a>项
         <a style="margin-left: 24px" @click="onClearSelected">清空</a>
       </div>
 
@@ -42,15 +46,20 @@
         :pagination="ipagination"
         :loading="loading"
         :rowSelection="{fixed:true,selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-        
-        @change="handleTableChange">
-
+        @change="handleTableChange"
+      >
         <template slot="htmlSlot" slot-scope="text">
           <div v-html="text"></div>
         </template>
         <template slot="imgSlot" slot-scope="text">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
-          <img v-else :src="getImgView(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
+          <img
+            v-else
+            :src="getImgView(text)"
+            height="25px"
+            alt="图片不存在"
+            style="max-width:80px;font-size: 12px;font-style: italic;"
+          />
         </template>
         <template slot="fileSlot" slot-scope="text">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
@@ -60,9 +69,8 @@
             type="primary"
             icon="download"
             size="small"
-            @click="uploadFile(text)">
-            下载
-          </a-button>
+            @click="uploadFile(text)"
+          >下载</a-button>
         </template>
 
         <span slot="action" slot-scope="text, record">
@@ -70,7 +78,10 @@
 
           <a-divider type="vertical" />
           <a-dropdown>
-            <a class="ant-dropdown-link">更多 <a-icon type="down" /></a>
+            <a class="ant-dropdown-link">
+              更多
+              <a-icon type="down" />
+            </a>
             <a-menu slot="overlay">
               <a-menu-item>
                 <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
@@ -80,25 +91,28 @@
             </a-menu>
           </a-dropdown>
         </span>
-
       </a-table>
     </div>
-
-    <serviceVisits-modal ref="modalForm" @ok="modalFormOk"></serviceVisits-modal>
+    <!-- <serviceVisits-modal ref="modalForm" @ok="modalFormOk"></serviceVisits-modal> -->
   </a-card>
 </template>
 
 <script>
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
-  import ServiceVisitsModal from './modules/ServiceVisitsModal'
+  // import ServiceVisitsModal from './modules/ServiceVisitsModal'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
   export default {
     name: "ServiceVisitsList",
     mixins:[JeecgListMixin],
     components: {
-      ServiceVisitsModal
+      // ServiceVisitsModal
+    },
+    props: {
+      workOrderNum: {
+        type: String,
+      },
     },
     data () {
       return {
@@ -187,23 +201,44 @@
         },
       }
     },
+    watch: {
+      workOrderNum(newValue, oldValue) {
+        if(newValue!==oldValue){
+          this.queryParam.workOrderId=newValue
+          this.LoadData()
+        }
+      }
+    },
     computed: {
       importExcelUrl: function(){
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
       }
     },
+    beforeCreate(){
+      this.queryParam.workOrderId=this.workOrderNum
+    },
     methods: {
+      
       initDictConfig(){
         initDictOptions('service_visits_way').then((res) => {
           if (res.success) {
             this.$set(this.dictOptions, 'visitWay', res.result)
           }
         })
+      },
+      onSelectChange(selectedRowKeys, selectionRows) {
+      this.selectedRowKeys = selectedRowKeys;
+      this.selectionRows = selectionRows;
+      if(this.selectionRows.lenght===1){
+        this.$emit('change',this.selectionRows[0])
       }
+      
+    }
+      
        
     }
   }
 </script>
 <style scoped>
-  @import '~@assets/less/common.less'
+@import '~@assets/less/common.less';
 </style>

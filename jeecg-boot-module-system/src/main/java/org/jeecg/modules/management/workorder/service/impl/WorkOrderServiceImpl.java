@@ -1,6 +1,8 @@
 package org.jeecg.modules.management.workorder.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.management.stage.entity.Stage;
 import org.jeecg.modules.management.stage.mapper.StageMapper;
@@ -11,13 +13,14 @@ import org.jeecg.modules.management.workorder.mapper.WorkOrderDetailMapper;
 import org.jeecg.modules.management.workorder.mapper.WorkOrderMapper;
 import org.jeecg.modules.management.workorder.mapper.WorkOrderProgressMapper;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
-import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.io.Serializable;
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @Description: 工单信息
@@ -99,4 +102,13 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
         }
     }
 
+    /**
+     * 查询出所有待分派的工单（过滤条件：type）
+     * @param type
+     * @return
+     */
+    @Override
+    public Page<WorkOrderDTO> queryListByType(Page<WorkOrderDTO> page, String type) {
+        return page.setRecords(workOrderMapper.queryListByType(page, type));
+    }
 }

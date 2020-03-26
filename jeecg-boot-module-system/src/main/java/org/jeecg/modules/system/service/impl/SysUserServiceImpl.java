@@ -18,6 +18,7 @@ import org.jeecg.modules.system.entity.*;
 import org.jeecg.modules.system.mapper.*;
 import org.jeecg.modules.system.model.SysUserSysDepartModel;
 import org.jeecg.modules.system.service.ISysUserService;
+import org.jeecg.modules.system.vo.EnginerDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -258,6 +259,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		return userMapper.getUserByRoleId(page,roleId,username);
 	}
 
+	// 根据角色code查询
+	@Override
+	public Page<EnginerDTO> getByRoleCode(Page<EnginerDTO> page, String roleCode) {
+		return userMapper.getByRoleCode(page, roleCode);
+	}
+
+	// 查询所有用户
+	@Override
+	public List<SysUser> queryAll() {
+		return userMapper.queryAll();
+	}
 
 	@Override
 	@CacheEvict(value= {CacheConstant.SYS_USERS_CACHE}, key="#username")
@@ -336,4 +348,22 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		}
 		return result;
 	}
+
+	@Override
+    @Transactional
+    public void deleteBatch(String ids) {
+	    userMapper.deleteBatch(ids);
+    }
+
+    @Override
+    public SysUser getByEnterpriseId(String enterpriseId) {
+        return userMapper.getByEnterpriseId(enterpriseId);
+    }
+
+    @Override
+    @Transactional
+    public void updateByEnterpriseId(SysUser userParams) {
+        userMapper.updateByEnterpriseId(userParams);
+    }
+
 }

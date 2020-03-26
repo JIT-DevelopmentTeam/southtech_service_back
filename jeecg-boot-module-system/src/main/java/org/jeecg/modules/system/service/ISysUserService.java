@@ -1,19 +1,19 @@
 package org.jeecg.modules.system.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
+import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.ibatis.annotations.Param;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.vo.SysUserCacheInfo;
 import org.jeecg.modules.system.entity.SysUser;
-
-import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.system.model.SysUserSysDepartModel;
+import org.jeecg.modules.system.vo.EnginerDTO;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -124,6 +124,20 @@ public interface ISysUserService extends IService<SysUser> {
 	public IPage<SysUser> getUserByRoleId(Page<SysUser> page,String roleId, String username);
 
 	/**
+	 * 查询所有用户
+	 * @return
+	 */
+	List<SysUser> queryAll();
+
+	/**
+	 * 根据角色code查询
+	 * @param page
+	 * @param roleCode
+	 * @return
+	 */
+	Page<EnginerDTO> getByRoleCode(Page<EnginerDTO> page, String roleCode);
+
+	/**
 	 * 通过用户名获取用户角色集合
 	 *
 	 * @param username 用户名
@@ -178,5 +192,24 @@ public interface ISysUserService extends IService<SysUser> {
 	 * @return
 	 */
 	Result checkUserIsEffective(SysUser sysUser);
+
+    /**
+     * 批量删除非admin用户
+     * @param ids
+     */
+	void deleteBatch(String ids);
+
+    /**
+     * 根据企业应用id获取数据
+     * @param enterpriseId
+     * @return
+     */
+    SysUser getByEnterpriseId(@Param("enterpriseId") String enterpriseId);
+
+    /**
+     * 根据企业应用id更新
+     * @param userParams
+     */
+    void updateByEnterpriseId(@Param("userParams") SysUser userParams);
 
 }

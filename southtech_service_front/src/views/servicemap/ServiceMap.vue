@@ -8,14 +8,18 @@
       <a-layout>
         <div :style="{width: '100%', height: '100%'}">
           <el-amap vid="servicemap" :zoom="zoom" :plugin="plugin" :center="center" :amap-manager="amapManager">
-            <el-amap-marker v-for="(titem, index) in ticketMarkers" :key="index"
+            <el-amap-marker v-if="titem.longitude != null && titem.latitude != null"
+                            v-for="(titem, index) in ticketMarkers" :key="'t' + index"
                             :position="[titem.longitude,titem.latitude]"
-                            :vid="index" :title="'客户名称：' + titem.name" :clickable="true" :icon="customerIcon"
+                            :vid="'ticket' + index" :title="'客户名称：' + titem.name ? titem.name : titem.realname"
+                            :clickable="true" :icon="customerIcon"
                             :offset="[-16, -30]" :events="titem.events"></el-amap-marker>
 
-            <el-amap-marker v-for="(eitem, index) in enginerMarkers" :key="index"
+            <el-amap-marker v-if="eitem.longitude != null && eitem.latitude != null"
+                            v-for="(eitem, index) in enginerMarkers" :key="'e' + index"
                             :position="[eitem.longitude,eitem.latitude]"
-                            :vid="index" :title="'工程师：' + eitem.name" :clickable="true" :icon="enginerIcon"
+                            :vid="'enginer' + index" :title="'工程师：' + eitem.name ? eitem.name : eitem.realname"
+                            :clickable="true" :icon="enginerIcon"
                             :offset="[-16, -30]"></el-amap-marker>
 
             <el-amap-info-window v-if="window" :position="window.position" :visible="window.visible"
@@ -41,8 +45,8 @@
       return {
         customerIcon: require('../../assets/customerIcon.png'),
         enginerIcon: require('../../assets/enginerIcon.png'),
-        center: [109.12014,32.441281],
-        oldCenter: [109.12014,32.441281],// 记录最初始的经纬度
+        center: [109.12014, 32.441281],
+        oldCenter: [109.12014, 32.441281],// 记录最初始的经纬度
         amapManager,
         zoom: 5,
         plugin: [
@@ -77,15 +81,14 @@
         windows: [],
         window: '',
         ticketUrl: {
-          list: '/client/client/listPageByWorkOrder'
+          list: '/workorder/workOrder/queryWorkOrderList'
         },
         enginerUrl: {
           list: '/sys/user/enginerList'
         }
       }
     },
-    methods: {
-    },
+    methods: {},
   }
 </script>
 

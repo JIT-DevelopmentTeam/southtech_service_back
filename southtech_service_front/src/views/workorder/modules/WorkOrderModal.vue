@@ -61,11 +61,11 @@
               <j-date placeholder="请选择申报时间" v-decorator="[ 'declarationTime', validatorRules.declarationTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
             </a-form-item>
           </a-col>
-          <!-- <a-col :lg="8">
+          <a-col :lg="8">
             <a-form-item label="附件" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-upload v-decorator="['annex']" :trigger-change="true"></j-upload>
+              <j-upload v-decorator="['annex',validatorRules.annex]" :trigger-change="true" :fileType="'image'" :text="'上传附件'" :name="'workOrder'"></j-upload>
             </a-form-item>
-          </a-col> -->
+          </a-col>
         </a-row>
 
         <!-- 子表单区域 -->
@@ -73,7 +73,7 @@
           <a-tab-pane tab="工单明细" key="1">
             <div>
               <a-row type="flex" style="margin-bottom:10px" :gutter="16">
-                <a-col :span="5">设备编号</a-col>
+                <a-col :span="5">设备档案</a-col>
                 <a-col v-if="workOrderType == '1'" :span="7">故障部位</a-col>
                 <a-col :span="9">描述</a-col>
                 <a-col :span="2">操作</a-col>
@@ -82,7 +82,7 @@
               <a-row type="flex" style="margin-bottom:10px" :gutter="16" v-for="(item, index) in model.workOrderDetailList" :key="index">
                 <a-col :span="5">
                   <a-form-item>
-                    <j-dict-select-tag v-decorator="['workOrderDetailList['+index+'].deviceNumber', {'initialValue':item.deviceNumber,rules: [{ required: true, message: '请选择设备编号!' }]}]" placeholder="设备编号" :trigger-change="true" :dictCode="deviceNumberCondition()"/>
+                    <j-dict-select-tag v-decorator="['workOrderDetailList['+index+'].deviceNumber', {'initialValue':item.deviceNumber,rules: [{ required: true, message: '请选择设备档案!' }]}]" placeholder="设备档案" :trigger-change="true" :dictCode="deviceNumberCondition()"/>
                   </a-form-item>
                 </a-col>
                 <a-col v-if="workOrderType == '1'" :span="7">
@@ -159,6 +159,7 @@
         emergencyLevel:{rules: [{ required: true, message: '请输入紧急程度!' }]},
         customerServiceName:{rules: [{ required: true, message: '请输入客服!' }]},
         declarationTime:{rules: [{ required: true, message: '请输入申报时间!' }]},
+        annex:{}
         },
         url: {
           add: "/workorder/workOrder/add",
@@ -193,7 +194,7 @@
         }
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime'))
+          this.form.setFieldsValue(pick(this.model,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
         })
       },
       close () {
@@ -236,7 +237,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime'))
+        this.form.setFieldsValue(pick(row,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
       },
       contactCondition() {
         return "tb_contact,name,id,client_id="+this.client;

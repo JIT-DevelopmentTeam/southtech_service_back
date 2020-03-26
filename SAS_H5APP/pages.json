@@ -1,0 +1,140 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",// 工作台
+			"style": {
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/wechat_service_num/workOrder/index",//  工单列表
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/mytask/index",// 我的工单
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/schedule/index",// 日程
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/porfile/index",// 个人设置
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/mytask/detail/workOrderDetail",// 工单详情
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/mytask/repair/workOrderRepair",// 工单维护
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/wechat_service_num/equipment/equipment",// 设备
+			"style":{
+				// "disableScroll":true,
+				"app-plus":{
+				    "bounce":"none"
+				}
+			}
+		},
+		{
+			"path":"pages/wechat_service_num/login/index",//  服务号登录页面
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/wechat_service_num/login/oauth",//  授权页面
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/wechat_service_num/declare/declare",// 故障申报
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/wechat_service_num/evaluate/evaluate",//  服务评价
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/wechat_service_num/suggests/suggest",//  投诉建议
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/wechat_service_num/workOrder/index",//  工单列表
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/wechat_service_num/workOrder/detail/work-order-detail",//  工单详情
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
+			"path":"pages/index/examine/examine",//  客户用户审核
+			"style":{
+				// "disableScroll": true
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "售后服务平台",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8",
+		"navigationStyle":"custom"
+	},
+	"tabBar":{
+		"backgroundColor":"#FFFFFF",
+		"list":[
+			{
+				"pagePath":"pages/mytask/index",
+				"text":"我的任务",
+				"iconPath":"static/mytask.png",
+				"selectedIconPath":"static/mytask1.png"
+			},
+			{
+				"pagePath":"pages/index/index",
+				"text":"工作台",
+				"iconPath":"static/workbranch.png",
+				"selectedIconPath":"static/workbranch1.png"
+			},
+			{
+				"text":"日程",
+				"iconPath":"static/schedule.png",
+				"selectedIconPath":"static/schedule1.png",
+				"pagePath":"pages/schedule/index"
+				
+			},
+			{
+				"text":"个人设置",
+				"iconPath":"static/porfile1.png",
+				"selectedIconPath":"static/porfile.png",
+				"pagePath":"pages/porfile/index"
+			}
+		]
+	}
+}

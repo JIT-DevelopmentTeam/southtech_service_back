@@ -74,6 +74,9 @@ public class WorkOrderPage {
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date declarationTime;
+    /**附件*/
+    @Excel(name = "附件", width = 15)
+    private java.lang.String annex;
 
 	@ExcelCollection(name="工单明细")
 	private List<WorkOrderDetail> workOrderDetailList;	

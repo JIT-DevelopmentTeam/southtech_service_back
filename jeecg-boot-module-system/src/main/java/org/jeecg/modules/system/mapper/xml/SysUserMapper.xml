@@ -22,6 +22,36 @@
 			and username = #{username}
 		</if>
 	</select>
+
+	<select id="getByRoleCode" resultType="org.jeecg.modules.system.vo.EnginerDTO">
+		SELECT
+			u.id,
+			u.userName,
+			u.realname,
+			t.longitude,
+			t.latitude
+		FROM
+			sys_user u
+			INNER JOIN sys_user_role ur ON u.id = ur.user_id
+			INNER JOIN sys_role r ON r.id = ur.role_id
+			AND r.role_code = 'service_engineer'
+			LEFT JOIN (
+			SELECT
+				t2.service_engineer_name,
+				t2.create_time,
+				t1.longitude,
+				t1.latitude
+			FROM
+				ic_sign_in t1
+			INNER JOIN ( SELECT service_engineer_name, MAX( create_time ) AS create_time FROM ic_sign_in GROUP BY service_engineer_name ) t2 ON t1.create_time = t2.create_time
+			) t ON t.service_engineer_name = u.username
+		WHERE
+			u.del_flag = '0'
+	</select>
+
+	<select id="queryAll" resultType="org.jeecg.modules.system.entity.SysUser">
+		SELECT * FROM sys_user
+	</select>
 	
 	<!--  修改用户部门code -->
 	<update id="updateUserDepart">
@@ -97,4 +127,34 @@
 			#{id}
 		</foreach>
 	</update>
+
+    <!-- 批量删除非超级管理员用户 -->
+    <update id="deleteBatch" parameterType="String">
+        delete from sys_user where
+          username != 'admin'
+        <if test="ids != null and ids != ''">
+            and id in (${ids})
+        </if>
+    </update>
+
+    <!-- 根据企业应用id获取 -->
+    <select id="getByEnterpriseId" parameterType="String" resultType="org.jeecg.modules.system.entity.SysUser">
+        select * from sys_user where enterprise_id = #{enterpriseId}
+    </select>
+
+    <!-- 更新 -->
+    <update id="updateByEnterpriseId">
+        update sys_user set
+          realname = #{userParams.realname},
+          email = #{userParams.email},
+          phone = #{userParams.phone},
+          org_code = #{userParams.orgCode},
+          status = #{userParams.status},
+          del_flag = #{userParams.delFlag},
+          post = #{userParams.post},
+          activiti_sync = #{userParams.activitiSync}
+        where
+          enterprise_id = #{userParams.enterpriseId}
+    </update>
+
 </mapper>
