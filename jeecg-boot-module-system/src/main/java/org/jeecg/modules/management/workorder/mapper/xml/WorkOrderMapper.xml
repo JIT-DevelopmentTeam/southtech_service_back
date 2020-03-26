@@ -24,6 +24,7 @@
         LEFT JOIN tb_client client ON client.id = workOrder.client_id
         WHERE
         workOrder.status = '1'
+        AND detail.service_engineer_name IS NULL
         <if test="type != null and type != ''">
             AND workOrder.type = #{type}
         </if>
