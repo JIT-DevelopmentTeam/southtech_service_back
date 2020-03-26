@@ -2,8 +2,8 @@
   <div id="components-layout-demo-basic">
     <a-layout>
       <a-layout-sider>
-        <sac-card ref="ticket" title="服务工单" :url='ticketUrl' v-model="ticketMarkers"></sac-card>
-        <sac-card ref="enginer" title="服务工程师" :url='enginerUrl' v-model="enginerMarkers"></sac-card>
+        <sac-card ref="ticket" title="服务工单" :url='ticketUrl' v-model="ticketMarkers" :imgIcon="customerIcon"></sac-card>
+        <sac-card ref="enginer" title="服务工程师" :url='enginerUrl' v-model="enginerMarkers" :imgIcon="enginerIcon"></sac-card>
       </a-layout-sider>
       <a-layout>
         <div :style="{width: '100%', height: '100%'}">
@@ -12,14 +12,14 @@
                             v-for="(titem, index) in ticketMarkers" :key="'t' + index"
                             :position="[titem.longitude,titem.latitude]"
                             :vid="'ticket' + index" :title="'客户名称：' + titem.name ? titem.name : titem.realname"
-                            :clickable="true" :icon="customerIcon"
+                            :clickable="true" :icon="customerIcon.url"
                             :offset="[-16, -30]" :events="titem.events"></el-amap-marker>
 
             <el-amap-marker v-if="eitem.longitude != null && eitem.latitude != null"
                             v-for="(eitem, index) in enginerMarkers" :key="'e' + index"
                             :position="[eitem.longitude,eitem.latitude]"
                             :vid="'enginer' + index" :title="'工程师：' + eitem.name ? eitem.name : eitem.realname"
-                            :clickable="true" :icon="enginerIcon"
+                            :clickable="true" :icon="enginerIcon.url"
                             :offset="[-16, -30]"></el-amap-marker>
 
             <el-amap-info-window v-if="window" :position="window.position" :visible="window.visible"
@@ -43,8 +43,8 @@
     data() {
       let self = this;
       return {
-        customerIcon: require('../../assets/customerIcon.png'),
-        enginerIcon: require('../../assets/enginerIcon.png'),
+        customerIcon: {url:require('../../assets/customerIcon.png')},
+        enginerIcon: {url:require('../../assets/enginerIcon.png')},
         center: [109.12014, 32.441281],
         oldCenter: [109.12014, 32.441281],// 记录最初始的经纬度
         amapManager,

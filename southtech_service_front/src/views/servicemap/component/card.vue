@@ -8,7 +8,9 @@
           </a-checkbox>
         </a-col>
         <a-col :span="8" :style="{fontWeight: 'bold'}">{{ title }}</a-col>
-        <a-col :span="8"></a-col>
+        <a-col :span="8">
+          <img :src="imgIcon.url">
+        </a-col>
       </a-row>
     </div>
     <div class="content" @scroll="hscroll($event)">
@@ -45,6 +47,9 @@
       },
       value: {
         type: Array
+      },
+      imgIcon: {
+        type: Object
       }
     },
     data() {

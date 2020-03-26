@@ -92,10 +92,10 @@
 						</fl-picker>
 					</conf-div>
 				</view>
-				<conf-div title="是否保质期内:">
-					<radio-btn :items="yes_no" @radioChange="yes_noChange" :stageStatus="stageStatus" type="isQGP"></radio-btn>
-				</conf-div>
 				<view v-if="stage.costTemplate === 'true'">
+					<conf-div title="是否保质期内:">
+						<radio-btn :items="yes_no" @radioChange="yes_noChange" :stageStatus="stageStatus" type="isQGP"></radio-btn>
+					</conf-div>
 					<conf-div title="费用合计(元):">
 						<input placeholder="请输入费用合计(元)" type="number" v-model="cost" :disabled="stageStatus ==1 ? true : false"/>
 					</conf-div>
@@ -322,11 +322,11 @@
 			// 	}
 			// })
 			
-			// this.completion.forEach((i) => {
-			// 	if (i.checked) {
-			// 		this.completeStatus = i.value
-			// 	}
-			// })
+			this.completion.forEach((i) => {
+				if (i.checked) {
+					this.completeStatus = i.value
+				}
+			})
 		},
 		computed: {
 			getTicket() {
@@ -472,25 +472,25 @@
 				formData.append("signInLatitude", this.signInLatitude);
 				formData.append("signOutLongitude", this.signOutLongitude);
 				formData.append("signOutLatitude", this.signOutLatitude);
-				let photoRes = this.photoCommit
-				for (var i = 0; i < photoRes.length; i++) {
-					let _this = this;
-					uni.uploadFile({
-						url: _this.picRequestRUl ,
-						filePath: photoRes[i].path,
-						name: 'photo',
-						formData: {
-							id : photoRes[i].id
-						},
-						success: (res) => {
+				// let photoRes = this.photoCommit
+				// for (var i = 0; i < photoRes.length; i++) {
+				// 	let _this = this;
+				// 	uni.uploadFile({
+				// 		url: _this.picRequestRUl ,
+				// 		filePath: photoRes[i].path,
+				// 		name: 'photo',
+				// 		formData: {
+				// 			id : photoRes[i].id
+				// 		},
+				// 		success: (res) => {
 							
-						}
-					})
-				}
+				// 		}
+				// 	})
+				// }
 				
-				// ticketRepairSave(formData).then(res => {
+				ticketRepairSave(formData).then(res => {
 					
-				// })
+				})
 				
 				
 				// this.delUploader(this.del_photoId)/* 删除图片 */
