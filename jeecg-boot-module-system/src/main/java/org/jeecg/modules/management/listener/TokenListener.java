@@ -18,7 +18,7 @@ public class TokenListener  implements ApplicationListener<ContextRefreshedEvent
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         // 服务器启动后更新Token
         DingTalkAccessTokenUtils.setToken();
-        WechatTokenUtils.setToken();
+        //WechatTokenUtils.setToken();
         ERPTokenUtils.setToken();
     }
 

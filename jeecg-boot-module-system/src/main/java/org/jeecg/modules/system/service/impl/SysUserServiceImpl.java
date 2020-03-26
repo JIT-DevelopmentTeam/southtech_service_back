@@ -366,4 +366,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         userMapper.updateByEnterpriseId(userParams);
     }
 
+    @Override
+    public List<SysUser> listByRoleCode(String roleCode) {
+        return userMapper.listByRoleCode(roleCode);
+    }
+
 }

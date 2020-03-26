@@ -8,6 +8,9 @@
     @cancel="handleCancel"
     cancelText="关闭">
     <a-spin :spinning="confirmLoading">
+      <a-layout>
+        <a-layout>
+          <a-layout-content>
       <a-form :form="form">
         <a-row class="form-row" :gutter="16">
           <a-col :lg="8">
@@ -26,7 +29,8 @@
                 placeholder="请选择客户"
                 v-decorator="['clientId',validatorRules.clientId]"
                 dict="tb_client,name,id"
-                @change="selectClient"
+                @change="selectClientInSelect"
+                :disabled="true"
                 :async="true">
               </j-search-select-tag>
             </a-form-item>
@@ -106,6 +110,29 @@
           </a-tab-pane>
         </a-tabs>
       </a-form>
+          </a-layout-content>
+          <a-layout-sider>
+          <a-row class="form-row" :gutter="32">
+            <a-col :lg="32">
+              <strong>快捷搜索</strong>
+              <a-input placeholder="客户" @change="searchClient($event.target.value)"></a-input>
+                <a-radio-group v-model="model.clientId" @change="selectClient">
+                  <a-radio v-for="(client,index) in clientList" :style="radioStyle" v-bind:key="index" :value="client.id" :title="client.name">{{client.name}}</a-radio>
+              </a-radio-group>
+            </a-col>
+          </a-row>
+          <a-row class="form-row" :gutter="32" style="margin-top:20%;">
+            <a-col :lg="32">
+              <strong>快捷搜索</strong>
+              <a-input placeholder="客服" @change="searchCustomerService($event.target.value)"></a-input>
+                <a-radio-group v-model="model.customerServiceName" @change="selectCustomerService">
+                  <a-radio v-for="(customerService,index) in customerServiceList" :style="radioStyle" v-bind:key="index" :value="customerService.username" :title="customerService.realname">{{customerService.realname}}</a-radio>
+              </a-radio-group>
+            </a-col>
+          </a-row>
+        </a-layout-sider>
+        </a-layout>
+      </a-layout>
     </a-spin>
   </a-modal>
 </template>
@@ -146,7 +173,11 @@
           xs: { span: 24 },
           sm: { span: 16 },
         },
-
+        radioStyle: {
+          display: 'block',
+          height: '30px',
+          lineHeight: '30px',
+        },
         confirmLoading: false,
         validatorRules:{
         number:{rules: [{ required: true, message: '请输入编号!' }]},
@@ -165,12 +196,34 @@
           add: "/workorder/workOrder/add",
           edit: "/workorder/workOrder/edit",
           workOrderDetailList: "/workorder/workOrder/queryWorkOrderDetailListByMainId",
+          listClient: "/client/client/list",
+          listCustomerService:"/sys/user/listUserByRoleCode",
+          getClientById:"/client/client/getClientById",
+          getContactById:"/client/client/getContactById",
+          getByUserName:"/sys/user/getByUserName"
         },
-        client:null,
-        workOrderType:null
+        workOrderType:null,
+        listSize:5,
+        clientList:[],
+        client:{},
+        contact:{},
+        customerService:{},
+        customerServiceList:[]
       }
     },
     created () {
+    },
+    mounted () {
+      getAction(this.url.listClient,{pageSize:this.listSize}).then((res) => {
+        if (res.success) {
+          this.clientList = res.result.records;
+        }
+      });
+      getAction(this.url.listCustomerService+"?roleCode=customer_service",{pageSize:this.listSize}).then((res) => {
+        if (res.success) {
+          this.customerServiceList = res.result.records;
+        }
+      });
     },
     methods: {
       add () {
@@ -181,7 +234,7 @@
         this.model = Object.assign({}, record);
         this.model.workOrderDetailList = [{}];
         if(this.model.id){
-          this.client = this.model.clientId;
+          this.client.id = this.model.clientId;
           this.workOrderType = this.model.type;
           let params = {id:this.model.id}
           //初始化订单明细列表
@@ -240,10 +293,10 @@
         this.form.setFieldsValue(pick(row,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
       },
       contactCondition() {
-        return "tb_contact,name,id,client_id="+this.client;
+        return "tb_contact,name,id,client_id="+this.client.id;
       },
       deviceNumberCondition(){
-        return "tb_device_number,name,id,client_id="+this.client;
+        return "tb_device_number,name,id,client_id="+this.client.id;
       },
       addRowDetail () {
         this.model.workOrderDetailList.push({});
@@ -255,11 +308,97 @@
         this.$forceUpdate();
       },
       selectClient(id) {
-        this.client = id;
+        this.client.id = id;
       },
       setWorkOrderType(value) {
         this.workOrderType = value;
+      },
+      searchClient(val) {
+        getAction(this.url.listClient,{pageSize:this.listSize,name:val}).then((res) => {
+          if (res.success) {
+            this.clientList = res.result.records;
+          }
+        });
+      },
+      selectClient() {
+        if (this.model.clientId) {
+          getAction(this.url.getClientById+"?id="+this.model.clientId,null).then((res) => {
+             if (res.success) {
+              this.client = res.result;
+              this.contact = {};
+              this.form.setFieldsValue({
+                clientId: this.client.id
+              });
+            }
+          });
+        }
+      },
+      searchCustomerService(val) {
+         getAction(this.url.listCustomerService,{pageSize:this.listSize,username:val}).then((res) => {
+          if (res.success) {
+            this.customerServiceList = res.result.records;
+          }
+        });
+      },
+      selectContact(value) {
+        getAction(this.url.getContactById+"?id="+value,null).then((res) => {
+          if (res.success) {
+            this.contact = res.result;
+            this.form.setFieldsValue({
+                contactId: this.contact.id
+            });
+          }
+        });
+      },
+      selectCustomerService() {
+        if (this.model.customerServiceName) {
+          getAction(this.url.getByUserName+"?userName="+this.model.customerServiceName,null).then((res) => {
+             if (res.success) {
+              this.customerService = res.result;
+              this.form.setFieldsValue({
+                  customerServiceName: this.customerService.username
+              });
+            }
+          });
+        }
+      },
+      selectClientInSelect(id) {
+        this.client.id = id;
       }
     }
   }
 </script>
+<style>
+    #components-layout-demo-basic { 
+      text-align: center;
+    }
+    #components-layout-demo-basic .ant-layout-header,
+    #components-layout-demo-basic .ant-layout-footer {
+      color: #fff;
+    }
+    #components-layout-demo-basic .ant-layout-footer {
+      line-height: 1.5;
+    }
+    .ant-layout-sider {
+      background:white;
+    }
+    .ant-layout-content {
+      background: white;
+    }
+    #components-layout-demo-basic .ant-layout-sider {
+      color: #fff;
+      line-height: 120px;
+      
+    }
+    #components-layout-demo-basic .ant-layout-content {
+      color: #fff;
+      min-height: 120px;
+      line-height: 120px;
+    }
+    #components-layout-demo-basic > .ant-layout {
+      margin-bottom: 48px;
+    }
+    #components-layout-demo-basic > .ant-layout:last-child {
+      margin: 0;
+    }
+</style>

@@ -212,4 +212,11 @@ public interface ISysUserService extends IService<SysUser> {
      */
     void updateByEnterpriseId(@Param("userParams") SysUser userParams);
 
+    /**
+     * 根据角色编号获取该角色用户
+     * @param roleCode
+     * @return
+     */
+    List<SysUser> listByRoleCode(@Param("roleCode") String roleCode);
+
 }

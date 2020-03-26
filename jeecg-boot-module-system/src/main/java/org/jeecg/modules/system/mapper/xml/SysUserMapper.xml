@@ -157,4 +157,8 @@
           enterprise_id = #{userParams.enterpriseId}
     </update>
 
+    <select id="listByRoleCode" parameterType="String" resultType="org.jeecg.modules.system.entity.SysUser">
+        SELECT * FROM sys_user WHERE id IN (SELECT user_id FROM sys_user_role WHERE role_id = (SELECT id FROM sys_role WHERE role_code = #{roleCode}))
+    </select>
+
 </mapper>

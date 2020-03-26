@@ -1,5 +1,8 @@
 <template>
     <a-spin :spinning="confirmLoading">
+      <a-layout>
+      <a-layout>
+        <a-layout-content>
       <a-form 
         :form="form"
         :title="title"
@@ -20,23 +23,29 @@
           </a-col>
           <a-col :lg="6">
             <a-form-item label="客户" :labelCol="labelCol" :wrapperCol="wrapperCol">
-               <j-search-select-tag
+              <j-search-select-tag
                 placeholder="请选择客户"
                 v-decorator="['clientId',validatorRules.clientId]"
                 dict="tb_client,name,id"
-                @change="selectClient"
+                @change="selectClientInSelect"
+                :disabled="true"
                 :async="true">
               </j-search-select-tag>
             </a-form-item>
           </a-col>
           <a-col :lg="6">
-           <a-form-item label="联系人" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-dict-select-tag v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" :trigger-change="true" :dictCode="contactCondition()"/>
+           <a-form-item label="接入方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <j-dict-select-tag type="list" v-decorator="['accessMethod',validatorRules.accessMethod]" :trigger-change="true" dictCode="work_order_access_method" placeholder="请选择接入方式"/>
             </a-form-item>
           </a-col>
           <a-col :lg="6">
-           <a-form-item label="接入方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-dict-select-tag type="list" v-decorator="['accessMethod',validatorRules.accessMethod]" :trigger-change="true" dictCode="work_order_access_method" placeholder="请选择接入方式"/>
+           <a-form-item label="联系人" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <j-dict-select-tag v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" :trigger-change="true" :dictCode="contactCondition()" @change="selectContact($event)"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="6">
+           <a-form-item label="联系电话" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-input placeholder="请选择联系人" :value="contact != null ? contact.mobilePhone : ''" :disabled="true"></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="6">
@@ -61,7 +70,7 @@
           </a-col>
           <a-col :lg="6">
             <a-form-item label="附件" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-upload v-decorator="['annex']" :trigger-change="true"></j-upload>
+              <j-upload v-decorator="['annex']" name="annex" :trigger-change="true"></j-upload>
             </a-form-item>
           </a-col>
         </a-row>
@@ -103,12 +112,35 @@
             </div>
           </a-tab-pane>
         </a-tabs>
-         <div id="components-layout-demo-basic">
+      </a-form>
+        </a-layout-content>
+        <a-layout-sider>
+          <a-row class="form-row" :gutter="32">
+            <a-col :lg="32">
+              <strong>快捷搜索</strong>
+              <a-input placeholder="客户" @change="searchClient($event.target.value)"></a-input>
+                <a-radio-group v-model="model.clientId" @change="selectClient">
+                  <a-radio v-for="(client,index) in clientList" :style="radioStyle" v-bind:key="index" :value="client.id" :title="client.name">{{client.name}}</a-radio>
+              </a-radio-group>
+            </a-col>
+          </a-row>
+          <a-row class="form-row" :gutter="32" style="margin-top:50%;">
+            <a-col :lg="32">
+              <strong>快捷搜索</strong>
+              <a-input placeholder="客服" @change="searchCustomerService($event.target.value)"></a-input>
+                <a-radio-group v-model="model.customerServiceName" @change="selectCustomerService">
+                  <a-radio v-for="(customerService,index) in customerServiceList" :style="radioStyle" v-bind:key="index" :value="customerService.username" :title="customerService.realname">{{customerService.realname}}</a-radio>
+              </a-radio-group>
+            </a-col>
+          </a-row>
+        </a-layout-sider>
+      </a-layout>
+      <div id="components-layout-demo-basic">
             <a-layout>
-            <a-layout-footer><a-button @click="handleOk" type="primary" icon="check">保存</a-button></a-layout-footer>
+            <a-layout-footer><a-button @click="handleOk" type="primary" icon="check">提交</a-button></a-layout-footer>
             </a-layout>
          </div>
-      </a-form>
+    </a-layout>
     </a-spin>
 </template>
 
@@ -137,7 +169,7 @@
       return {
         form: this.$form.createForm(this),
         title:"操作",
-        width:1400,
+        width:1600,
         visible: false,
         model: {},
         labelCol: {
@@ -148,7 +180,11 @@
           xs: { span: 24 },
           sm: { span: 16 },
         },
-
+        radioStyle: {
+          display: 'block',
+          height: '30px',
+          lineHeight: '30px',
+        },
         confirmLoading: false,
         validatorRules:{
         number:{rules: [{ required: true, message: '请输入编号!' }]},
@@ -166,8 +202,18 @@
           add: "/workorder/workOrder/add",
           edit: "/workorder/workOrder/edit",
           workOrderDetailList: "/workorder/workOrder/queryWorkOrderDetailListByMainId",
+          listClient: "/client/client/list",
+          listCustomerService:"/sys/user/listUserByRoleCode",
+          getClientById:"/client/client/getClientById",
+          getContactById:"/client/client/getContactById",
+          getByUserName:"/sys/user/getByUserName"
         },
-        client:null,
+        listSize:5,
+        clientList:[],
+        client:{},
+        contact:{},
+        customerService:{},
+        customerServiceList:[]
       }
     },
     created () {
@@ -180,6 +226,16 @@
         this.$nextTick(() => {
           this.form.setFieldsValue(pick(this.model,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
         })
+        getAction(this.url.listClient,{pageSize:this.listSize}).then((res) => {
+          if (res.success) {
+            this.clientList = res.result.records;
+          }
+        });
+        getAction(this.url.listCustomerService+"?roleCode=customer_service",{pageSize:this.listSize}).then((res) => {
+          if (res.success) {
+            this.customerServiceList = res.result.records;
+          }
+        });
     },
     methods: {
       handleOk () {
@@ -209,6 +265,7 @@
             }).finally(() => {
               that.confirmLoading = false;
               this.form.resetFields();
+              this.contact = {};
               this.model.type = "1";
               this.model.workOrderDetailList = [{}];
               this.visible = true;
@@ -227,10 +284,10 @@
         this.form.setFieldsValue(pick(row,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
       },
       contactCondition() {
-        return "tb_contact,name,id,client_id="+this.client;
+        return "tb_contact,name,id,client_id="+this.client.id;
       },
       deviceNumberCondition(){
-        return "tb_device_number,name,id,client_id="+this.client;
+        return "tb_device_number,name,id,client_id="+this.client.id;
       },
       addRowDetail () {
         this.model.workOrderDetailList.push({});
@@ -241,38 +298,95 @@
         this.model.workOrderDetailList.splice(index,1);
         this.$forceUpdate();
       },
-      selectClient(id) {
-        this.client = id;
+      searchClient(val) {
+        getAction(this.url.listClient,{pageSize:this.listSize,name:val}).then((res) => {
+          if (res.success) {
+            this.clientList = res.result.records;
+          }
+        });
+      },
+      selectClient() {
+        if (this.model.clientId) {
+          getAction(this.url.getClientById+"?id="+this.model.clientId,null).then((res) => {
+             if (res.success) {
+              this.client = res.result;
+              this.contact = {};
+              this.form.setFieldsValue({
+                clientId: this.client.id
+              });
+            }
+          });
+        }
+      },
+      searchCustomerService(val) {
+         getAction(this.url.listCustomerService,{pageSize:this.listSize,username:val}).then((res) => {
+          if (res.success) {
+            this.customerServiceList = res.result.records;
+          }
+        });
+      },
+      selectContact(value) {
+        getAction(this.url.getContactById+"?id="+value,null).then((res) => {
+          if (res.success) {
+            this.contact = res.result;
+            this.form.setFieldsValue({
+                contactId: this.contact.id
+            });
+          }
+        });
+      },
+      selectCustomerService() {
+        if (this.model.customerServiceName) {
+          getAction(this.url.getByUserName+"?userName="+this.model.customerServiceName,null).then((res) => {
+             if (res.success) {
+              this.customerService = res.result;
+              this.form.setFieldsValue({
+                customerServiceName: this.customerService.username
+            });
+            }
+          });
+        }
+      },
+      selectClientInSelect(id) {
+        this.client.id = id;
       }
     }
   }
 </script>
 <style>
-    #components-layout-demo-basic {
-        text-align: right;
+     #components-layout-demo-basic {
+      text-align: center;
     }
     #components-layout-demo-basic .ant-layout-header,
     #components-layout-demo-basic .ant-layout-footer {
-        color: #fff;
+      color: #fff;
     }
     #components-layout-demo-basic .ant-layout-footer {
-        line-height: 1.5;
+      line-height: 1.5;
+    }
+    .ant-layout-sider {
+      background:white;
+    }
+    .ant-layout-content {
+      background: white;
+    }
+    .ant-layout-footer {
+      background: white;
     }
     #components-layout-demo-basic .ant-layout-sider {
-        background: #3ba0e9;
-        color: #fff;
-        line-height: 120px;
+      color: #fff;
+      line-height: 120px;
+      
     }
     #components-layout-demo-basic .ant-layout-content {
-        background: rgba(16, 142, 233, 1);
-        color: #fff;
-        min-height: 120px;
-        line-height: 120px;
+      color: #fff;
+      min-height: 120px;
+      line-height: 120px;
     }
     #components-layout-demo-basic > .ant-layout {
-        margin-bottom: 48px;
+      margin-bottom: 48px;
     }
     #components-layout-demo-basic > .ant-layout:last-child {
-        margin: 0;
+      margin: 0;
     }
 </style>

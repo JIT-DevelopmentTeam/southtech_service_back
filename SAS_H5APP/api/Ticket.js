@@ -1,12 +1,17 @@
 import { http } from '@/utils/request.js'
 
 /* 获取对应数据字段列表 */
-export function getDicList(dicCode) {
+export function getDicList(dictCode) {
 	return http({
-		url: '/mobile/dic/getDictItemByCode',
-		params: {
-			dicCode: dicCode
-		},
+		url: '/mobile/dic/getDictItemByCode?dictCode='+dictCode,
+		method: 'get'
+	})
+}
+
+/* 根据角色编号获取用户 */
+export function listUserByRoleCode(roleCode) {
+	return http({
+		url: '/mobile/user/listUserByRoleCode?roleCode='+roleCode,
 		method: 'get'
 	})
 }

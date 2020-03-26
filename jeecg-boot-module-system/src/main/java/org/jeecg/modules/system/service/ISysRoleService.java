@@ -1,6 +1,7 @@
 package org.jeecg.modules.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.ibatis.annotations.Param;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.system.entity.SysRole;
 import org.jeecgframework.poi.excel.entity.ImportParams;
@@ -39,5 +40,6 @@ public interface ISysRoleService extends IService<SysRole> {
      * @return
      */
     public boolean deleteBatchRole(String[] roleids);
+
 
 }
