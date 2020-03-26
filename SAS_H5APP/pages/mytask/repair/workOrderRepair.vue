@@ -64,9 +64,8 @@
 				</view>
 				<view v-if="stage.takePicture === 'true'">
 					<conf-div title="现场拍照(最多只能上传9张):" :required="required">
-						<chooseImage :num="9" :size="150" :isSave="false" saveStr="chooseImage" :isClear="hasChooseImg" :imageList="imageList"
-						 :photoList.sync="photoList" @uploadPhotoSuccess="uploadPhotoSuccess" @deletePhotoSuccess="deletePhotoSuccess"
-						 :stageStatus="stageStatus" :photoArr="photoArr" :picRequestRUl="picRequestRUl" />
+						<chooseImage :num="9" :isSave="false" :imageList="imageList" @uploadPhotoSuccess="uploadPhotoSuccess"
+						 @deletePhotoSuccess="deletePhotoSuccess" :stageStatus="stageStatus" :photoArr="photoArr" />
 					</conf-div>
 				</view>
 				<conf-div title="完成情况:">
@@ -166,7 +165,7 @@
 		name: "mytaskRepair",
 		data() {
 			return {
-				picRequestRUl: '/f/mobile/upload/uploadPicture',  // 请求地址
+				picRequestRUl: this.$IP + '/mobile/upload/uploadPicture',  // 请求地址
 				id: '',/* 阶段id */
 				ticketId: "",/* 工单id */
 				stageStatus: '',/* 阶段完成状态 */
@@ -176,7 +175,6 @@
 					'display': 'inline-block'
 				},
 				left_right: '右',
-				hasChooseImg: '',
 				completion: [{
 						value: '1',
 						name: '完成',
@@ -200,7 +198,6 @@
 					}
 				],
 				attachmentList: [],
-				photoList: [],
 				fileList:[],
 				imageList: [],
 				fileImag:[],
@@ -229,7 +226,9 @@
 				signInLongitude: 0.0,
 				signInLatitude: 0.0,
 				signOutLongitude: 0.0,
-				signOutLatitude: 0.0
+				signOutLatitude: 0.0,
+				/* ---------------- */
+				photoCommit: []// 图片上传数组
 			}
 		},
 		components: {
@@ -353,10 +352,10 @@
 					var singinRule = {value:this.signInTime, checkType:'String', errorMsg:'签到时间不能为空'}
 					rule.push(singinRule)
 				}
-				// if (this.stage.takePicture === 'true') {
-				// 	var photoRule = {value:this.fileImag, checkType:'length', errorMsg:'必须拍照'}
-				// 	rule.push(photoRule)
-				// }
+				if (this.stage.takePicture === 'true') {
+					var photoRule = {value:this.photoCommit, checkType:'length', errorMsg:'必须拍照'}
+					rule.push(photoRule)
+				}
 				if (this.formatModel == '故障预判') {
 					var faultJudgementRule = {value:this.faultJudgement, checkType:'String', errorMsg:'故障预判不能为空'}
 					rule.push(faultJudgementRule)
@@ -456,27 +455,6 @@
 								this.signOutLongitude = result.longitude;
 								this.signOutLatitude = result.latitude;
 							}
-					        /* 高德坐标 result 结构
-					        {
-					            longitude : Number,
-					            latitude : Number,
-					            accuracy : Number,
-					            address : String,
-					            province : String,
-					            city : String,
-					            district : String,
-					            road : String,
-					            netType : String,
-					            operatorType : String,
-					            errorMessage : String,
-					            errorCode : Number,
-					            isWifiEnabled : Boolean,
-					            isGpsEnabled : Boolean,
-					            isFromMock : Boolean,
-					            provider : wifi|lbs|gps,
-					            isMobileEnabled : Boolean
-					        }
-					        */
 					    },
 					    onFail : function(err) {}
 					});
@@ -494,11 +472,20 @@
 				formData.append("signInLatitude", this.signInLatitude);
 				formData.append("signOutLongitude", this.signOutLongitude);
 				formData.append("signOutLatitude", this.signOutLatitude);
-				let imageInfo = this.fileImag;
-				if (imageInfo != null) {
-					for (var i = 0; i < imageInfo.length; i++) {
-						console.log(imageInfo[i]);
-					}
+				let photoRes = this.photoCommit
+				for (var i = 0; i < photoRes.length; i++) {
+					let _this = this;
+					uni.uploadFile({
+						url: _this.picRequestRUl ,
+						filePath: photoRes[i].path,
+						name: 'photo',
+						formData: {
+							id : photoRes[i].id
+						},
+						success: (res) => {
+							
+						}
+					})
 				}
 				
 				// ticketRepairSave(formData).then(res => {
@@ -578,16 +565,13 @@
 				// 	console.log(error);
 				// })
 			},
-			uploadPhotoSuccess(result, entityList) {
-				if(result.statusCode == 200) {
-					this.fileImag = entityList;
+			uploadPhotoSuccess(entityList) {
+				for (var i = 0; i < entityList.length; i++) {
+					this.photoCommit.push(entityList[i]);
 				}
 			},
-			deletePhotoSuccess(result, entityList, photoId) {
-				if(result.confirm) {
-					this.fileImag = entityList;
-					this.del_photoId = photoId
-				}
+			deletePhotoSuccess(entityList) {
+				this.photoCommit = entityList;
 			},
 			uploadSuccess(result,entityList) {
 				if(result.statusCode == 200) {

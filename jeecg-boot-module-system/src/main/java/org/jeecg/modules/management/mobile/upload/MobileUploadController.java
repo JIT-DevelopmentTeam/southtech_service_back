@@ -1,11 +1,13 @@
 package org.jeecg.modules.management.mobile.upload;
 
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.modules.management.file.service.IFileService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,11 +15,15 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping(value = "/mobile/upload")
 public class MobileUploadController {
 
+    @Autowired
+    private IFileService fileService;
+
     @RequestMapping(value = "/uploadPicture", method = RequestMethod.POST)
-    public Result<?> uploadPicture(HttpServletRequest req) {
-        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) req;
-        MultipartFile mf = multipartRequest.getFile("photo");// 获取上传文件对象
-        return Result.ok();
+    public Result<?> uploadPicture(@RequestParam(value = "photo", required = false) MultipartFile[] photo, HttpServletRequest req) {
+        String id = req.getParameter("id");
+        String progressId = req.getParameter("progressId");
+        Result<?> result = fileService.uploadFiles(photo, "photo", id, progressId);
+        return result;
     }
 
     @RequestMapping(value = "/deleteULPicture", method = RequestMethod.GET)
