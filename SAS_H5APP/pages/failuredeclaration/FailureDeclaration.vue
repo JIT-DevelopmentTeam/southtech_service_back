@@ -86,7 +86,7 @@
 								<view class="uni-list-cell-db">
 									<checkbox-group>
 										<label style="display: block;" v-for="(faultLocation,index) in faultLocationList">
-											<checkbox :value="faultLocation.id" v-model="workOrderDetail.faultLocation" checked="true" color="#FFCC33" style="transform:scale(0.7)" />{{faultLocation.text}}
+											<checkbox :value="faultLocation.id" v-model="workOrderDetail.faultLocation" color="#FFCC33" style="transform:scale(0.7)" />{{faultLocation.text}}
 										</label>
 									</checkbox-group>
 								</view>

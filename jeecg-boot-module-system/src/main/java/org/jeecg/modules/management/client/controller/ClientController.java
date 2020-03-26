@@ -28,9 +28,6 @@ import org.jeecg.modules.wechat.constant.WechatConstant;
 import org.jeecg.modules.wechat.entity.WxUserEntity;
 import org.jeecg.modules.wechat.util.WxUserUtils;
 import org.jeewx.api.core.exception.WexinReqException;
-import org.jeewx.api.core.req.WeiXinReqService;
-import org.jeewx.api.core.req.model.user.UserInfoListGet;
-import org.jeewx.api.wxuser.user.model.Wxuser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -43,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.jeewx.api.wxuser.user.JwUserAPI.getWxuser;
 
 
 /**
