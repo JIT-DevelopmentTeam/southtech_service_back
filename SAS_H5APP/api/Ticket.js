@@ -43,3 +43,11 @@ export function delUploadFile(id) {
 		method: 'get'
 	})
 }
+
+export function getAllDetail(params) {
+	return http({
+		url: '/mobile/workOrder/getAllDetail',
+		params: params,
+		method: 'get'
+	})
+}

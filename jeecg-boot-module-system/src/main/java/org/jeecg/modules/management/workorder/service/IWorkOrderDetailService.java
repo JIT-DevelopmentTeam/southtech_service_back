@@ -1,7 +1,9 @@
 package org.jeecg.modules.management.workorder.service;
 
-import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
+import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDetailDTO;
+
 import java.util.List;
 
 /**
@@ -13,5 +15,7 @@ import java.util.List;
 public interface IWorkOrderDetailService extends IService<WorkOrderDetail> {
 
 	List<WorkOrderDetail> selectByMainId(String mainId);
+
+	List<MobileWorkOrderDetailDTO> getByWorkOrderId(String workOrderId);
 
 }

@@ -71,7 +71,7 @@
 				<conf-div title="完成情况:">
 					<radio-btn :items="completion" @radioChange="comChange" :stageStatus="stageStatus" type="complete"></radio-btn>
 				</conf-div>
-				<view v-if="formatModel == '故障预判'">
+				<view v-if="formatModel == '故障研判'">
 					<conf-div title="故障判断:" :required="required">
 						<textarea placeholder="请输入故障判断" v-model="faultJudgement" :disabled="stageStatus ==1 ? true : false" />
 						<view class="separator"></view>
@@ -356,7 +356,7 @@
 					var photoRule = {value:this.photoCommit, checkType:'length', errorMsg:'必须拍照'}
 					rule.push(photoRule)
 				}
-				if (this.formatModel == '故障预判') {
+				if (this.formatModel == '故障研判') {
 					var faultJudgementRule = {value:this.faultJudgement, checkType:'String', errorMsg:'故障预判不能为空'}
 					rule.push(faultJudgementRule)
 				}

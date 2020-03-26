@@ -1,13 +1,14 @@
 package org.jeecg.modules.management.workorder.entity;
 
-import java.io.Serializable;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Data;
 import org.jeecgframework.poi.excel.annotation.Excel;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
 
 /**
  * @Description: 工单明细
@@ -70,4 +71,6 @@ public class WorkOrderDetail implements Serializable {
     private java.util.Date assignedTime;
     /**计划完成时间*/
     private java.util.Date plannedCompletionTime;
+    /**当前进度id*/
+    private java.lang.String currentProgress;
 }
