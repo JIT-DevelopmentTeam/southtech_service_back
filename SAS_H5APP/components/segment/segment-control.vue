@@ -12,7 +12,7 @@
 				<step-item :ticketId="ticketId" :ticketType="ticketType" :isNavigateTo="isNavigateTo"></step-item>
 			</view>
 			<view v-else>
-				
+				<detail-card :ticketId="ticketId"></detail-card>
 			</view>
         </view>
     </view>
@@ -22,7 +22,8 @@
 	export default {
 		components: {
 			uniSegmentedControl: () => import('@dcloudio/uni-ui/lib/uni-segmented-control/uni-segmented-control.vue'),
-			stepItem: () => import('@/components/swiper-item/swiper-item.vue')
+			stepItem: () => import('@/components/swiper-item/swiper-item.vue'),
+			detailCard: () => import('@/pages/mytask/detail/component/detail_card.vue')
 		},
 		props:{
 			ticketId:{

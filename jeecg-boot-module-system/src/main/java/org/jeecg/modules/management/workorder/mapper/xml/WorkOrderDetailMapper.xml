@@ -15,4 +15,22 @@
 		WHERE
 			 work_order_id = #{mainId} 
 	</select>
+
+	<select id="getByWorkOrderId" resultType="org.jeecg.modules.management.workorder.vo.MobileWorkOrderDetailDTO">
+		SELECT
+			detail.id AS "detailId",
+			device.`name` AS "deviceName",
+			user.realname AS "enginerName",
+			progress.`name` AS "currentProgress",
+			report.isCompleted AS "isCompleted"
+		FROM
+			ic_work_order_detail detail
+			LEFT JOIN tb_device_number device ON device.id = detail.device_number
+			LEFT JOIN sys_user user ON user.username = detail.service_engineer_name
+			LEFT JOIN ic_work_order workOrder ON workOrder.id = detail.work_order_id
+			LEFT JOIN ic_work_order_progress progress ON progress.id = detail.current_progress
+			LEFT JOIN ic_progress_report report ON report.work_order_detail_id = detail.id
+			WHERE
+			workOrder.id = #{workOrderId}
+	</select>
 </mapper>

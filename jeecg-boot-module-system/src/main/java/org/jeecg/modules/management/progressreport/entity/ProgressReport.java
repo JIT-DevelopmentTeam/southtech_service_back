@@ -1,17 +1,14 @@
 package org.jeecg.modules.management.progressreport.entity;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Data;
 import org.jeecgframework.poi.excel.annotation.Excel;
-import org.jeecg.common.aspect.annotation.Dict;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
 
 /**
  * @Description: 进度汇报
@@ -49,10 +46,16 @@ public class ProgressReport implements Serializable {
 	/**描述*/
 	@Excel(name = "描述", width = 15)
     private java.lang.String description;
-	/**附件*/
-	@Excel(name = "附件", width = 15)
-    private java.lang.String annex;
 	/**所属进度*/
 	@Excel(name = "所属进度", width = 15)
     private java.lang.String progressId;
+	/**汇报状态*/
+	@Excel(name = "汇报状态", width = 15)
+	private java.lang.String isCompleted;
+	/**工单id*/
+	@Excel(name = "工单id", width = 15)
+	private java.lang.String workOrderId;
+	/**工单明细id*/
+	@Excel(name = "工单明细id", width = 15)
+	private java.lang.String workOrderDetailId;
 }
