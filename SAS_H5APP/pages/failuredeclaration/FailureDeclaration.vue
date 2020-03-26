@@ -228,7 +228,6 @@
 				this.deviceNumberList.splice(0,this.deviceNumberList.length);
 				let clientId = this.clientList[e.target.value].value;
 				getDicList("tb_device_number,name,id,client_id="+clientId).then((res) => {
-					debugger;
 					if (res.data.success) {
 						this.deviceNumberList = res.data.result;
 					}
