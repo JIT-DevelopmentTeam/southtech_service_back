@@ -7,6 +7,7 @@ import java.util.Map;
 import org.jeecg.modules.system.entity.SysRole;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.entity.SysUserRole;
+import org.jeecg.modules.system.mapper.SysRoleMapper;
 import org.jeecg.modules.system.mapper.SysUserRoleMapper;
 import org.jeecg.modules.system.service.ISysRoleService;
 import org.jeecg.modules.system.service.ISysUserRoleService;
@@ -59,8 +60,9 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
 		}
 		return map;
 	}
-	
-	/**
+
+
+    /**
 	 * queryUserRole调用的方法
 	 * @param roleList
 	 * @param roleId

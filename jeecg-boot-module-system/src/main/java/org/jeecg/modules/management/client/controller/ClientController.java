@@ -223,6 +223,16 @@ public class ClientController extends JeecgController<Client, IClientService> {
         return Result.ok(pageList);
     }
 
+    /**
+     * 根据id获取客户信息
+     * @param id
+     * @return
+     */
+    @GetMapping(value = "/getClientById")
+    public Result<?> queryClientById(@RequestParam("id") String id) {
+        return Result.ok(clientService.getById(id));
+    }
+
 	/*---------------------------------主表处理-end-------------------------------------*/
 	
 
@@ -285,6 +295,16 @@ public class ClientController extends JeecgController<Client, IClientService> {
 		this.contactService.removeByIds(Arrays.asList(ids.split(",")));
         return Result.ok("批量删除成功!");
 	}
+
+    /**
+     * 根据id获取数据
+     * @param id
+     * @return
+     */
+	@GetMapping(value = "/getContactById")
+    public Result<?> queryContactById(@RequestParam("id") String id) {
+	    return Result.ok(contactService.getById(id));
+    }
 
     /*--------------------------------子表处理-联系人信息-end----------------------------------------------*/
 

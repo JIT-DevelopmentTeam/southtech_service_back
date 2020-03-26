@@ -112,4 +112,5 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         this.removeByIds(Arrays.asList(roleIds));
         return true;
     }
+
 }

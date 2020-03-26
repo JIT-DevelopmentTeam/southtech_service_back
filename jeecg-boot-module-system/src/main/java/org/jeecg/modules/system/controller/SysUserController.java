@@ -20,10 +20,7 @@ import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.PasswordUtil;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.system.entity.SysDepart;
-import org.jeecg.modules.system.entity.SysUser;
-import org.jeecg.modules.system.entity.SysUserDepart;
-import org.jeecg.modules.system.entity.SysUserRole;
+import org.jeecg.modules.system.entity.*;
 import org.jeecg.modules.system.model.DepartIdModel;
 import org.jeecg.modules.system.model.SysUserSysDepartModel;
 import org.jeecg.modules.system.service.*;
@@ -82,6 +79,7 @@ public class SysUserController {
     @Autowired
     private ISysRoleService sysRoleService;
 
+
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public Result<IPage<SysUser>> queryPageList(SysUser user, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, HttpServletRequest req) {
@@ -92,6 +90,38 @@ public class SysUserController {
         result.setSuccess(true);
         result.setResult(pageList);
         return result;
+    }
+
+    @RequestMapping(value = "/listUserByRoleCode", method = RequestMethod.GET)
+    public Result<IPage<SysUser>> queryUserPageList(SysUser user, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+                                                @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, @RequestParam("roleCode") String roleCode, HttpServletRequest req) {
+        Result<IPage<SysUser>> result = new Result<IPage<SysUser>>();
+        QueryWrapper<SysUser> queryWrapper = QueryGenerator.initQueryWrapper(user, req.getParameterMap());
+        QueryWrapper<SysRole> roleQueryWrapper = new QueryWrapper<>();
+        roleQueryWrapper.eq("role_code",roleCode);
+        SysRole role = sysRoleService.getOne(roleQueryWrapper);
+        if (!oConvertUtils.isEmpty(role)) {
+            QueryWrapper<SysUserRole> userRoleQueryWrapper = new QueryWrapper<>();
+            userRoleQueryWrapper.eq("role_id",role.getId());
+            List<SysUserRole> userRoleList = userRoleService.list(userRoleQueryWrapper);
+            List<String> userIdsList = new ArrayList<>();
+            for (SysUserRole sysUserRole : userRoleList) {
+                userIdsList.add(sysUserRole.getUserId());
+            }
+            if (!userIdsList.isEmpty()) {
+                queryWrapper.in("id",userIdsList);
+            }
+        }
+        Page<SysUser> page = new Page<SysUser>(pageNo, pageSize);
+        IPage<SysUser> pageList = sysUserService.page(page, queryWrapper);
+        result.setSuccess(true);
+        result.setResult(pageList);
+        return result;
+    }
+
+    @GetMapping(value = "/getByUserName")
+    public Result<?> queryByUserName(@RequestParam("userName") String userName) {
+        return Result.ok(sysUserService.getUserByName(userName));
     }
 
     @RequestMapping(value = "/queryAll", method = RequestMethod.GET)

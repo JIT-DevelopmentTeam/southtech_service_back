@@ -2,6 +2,7 @@ package org.jeecg.modules.system.service;
 
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.system.entity.SysUserRole;
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -21,4 +22,5 @@ public interface ISysUserRoleService extends IService<SysUserRole> {
 	 * @return
 	 */
 	Map<String,String> queryUserRole();
+
 }
