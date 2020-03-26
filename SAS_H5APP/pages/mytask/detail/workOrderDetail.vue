@@ -45,14 +45,14 @@
 							{{getTicket.contactName}}
 						</view>
 					</view>
-					<view class="sameLine">
+					<!-- <view class="sameLine">
 						<view class="label sameLine fontsmall bold">
 							职位：
 						</view>
 						<view class="label sameLine fontsmall">
 							院长
 						</view>
-					</view>
+					</view> -->
 				</view>
 				<view class="line">
 					<view class="sameLine">

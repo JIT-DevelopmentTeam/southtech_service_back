@@ -51,8 +51,8 @@
             </a-form-item>
           </a-col>
           <a-col :lg="8">
-            <a-form-item label="镇/街道" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input @blur="getLocationByAddress" v-decorator="[ 'community', validatorRules.community]" placeholder="请输入镇/街道"></a-input>
+            <a-form-item label="镇" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-input @blur="getLocationByAddress" v-decorator="[ 'community', validatorRules.community]" placeholder="请输入镇"></a-input>
             </a-form-item>
           </a-col>
         </a-row>
@@ -134,7 +134,7 @@
         province:{rules: [{ required: true, message: '请输入省!' }]},
         city:{rules: [{ required: true, message: '请输入市!' }]},
         area:{rules: [{ required: true, message: '请输入区!' }]},
-        community:{rules: [{ required: true, message: '请输入镇/街道!' }]},
+        community:{rules: [{ required: true, message: '请输入镇!' }]},
         address:{},
         userId:{rules: [{ required: true, message: '请选择所属用户!' }]},
         industry:{},

@@ -68,7 +68,7 @@
 			}
 		},
 		methods: {
-			toRepair(stageId,ticketId,finishTime, index) {
+			toRepair(progressId,ticketId,finishTime, index) {
 				let stageStatus = 0;
 				if(finishTime !== null) {stageStatus = 1}
 				if(!this.isNavigateTo){return;}
@@ -84,7 +84,7 @@
 					}
 				}
 				uni.navigateTo({
-					url: '../../mytask/repair/workOrderRepair?id=' + stageId + "&ticketId=" + ticketId + "&stageStatus=" + stageStatus + "&ticketType=" + this.ticketType
+					url: '../../mytask/repair/workOrderRepair?id=' + progressId + "&ticketId=" + ticketId + "&stageStatus=" + stageStatus + "&ticketType=" + this.ticketType
 				})
 			}
 		},

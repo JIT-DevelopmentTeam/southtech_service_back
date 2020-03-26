@@ -8,7 +8,9 @@
           </a-checkbox>
         </a-col>
         <a-col :span="8" :style="{fontWeight: 'bold'}">{{ title }}</a-col>
-        <a-col :span="8"></a-col>
+        <a-col :span="8">
+          <img :src="imgIcon.url">
+        </a-col>
       </a-row>
     </div>
     <div class="content" @scroll="hscroll($event)">
@@ -17,7 +19,7 @@
                           style="line-height: 2; display: block; text-align: left; margin: 0 20px;">
           <a-list itemLayout="horizontal" :dataSource="dataSource" :split="false">
             <a-list-item slot="renderItem" slot-scope="item, index">
-              <a-checkbox :value="item.clientName ? item.clientName : item.realname">{{ item.clientName ? item.clientName : item.realname }}</a-checkbox>
+              <a-checkbox :value="item.detailId ? item.detailId : item.userName">{{ item.clientName ? item.clientName : item.realname }}</a-checkbox>
             </a-list-item>
           </a-list>
           <!--        <a-row v-for="(item, index) in list" :key="index">-->
@@ -45,6 +47,9 @@
       },
       value: {
         type: Array
+      },
+      imgIcon: {
+        type: Object
       }
     },
     data() {
@@ -69,14 +74,14 @@
       onChange(checkedList) {
         this.indeterminate = !!checkedList.length && checkedList.length < this.dataSource.length;
         this.checkAll = checkedList.length === this.dataSource.length;
-        const selectList = this.dataSource.filter(e => checkedList.includes(e.clientName ? e.clientName : e.realname))
+        const selectList = this.dataSource.filter(e => checkedList.includes(e.detailId ? e.detailId : e.userName))
         this.$emit('input', selectList)
       },
       onCheckAllChange(e) {
         let list = this.dataSource
         let checkedList = []
         for (let i = 0; i < list.length; i++) {
-          checkedList.push(list[i].clientName ? list[i].clientName : list[i].realname)
+          checkedList.push(list[i].detailId ? list[i].detailId : list[i].userName)
         }
         Object.assign(this, {
           checkedList: e.target.checked ? checkedList : [],

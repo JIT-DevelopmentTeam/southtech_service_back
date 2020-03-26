@@ -66,7 +66,7 @@ export default {
 		return {
 			imgList: [],
 			base64: '',
-			uploadPhotoUrl: this.$IP + '/f/mobile/upload/uploadPicture', //替换成你的后端接收文件地址
+			uploadPhotoUrl: this.$IP + '/mobile/upload/uploadPicture', //替换成你的后端接收文件地址
 			fileImage:[],
 			commitList: []
 		};
@@ -97,32 +97,34 @@ export default {
 						uni.setStorageSync(_this.saveStr, _this.imgList.join(','));
 					}
 					
-					for (let i = 0; i < _this.commitList.length; i++) {
-						uni.uploadFile({
-							url: _this.uploadPhotoUrl ,
-							filePath: _this.commitList[i].path,
-							name: 'photo',
-							formData: {
-								id : _this.commitList[i].id
-							},
-							success: (res) => {
-								let json=JSON.parse(res.data);
-								var  fileEntity =json.body.filesEntity;
-								_this.fileImage.push(fileEntity);
-								console.log('fileImage -> ', _this.fileImage);
-								_this.$emit('uploadPhotoSuccess', res,_this.fileImage);
-								if (res.statusCode  == 200) {
-									_this.$emit('update:photoList', _this.commitList);
-									_this.$forceUpdate();
-								} else {
+					_this.$emit("uploadPhotoSuccess", _this.commitList)
+					
+					// for (let i = 0; i < _this.commitList.length; i++) {
+					// 	uni.uploadFile({
+					// 		url: _this.uploadPhotoUrl ,
+					// 		filePath: _this.commitList[i].path,
+					// 		name: 'photo',
+					// 		formData: {
+					// 			id : _this.commitList[i].id
+					// 		},
+					// 		success: (res) => {
+					// 			let json=JSON.parse(res.data);
+					// 			var  fileEntity =json.body.filesEntity;
+					// 			_this.fileImage.push(fileEntity);
+					// 			console.log('fileImage -> ', _this.fileImage);
+					// 			_this.$emit('uploadPhotoSuccess', res,_this.fileImage);
+					// 			if (res.statusCode  == 200) {
+					// 				_this.$emit('update:photoList', _this.commitList);
+					// 				_this.$forceUpdate();
+					// 			} else {
 									
-								}
-							},
-							fail: (err) => {
+					// 			}
+					// 		},
+					// 		fail: (err) => {
 								
-							}
-						})
-					}
+					// 		}
+					// 	})
+					// }
 				}
 			});
 		},
@@ -145,8 +147,8 @@ export default {
 						})
 						this.imgList.splice(idx, 1);
 						this.$forceUpdate();
-						this.$emit('deletePhotoSuccess', res,this.fileImage, id);
-						this.$emit('update:photoList', this.imgList);
+						this.$emit('deletePhotoSuccess', this.imgList);
+						// this.$emit('update:photoList', this.imgList);
 					}
 				}
 			});

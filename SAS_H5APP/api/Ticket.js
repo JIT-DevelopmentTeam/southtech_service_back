@@ -33,11 +33,11 @@ export function getWorkOrderList(params) {
 }
 
 /* 阶段维护保存 */
-export function ticketRepairSave(params, header) {
+export function ticketRepairSave(params/* , header */) {
 	return http({
-		url: '/f/mobile/stageProcess/save',
+		url: '/mobile/stage/progressReport',
 		method: 'post',
-		headers: header,
+		// headers: header,
 		data: params
 	})
 }

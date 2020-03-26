@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export const http = axios.create({
-	baseURL: 'http://127.0.0.1:8080/jeecg-boot',
+	baseURL: 'http://localhost:8080/jeecg-boot',
 	// baseURL: 'http://120.77.40.245:8080/sac',// 捷特
 	// baseURL: 'http://40.73.75.101:8080/sac',// 索奥斯
 	timeout: 50000

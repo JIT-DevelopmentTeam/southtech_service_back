@@ -38,7 +38,7 @@ import com.alibaba.fastjson.JSON;
  /**
  * @Description: 阶段信息
  * @Author: jeecg-boot
- * @Date:   2020-03-13
+ * @Date:   2020-03-16
  * @Version: V1.0
  */
 @RestController
@@ -67,6 +67,7 @@ public class StageController extends JeecgController<Stage, IStageService> {
 		IPage<Stage> pageList = stageService.page(page, queryWrapper);
 		return Result.ok(pageList);
 	}
+	
 	/**
 	 *   添加
 	 *
@@ -158,7 +159,5 @@ public class StageController extends JeecgController<Stage, IStageService> {
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
         return super.importExcel(request, response, Stage.class);
     }
-
-
 
 }
