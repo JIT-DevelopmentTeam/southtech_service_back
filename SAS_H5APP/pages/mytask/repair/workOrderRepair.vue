@@ -54,24 +54,24 @@
 						<span class="iconfont icontianjiayonghu iconStyle Btn" @click="stageStatus != 1 ? selectUser() : ''"></span>
 					</view>
 				</conf-div> -->
-				<view v-if="stage.checkIn === 'true'">
+				<!-- <view v-if="stage.checkIn === 'true'"> -->
 					<conf-div title="签到时间:" :required="required">
 						<time-selector showType="yearToMinute" beginDate="1970-01-01" endDate="2030-12-31" beginTime="06:00:00" endTime="23:59:59"
 						 @btnConfirm="bindInTimeConfirm">
 							<text>当前选择：{{ signInTime }}</text>
 						</time-selector>
 					</conf-div>
-				</view>
-				<view v-if="stage.takePicture === 'true'">
+				<!-- </view> -->
+				<!-- <view v-if="stage.takePicture === 'true'"> -->
 					<conf-div title="现场拍照(最多只能上传9张):" :required="required">
 						<chooseImage :num="9" :isSave="false" :imageList="imageList" @uploadPhotoSuccess="uploadPhotoSuccess"
 						 @deletePhotoSuccess="deletePhotoSuccess" :stageStatus="stageStatus" :photoArr="photoArr" />
 					</conf-div>
-				</view>
+				<!-- </view> -->
 				<conf-div title="完成情况:">
 					<radio-btn :items="completion" @radioChange="comChange" :stageStatus="stageStatus" type="complete"></radio-btn>
 				</conf-div>
-				<view v-if="formatModel == '故障研判'">
+				<!-- <view v-if="formatModel == '故障研判'"> -->
 					<conf-div title="故障判断:" :required="required">
 						<textarea placeholder="请输入故障判断" v-model="faultJudgement" :disabled="stageStatus ==1 ? true : false" />
 						<view class="separator"></view>
@@ -85,13 +85,14 @@
 							@click="priceChange"
 							:disabled="stageStatus ==1 ? true : false"
 							:mess="''"
+							:open="'1'"
 							typeStyle="center">
 							<view class="label">
 								{{faultLocaDefault}}
 							</view>
 						</fl-picker>
 					</conf-div>
-				</view>
+				<!-- </view> -->
 				<view v-if="stage.costTemplate === 'true'">
 					<conf-div title="是否保质期内:">
 						<radio-btn :items="yes_no" @radioChange="yes_noChange" :stageStatus="stageStatus" type="isQGP"></radio-btn>
@@ -100,12 +101,12 @@
 						<input placeholder="请输入费用合计(元)" type="number" v-model="cost" :disabled="stageStatus ==1 ? true : false"/>
 					</conf-div>
 				</view>
-				<view v-if="stage.attachment === 'true'">
+				<!-- <view v-if="stage.attachment === 'true'"> -->
 					<conf-div title="附件(最多只能上传9份):" :required="required">
 						<Attachment mode="create" :canUploadFile="true" :showProcess="true" :attachmentList.sync="attachmentList" @uploadSuccess="uploadSuccess" @deleteSuccess="deleteSuccess" :stageStatus="stageStatus" :fileArr="fileArr"></Attachment>
 					</conf-div>
-				</view>
-				<view v-if="stage.checkOut === 'true'">
+				<!-- </view> -->
+				<!-- <view v-if="stage.checkOut === 'true'"> -->
 					<conf-div title="签出时间:" :required="required">
 							<time-selector
 							    showType="yearToMinute"
@@ -119,7 +120,7 @@
 							</time-selector>
 						<!-- </view> -->
 					</conf-div>
-				</view>
+				<!-- </view> -->
 				<view v-if="stageStatus != 1">
 					<view class="occupying-box"></view>
 				</view>
@@ -166,6 +167,7 @@
 		data() {
 			return {
 				picRequestRUl: this.$IP + '/mobile/upload/uploadPicture',  // 请求地址
+				detailId: '',/* 工单明细id */
 				id: '',/* 阶段id */
 				ticketId: "",/* 工单id */
 				stageStatus: '',/* 阶段完成状态 */
@@ -210,7 +212,6 @@
 				arr: [],/* 图片选择数组 */
 				completeStatus: '',/* 完成情况 */
 				isQGP: '',/* 是否保质期内 */
-				dataForm: {},
 				faultJudgement: '',/* 故障判断 */
 				faultLocation: '',/* 故障部位 */
 				cost: '',/* 费用合计 */
@@ -246,6 +247,7 @@
 		},
 		onLoad(option) {
 			console.log(option);
+			this.detailId = option.detailId
 			this.id = option.id
 			this.ticketId = option.ticketId
 			this.stageStatus = option.stageStatus
@@ -463,6 +465,8 @@
 			async commitInfo(){
 				let formData = new FormData();
 				formData.append("progressId", this.id);
+				formData.append("detailId", this.detailId);
+				formData.append("ticketId", this.ticketId);
 				// formData.append("userId", this.$store.getters['getUserId']);
 				formData.append("userId", '15752589952308491');
 				formData.append("checkIn", this.signInTime);
@@ -472,21 +476,8 @@
 				formData.append("signInLatitude", this.signInLatitude);
 				formData.append("signOutLongitude", this.signOutLongitude);
 				formData.append("signOutLatitude", this.signOutLatitude);
-				// let photoRes = this.photoCommit
-				// for (var i = 0; i < photoRes.length; i++) {
-				// 	let _this = this;
-				// 	uni.uploadFile({
-				// 		url: _this.picRequestRUl ,
-				// 		filePath: photoRes[i].path,
-				// 		name: 'photo',
-				// 		formData: {
-				// 			id : photoRes[i].id
-				// 		},
-				// 		success: (res) => {
-							
-				// 		}
-				// 	})
-				// }
+				formData.append("faultLocation", this.faultLocation);
+				formData.append('faultJudgement', this.faultJudgement);
 				
 				ticketRepairSave(formData).then(res => {
 					
@@ -565,6 +556,23 @@
 				// 	console.log(error);
 				// })
 			},
+			savePhoto() {
+				let photoRes = this.photoCommit
+				for (var i = 0; i < photoRes.length; i++) {
+					let _this = this;
+					uni.uploadFile({
+						url: _this.picRequestRUl ,
+						filePath: photoRes[i].path,
+						name: 'photo',
+						formData: {
+							id : photoRes[i].id
+						},
+						success: (res) => {
+							
+						}
+					})
+				}
+			},
 			uploadPhotoSuccess(entityList) {
 				for (var i = 0; i < entityList.length; i++) {
 					this.photoCommit.push(entityList[i]);
@@ -596,6 +604,7 @@
 				console.log(data.indexStr);
 				console.log(data.textStr);
 				this.faultLocaDefault = data.textStr
+				this.faultLocation = data.valueStr
 			},
 			delUploader(id) {
 				if (id != '') {

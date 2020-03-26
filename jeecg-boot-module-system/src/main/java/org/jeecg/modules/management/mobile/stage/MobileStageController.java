@@ -1,6 +1,8 @@
 package org.jeecg.modules.management.mobile.stage;
 
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.modules.management.progressreport.entity.ProgressReport;
+import org.jeecg.modules.management.progressreport.service.IProgressReportService;
 import org.jeecg.modules.management.signin.entity.SignIn;
 import org.jeecg.modules.management.signin.service.ISignInService;
 import org.jeecg.modules.management.stage.service.IStageService;
@@ -30,6 +32,9 @@ public class MobileStageController {
     @Autowired
     private ISysUserService sysUserService;
 
+    @Autowired
+    private IProgressReportService progressReportService;
+
     @RequestMapping(value = "/queryStageByWorkOrderId")
     public Result<?> queryStageByWorkOrderId(HttpServletRequest req) {
         List<MobileStageDTO> list = stageService.queryStageByWorkOrderId(req.getParameter("workOrderId"));
@@ -39,8 +44,11 @@ public class MobileStageController {
     @RequestMapping(value = "/progressReport", method = RequestMethod.POST)
     public Result<?> progressReport(@RequestParam Map<String, Object> params) {
         SysUser user = sysUserService.getByEnterpriseId(params.get("userId").toString());
-//        signInSave("1", params, user, signInService);
-//        signInSave("2", params, user, signInService);
+        // 签到 签出保存
+        signInSave("1", params, user, signInService);
+        signInSave("2", params, user, signInService);
+        // 进度汇报保存
+        reportSave(params);
         return Result.ok();
     }
 
@@ -67,6 +75,21 @@ public class MobileStageController {
                 break;
         }
         signInService.save(signIn);
+    }
+
+    /**
+     * 进度汇报（保存操作）
+     * @param params
+     */
+    private void reportSave(Map<String, Object> params) {
+        ProgressReport progressReport = new ProgressReport();
+        progressReport.setDescription(params.get("faultJudgement").toString());
+        progressReport.setProgressId(params.get("progressId").toString());
+        progressReport.setIsCompleted(params.get("completeStatus").toString());
+        progressReport.setWorkOrderDetailId(params.get("detailId").toString());
+        progressReport.setWorkOrderId(params.get("ticketId").toString());
+        progressReport.setFaultLocation(params.get("faultLocation").toString());
+        progressReportService.save(progressReport);
     }
 
 }
