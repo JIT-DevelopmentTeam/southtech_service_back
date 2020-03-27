@@ -18,4 +18,6 @@ public interface IWorkOrderDetailService extends IService<WorkOrderDetail> {
 
 	List<MobileWorkOrderDetailDTO> getByWorkOrderId(String workOrderId);
 
+	void updateCurrentProgressByWorkOrderId(String currentProgress, String workOrderId);
+
 }

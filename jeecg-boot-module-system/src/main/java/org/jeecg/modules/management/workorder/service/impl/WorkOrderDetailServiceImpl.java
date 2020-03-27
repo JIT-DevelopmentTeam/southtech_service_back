@@ -31,4 +31,9 @@ public class WorkOrderDetailServiceImpl extends ServiceImpl<WorkOrderDetailMappe
 	public List<MobileWorkOrderDetailDTO> getByWorkOrderId(String workOrderId) {
 		return workOrderDetailMapper.getByWorkOrderId(workOrderId);
 	}
+
+	@Override
+	public void updateCurrentProgressByWorkOrderId(String currentProgress, String workOrderId) {
+		workOrderDetailMapper.updateCurrentProgressByWorkOrderId(currentProgress, workOrderId);
+	}
 }

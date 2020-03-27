@@ -58,4 +58,7 @@ public class ProgressReport implements Serializable {
 	/**工单明细id*/
 	@Excel(name = "工单明细id", width = 15)
 	private java.lang.String workOrderDetailId;
+	/**故障部位*/
+	@Excel(name = "故障部位", width = 15)
+	private java.lang.String faultLocation;
 }

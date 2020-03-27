@@ -2,6 +2,8 @@ package org.jeecg.modules.management.workorder.service;
 
 import org.jeecg.modules.management.workorder.entity.WorkOrderProgress;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -13,4 +15,6 @@ import java.util.List;
 public interface IWorkOrderProgressService extends IService<WorkOrderProgress> {
 
 	public List<WorkOrderProgress> selectByMainId(String mainId);
+
+	void updateFinishTimeById(Date finishTime, String progressId);
 }

@@ -21,4 +21,6 @@ public interface WorkOrderDetailMapper extends BaseMapper<WorkOrderDetail> {
 
 	List<MobileWorkOrderDetailDTO> getByWorkOrderId(@Param("workOrderId") String workOrderId);
 
+	void updateCurrentProgressByWorkOrderId(@Param("currentProgress") String currentProgress, @Param("workOrderId") String workOrderId);
+
 }

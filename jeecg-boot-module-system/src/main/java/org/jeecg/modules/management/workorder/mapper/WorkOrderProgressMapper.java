@@ -1,9 +1,11 @@
 package org.jeecg.modules.management.workorder.mapper;
 
-import java.util.List;
-import org.jeecg.modules.management.workorder.entity.WorkOrderProgress;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+import org.jeecg.modules.management.workorder.entity.WorkOrderProgress;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @Description: 工单进度
@@ -16,4 +18,6 @@ public interface WorkOrderProgressMapper extends BaseMapper<WorkOrderProgress> {
 	public boolean deleteByMainId(@Param("mainId") String mainId);
     
 	public List<WorkOrderProgress> selectByMainId(@Param("mainId") String mainId);
+
+	void updateFinishTimeById(@Param("finishTime") Date finishTime, @Param("progressId") String progressId);
 }
