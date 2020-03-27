@@ -168,7 +168,7 @@
         <work-order-progress-page :mainId="selectedMainId" />
       </a-tab-pane>
       <a-tab-pane tab="回访记录" key="3">
-        <ServiceVisitsList ref="ServiceVisitsList" :workNum="workOrder.number"/>
+        <ServiceVisitsList ref="ServiceVisitsList" :workOrderNum="workOrder.number"/>
       </a-tab-pane>
     </a-tabs>
 
@@ -413,6 +413,8 @@ export default {
       if (this.selectionRows.length === 1) {
         let row = this.selectionRows[0]
         this.workOrder = row
+        
+        this.$refs.ServiceVisitsList.loadData();
       }
     },
     loadData(arg) {

@@ -98,146 +98,170 @@
 </template>
 
 <script>
+import { JeecgListMixin } from '@/mixins/JeecgListMixin'
+// import ServiceVisitsModal from './modules/ServiceVisitsModal'
+import { initDictOptions, filterMultiDictText } from '@/components/dict/JDictSelectUtil'
 
-  import { JeecgListMixin } from '@/mixins/JeecgListMixin'
-  // import ServiceVisitsModal from './modules/ServiceVisitsModal'
-  import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
-
-  export default {
-    name: "ServiceVisitsList",
-    mixins:[JeecgListMixin],
-    components: {
-      // ServiceVisitsModal
-    },
-    props: {
-      workOrderNum: {
-        type: String,
-      },
-    },
-    data () {
-      return {
-        description: '回访记录管理页面',
-        // 表头
-        columns: [
-          {
-            title: '#',
-            dataIndex: '',
-            key:'rowIndex',
-            width:60,
-            align:"center",
-            customRender:function (t,r,index) {
-              return parseInt(index)+1;
-            }
-          },
-          {
-            title:'回访人',
-            align:"center",
-            dataIndex: 'visitPeople'
-          },
-          {
-            title:'回访时间',
-            align:"center",
-            dataIndex: 'visitTime'
-          },
-          {
-            title:'客户',
-            align:"center",
-            dataIndex: 'customer'
-          },
-          {
-            title:'受访人',
-            align:"center",
-            dataIndex: 'respondents'
-          },
-          {
-            title:'是否完成',
-            align:"center",
-            dataIndex: 'isCompleted'
-          },
-          {
-            title:'回访评分',
-            align:"center",
-            dataIndex: 'score'
-          },
-          {
-            title:'回访方式',
-            align:"center",
-            dataIndex: 'visitWay',
-            customRender:(text)=>{
-              if(!text){
-                return ''
-              }else{
-                return filterMultiDictText(this.dictOptions['visitWay'], text+"")
-              }
-            }
-          },
-          {
-            title:'联系电话',
-            align:"center",
-            dataIndex: 'contact'
-          },
-          {
-            title:'回访意见',
-            align:"center",
-            dataIndex: 'opinion',
-            scopedSlots: {customRender: 'htmlSlot'}
-          },
-          {
-            title: '操作',
-            dataIndex: 'action',
-            align:"center",
-            scopedSlots: { customRender: 'action' }
-          }
-        ],
-        url: {
-          list: "/servicevisits/serviceVisits/list",
-          delete: "/servicevisits/serviceVisits/delete",
-          deleteBatch: "/servicevisits/serviceVisits/deleteBatch",
-          exportXlsUrl: "/servicevisits/serviceVisits/exportXls",
-          importExcelUrl: "servicevisits/serviceVisits/importExcel",
-        },
-        dictOptions:{
-         visitWay:[],
-        },
-      }
-    },
-    watch: {
-      workOrderNum(newValue, oldValue) {
-        if(newValue!==oldValue){
-          this.queryParam.workOrderId=newValue
-          this.LoadData()
+export default {
+  name: 'ServiceVisitsList',
+  mixins: [JeecgListMixin],
+  components: {
+    // ServiceVisitsModal
+  },
+  props: {
+    workOrderNum: {
+      type: String
+    }
+  },
+  watch: {
+    workOrderNum: {
+      immediate: true,
+      handler(val) {
+        if (!this.workOrderNum) {
+          this.clearList()
+        } else {
+          this.queryParam['workOrderId'] = val
+          this.loadData(1)
+          this.initDictConfig()
         }
       }
-    },
-    computed: {
-      importExcelUrl: function(){
-        return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
-      }
-    },
-    beforeCreate(){
-      this.queryParam.workOrderId=this.workOrderNum
-    },
-    methods: {
-      
-      initDictConfig(){
-        initDictOptions('service_visits_way').then((res) => {
-          if (res.success) {
-            this.$set(this.dictOptions, 'visitWay', res.result)
-          }
-        })
-      },
-      onSelectChange(selectedRowKeys, selectionRows) {
-      this.selectedRowKeys = selectedRowKeys;
-      this.selectionRows = selectionRows;
-      if(this.selectionRows.lenght===1){
-        this.$emit('change',this.selectionRows[0])
-      }
-      
     }
-      
-       
+  },
+  data() {
+    return {
+      description: '回访记录管理页面',
+      // 表头
+      columns: [
+        {
+          title: '#',
+          dataIndex: '',
+          key: 'rowIndex',
+          width: 60,
+          align: 'center',
+          customRender: function(t, r, index) {
+            return parseInt(index) + 1
+          }
+        },
+        {
+          title: '回访人',
+          align: 'center',
+          dataIndex: 'visitPeople',
+          customRender: text => {
+            if (!text) {
+              return ''
+            } else {
+              return filterMultiDictText(this.dictOptions['visitPeople'], text + '')
+            }
+          }
+        },
+        {
+          title: '回访时间',
+          align: 'center',
+          dataIndex: 'visitTime'
+        },
+        {
+          title: '客户',
+          align: 'center',
+          dataIndex: 'customer',
+          customRender: text => {
+            if (!text) {
+              return ''
+            } else {
+              return filterMultiDictText(this.dictOptions['customer'], text + '')
+            }
+          }
+        },
+        {
+          title: '受访人',
+          align: 'center',
+          dataIndex: 'respondents'
+        },
+        {
+          title: '是否完成',
+          align: 'center',
+          dataIndex: 'isCompleted'
+        },
+        {
+          title: '回访评分',
+          align: 'center',
+          dataIndex: 'score'
+        },
+        {
+          title: '回访方式',
+          align: 'center',
+          dataIndex: 'visitWay',
+          customRender: text => {
+            if (!text) {
+              return ''
+            } else {
+              return filterMultiDictText(this.dictOptions['visitWay'], text + '')
+            }
+          }
+        },
+        {
+          title: '联系电话',
+          align: 'center',
+          dataIndex: 'contact'
+        },
+        {
+          title: '回访意见',
+          align: 'center',
+          dataIndex: 'opinion',
+          scopedSlots: { customRender: 'htmlSlot' }
+        },
+        {
+          title: '操作',
+          dataIndex: 'action',
+          align: 'center',
+          scopedSlots: { customRender: 'action' }
+        }
+      ],
+      url: {
+        list: '/servicevisits/serviceVisits/list',
+        delete: '/servicevisits/serviceVisits/delete',
+        deleteBatch: '/servicevisits/serviceVisits/deleteBatch',
+        exportXlsUrl: '/servicevisits/serviceVisits/exportXls',
+        importExcelUrl: 'servicevisits/serviceVisits/importExcel'
+      },
+      dictOptions: {
+        visitWay: [],
+        customer: []
+      }
+    }
+  },
+
+  computed: {
+    importExcelUrl: function() {
+      return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`
+    }
+  },
+  methods: {
+    initDictConfig() {
+      initDictOptions('service_visits_way').then(res => {
+        if (res.success) {
+          this.$set(this.dictOptions, 'visitWay', res.result)
+        }
+      })
+      initDictOptions('tb_client,name,id').then(res => {
+        if (res.success) {
+          this.$set(this.dictOptions, 'customer', res.result)
+        }
+      })
+      initDictOptions('sys_user,realname,username').then(res => {
+        if (res.success) {
+          this.$set(this.dictOptions, 'visitPeople', res.result)
+        }
+      })
+    },
+    onSelectChange(selectedRowKeys, selectionRows) {
+      this.selectedRowKeys = selectedRowKeys
+      this.selectionRows = selectionRows
+      if (this.selectionRows.lenght === 1) {
+        this.$emit('change', this.selectionRows[0])
+      }
     }
   }
+}
 </script>
 <style scoped>
 @import '~@assets/less/common.less';
