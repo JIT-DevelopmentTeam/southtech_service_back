@@ -82,6 +82,7 @@
               <a-row type="flex" style="margin-bottom:10px" :gutter="16">
                 <a-col :span="5">设备档案</a-col>
                 <a-col :span="5">故障部位</a-col>
+                <a-col :span="3">附件</a-col>
                 <a-col :span="9">描述</a-col>
                 <a-col :span="2">操作</a-col>
               </a-row>
@@ -97,14 +98,14 @@
                     <j-multi-select-tag placeholder="故障部位" v-decorator="['workOrderDetailList['+index+'].faultLocation', {'initialValue':item.faultLocation,rules: [{ required: true, message: '请选择故障部位!' }]}]" dictCode="work_order_detail_fault_location"/>
                   </a-form-item>
                 </a-col>
-                <a-col :span="5">
+                <a-col :span="3">
                   <a-form-item>
-                    <j-upload v-decorator="['workOrderDetailList['+index+'].annex', {'initialValue':item.annex}]" :trigger-change="true"></j-upload>
+                    <j-upload v-decorator="['workOrderDetailList['+index+'].annex', {'initialValue':item.annex}]" :trigger-change="true" name="workOrderDetail"></j-upload>
                   </a-form-item>
                 </a-col>
                 <a-col :span="9">
                   <a-form-item>
-                    <a-textarea v-decorator="['workOrderDetailList['+index+'].description', {'initialValue':item.description}]" placeholder="描述"></a-textarea>
+                    <a-textarea rows="4" v-decorator="['workOrderDetailList['+index+'].description', {'initialValue':item.description}]" placeholder="描述"></a-textarea>
                   </a-form-item>
                 </a-col>
                 <a-col :span="2">
@@ -289,10 +290,22 @@
         this.form.setFieldsValue(pick(row,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
       },
       contactCondition() {
-        return "tb_contact,name,id,client_id="+this.client.id;
+        let sql = "tb_contact,name,id,client_id=";
+        if (this.client) {
+          sql += this.client.id;
+        } else {
+          sql += "0";
+        }
+        return sql;
       },
       deviceNumberCondition(){
-        return "tb_device_number,name,id,client_id="+this.client.id;
+        let sql = "tb_device_number,name,id,client_id=";
+        if (this.client) {
+          sql += this.client.id;
+        } else {
+          sql += "0";
+        }
+        return sql;
       },
       addRowDetail () {
         this.model.workOrderDetailList.push({});

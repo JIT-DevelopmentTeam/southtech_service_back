@@ -64,16 +64,11 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     public void saveMain(WorkOrder workOrder, List<WorkOrderDetail> workOrderDetailList) {
 	    workOrder.setStatus("1");
         workOrderMapper.insert(workOrder);
-        if (workOrderDetailList != null) {
-            for (WorkOrderDetail entity : workOrderDetailList) {
-                entity.setWorkOrderId(workOrder.getId());
-                workOrderDetailMapper.insert(entity);
-            }
-        }
         QueryWrapper<Stage> stageQueryWrapper = new QueryWrapper<>();
         stageQueryWrapper.eq("work_order_type",workOrder.getType());
         stageQueryWrapper.orderByAsc("order_index");
         List<Stage> stageList = stageMapper.selectList(stageQueryWrapper);
+        WorkOrderProgress currentProgress = null;
         for (int i = 0; i < stageList.size(); i++) {
             WorkOrderProgress workOrderProgress = new WorkOrderProgress();
             if (i == 0) {
@@ -83,6 +78,18 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
             workOrderProgress.setStageId(stageList.get(i).getId());
             workOrderProgress.setWorkOrderId(workOrder.getId());
             workOrderProgressMapper.insert(workOrderProgress);
+            if (i == 1) {
+                currentProgress = workOrderProgress;
+            }
+        }
+        if (workOrderDetailList != null) {
+            for (WorkOrderDetail entity : workOrderDetailList) {
+                if (currentProgress != null) {
+                    entity.setCurrentProgress(currentProgress.getId());
+                }
+                entity.setWorkOrderId(workOrder.getId());
+                workOrderDetailMapper.insert(entity);
+            }
         }
     }
 

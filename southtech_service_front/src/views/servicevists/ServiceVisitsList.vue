@@ -179,7 +179,14 @@ export default {
         {
           title: '是否完成',
           align: 'center',
-          dataIndex: 'isCompleted'
+          dataIndex: 'isCompleted',
+          customRender: text => {
+            if (!text) {
+              return ''
+            } else {
+              return filterMultiDictText(this.dictOptions['isCompleted'], text + '')
+            }
+          }
         },
         {
           title: '回访评分',
@@ -225,7 +232,8 @@ export default {
       },
       dictOptions: {
         visitWay: [],
-        customer: []
+        customer: [],
+        isCompleted:[]
       }
     }
   },
@@ -250,6 +258,11 @@ export default {
       initDictOptions('sys_user,realname,username').then(res => {
         if (res.success) {
           this.$set(this.dictOptions, 'visitPeople', res.result)
+        }
+      })
+      initDictOptions('DIC_YES_OR_NOT').then(res => {
+        if (res.success) {
+          this.$set(this.dictOptions, 'isCompleted', res.result)
         }
       })
     },
