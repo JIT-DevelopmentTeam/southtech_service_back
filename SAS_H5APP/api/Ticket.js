@@ -56,3 +56,20 @@ export function getAllDetail(params) {
 		method: 'get'
 	})
 }
+
+/* 获取用户列表 */
+export function listClient(params) {
+	return http({
+		url: '/mobile/client/list',
+		params: params,
+		method: 'get'
+	})
+}
+
+/* 根据id获取客户 */
+export function getClientById(params) {
+	return http({
+		url: '/mobile/client/getClientById?id='+params,
+		method: 'get'
+	})
+}
