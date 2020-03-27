@@ -30,8 +30,12 @@
 			LEFT JOIN sys_user user ON user.username = detail.service_engineer_name
 			LEFT JOIN ic_work_order workOrder ON workOrder.id = detail.work_order_id
 			LEFT JOIN ic_work_order_progress progress ON progress.id = detail.current_progress
-			LEFT JOIN ic_progress_report report ON report.work_order_detail_id = detail.id
+			LEFT JOIN ic_progress_report report ON report.work_order_detail_id = detail.id AND report.progress_id = detail.current_progress
 			WHERE
 			workOrder.id = #{workOrderId}
 	</select>
+
+	<update id="updateCurrentProgressByWorkOrderId">
+		UPDATE ic_work_order_detail SET current_progress = #{currentProgress} WHERE work_order_id = #{workOrderId}
+	</update>
 </mapper>

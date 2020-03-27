@@ -52,6 +52,7 @@ const actions = {
 	GetWorkOrderDetail({commit,state}, payload) {
 		return new Promise((resolve, reject) => {
 			getAllDetail(payload).then(res => {
+				commit("setTicketDetailList",res.data.result)
 				resolve(res.data.result)
 			}).catch(err => {
 				console.log(error);

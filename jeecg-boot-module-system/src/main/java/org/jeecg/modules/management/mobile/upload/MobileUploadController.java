@@ -21,8 +21,8 @@ public class MobileUploadController {
     @RequestMapping(value = "/uploadPicture", method = RequestMethod.POST)
     public Result<?> uploadPicture(@RequestParam(value = "photo", required = false) MultipartFile[] photo, HttpServletRequest req) {
         String id = req.getParameter("id");
-        String progressId = req.getParameter("progressId");
-        Result<?> result = fileService.uploadFiles(photo, "photo", id, progressId);
+        String progressReportId = req.getParameter("progressReportId");
+        Result<?> result = fileService.uploadFiles(photo, "photo", id, progressReportId);
         return result;
     }
 

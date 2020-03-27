@@ -24,9 +24,9 @@ import java.util.*;
 public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IFileService {
 
     @Override
-    public Result<File> uploadFiles(MultipartFile[] files, String dic, String sid, String progressId) {
+    public Result<File> uploadFiles(MultipartFile[] files, String dic, String sid, String progressReportId) {
         Result<File> result = new Result<>();
-        File filesEntity = files(files, dic,sid, progressId);
+        File filesEntity = files(files, dic,sid, progressReportId);
         if (filesEntity == null) {
             result.setSuccess(false);
             result.setMessage("上传失败");
@@ -38,7 +38,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
         return result;
     }
 
-    public synchronized File files(MultipartFile[] files, String dis,String sid, String progressId) {
+    public synchronized File files(MultipartFile[] files, String dis,String sid, String progressReportId) {
         List<Map> list = uploadFile(files, dis);
         File fileEntity = null;
         String fileName = "";
@@ -52,7 +52,23 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
             fileEntity.setFilename(params.get("newFileName").toString());
             fileEntity.setUrl(params.get("path").toString());
             fileEntity.setId(sid);
+            fileEntity.setProgressReportId(progressReportId);
+            String oldFileName = params.get("oldFileName").toString();
+            String path = params.get("path").toString();
+            String id = fileEntity.getId();
+            if(list.size() - 1 == i){
+                fileName = fileName + oldFileName;
+                filePath = filePath + path;
+                fileId = fileId + id;
+            }else{
+                fileName = fileName + oldFileName +",";
+                filePath = filePath + path+",";
+                fileId = fileId + id+",";
+            }
         }
+        file.setId(fileId);
+        file.setUrl(filePath);
+        file.setFilename(fileName);
         return file;
     }
 
@@ -116,7 +132,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
      * @return
      */
     public static String getClasspath(){
-        String path = (String.valueOf(Thread.currentThread().getContextClassLoader().getResource(""))).replaceAll("file:/", "").replaceAll("%20", " ").trim();
+        String path = (String.valueOf(Thread.currentThread().getContextClassLoader().getResource(""))+"../../").replaceAll("file:/", "").replaceAll("%20", " ").trim();
         if(path.indexOf(":") != 1){
             path = java.io.File.separator + path;
         }

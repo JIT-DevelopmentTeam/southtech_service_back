@@ -1,25 +1,29 @@
 <template>
-	<view @click="dClick(info.detailId, info.progressId, info.isCompleted)">
-		<uni-card class="uniCard">
-			<view>
-				<view class="inline">设备档案：</view>
-				<view class="inline">{{ info.deviceName }}</view>
+	<view>
+		<view v-for="(item, index) in showList" :key="index">
+			<view @click="dClick(item.detailId, item.progressId, item.isCompleted)">
+				<uni-card class="uniCard">
+					<view>
+						<view class="inline">设备档案：</view>
+						<view class="inline">{{ item.deviceName }}</view>
+					</view>
+				    <view>
+				    	<view class="inline">服务工程师：</view>
+				    	<view class="inline">{{item.enginerName}}</view>
+				    </view>
+					<view class="gird">
+						<view>
+							<view class="inline">当前阶段：</view>
+							<view class="inline">{{item.currentProgress}}</view>
+						</view>
+						<view>
+							<view class="inline">完成状态：</view>
+							<view class="inline">{{item.isCompleted === '1' ? '完成' : '' || item.isCompleted === '0' ? '继续' : ''}}</view>
+						</view>
+					</view>
+				</uni-card>
 			</view>
-		    <view>
-		    	<view class="inline">服务工程师：</view>
-		    	<view class="inline">{{info.enginerName}}</view>
-		    </view>
-			<view class="gird">
-				<view>
-					<view class="inline">当前阶段：</view>
-					<view class="inline">{{info.currentProgress}}</view>
-				</view>
-				<view>
-					<view class="inline">完成状态：</view>
-					<view class="inline">{{info.isCompleted}}</view>
-				</view>
-			</view>
-		</uni-card>
+		</view>
 	</view>
 </template>
 
@@ -48,9 +52,20 @@
 		},
 		data() {
 			return {
+				dataSource: []
+			}
+		},
+		computed: {
+			showList() {
+				let result = this.$store.getters['workOrder/getTicketDetailList'];
+				return result;
 			}
 		},
 		created() {
+			let params = {
+				workOrderId: this.ticketId
+			}
+			this.$store.dispatch('workOrder/GetWorkOrderDetail', params)
 		},
 		methods: {
 			dClick(detailId, progressId, isCompleted) {

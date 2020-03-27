@@ -480,7 +480,22 @@
 				formData.append('faultJudgement', this.faultJudgement);
 				
 				ticketRepairSave(formData).then(res => {
-					
+					if (res.status === 200) {
+						this.savePhoto(res.data.result)
+						uni.showToast({
+							title: '保存成功',
+							duration: 500,
+							mask: true,
+							complete: () => {
+								uni.navigateBack({
+									delta:1
+								});
+								var payload = {'workOrderId': this.ticketId}
+								this.$store.dispatch('workOrder/GetWorkOrderDetail', payload)
+								this.$store.dispatch('stage/GetDataList', payload)
+							}
+						})
+					}
 				})
 				
 				
@@ -556,7 +571,7 @@
 				// 	console.log(error);
 				// })
 			},
-			savePhoto() {
+			savePhoto(progressReportId) {
 				let photoRes = this.photoCommit
 				for (var i = 0; i < photoRes.length; i++) {
 					let _this = this;
@@ -565,7 +580,8 @@
 						filePath: photoRes[i].path,
 						name: 'photo',
 						formData: {
-							id : photoRes[i].id
+							id : photoRes[i].id,
+							progressReportId: progressReportId
 						},
 						success: (res) => {
 							

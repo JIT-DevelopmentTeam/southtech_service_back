@@ -9,8 +9,16 @@
 			 work_order_id = #{mainId} 	</delete>
 	
 	<select id="selectByMainId" parameterType="java.lang.String" resultType="org.jeecg.modules.management.workorder.entity.WorkOrderProgress">
-		SELECT * 
-		FROM  ic_work_order_progress
+		SELECT
+		progress.*
+		FROM  ic_work_order_progress progress
+		LEFT JOIN tb_stage stage ON stage.id = progress.stage_id
 		WHERE
-			 work_order_id = #{mainId} 	</select>
+			 work_order_id = #{mainId}
+		ORDER BY stage.order_index
+	</select>
+
+	<update id="updateFinishTimeById">
+		UPDATE ic_work_order_progress SET finish_time = #{finishTime} WHERE id = #{progressId}
+	</update>
 </mapper>
