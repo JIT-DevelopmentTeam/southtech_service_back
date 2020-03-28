@@ -4,7 +4,12 @@ export const http = axios.create({
 	baseURL: 'http://localhost:8080/jeecg-boot',
 	// baseURL: 'http://120.77.40.245:8080/sac',// 捷特
 	// baseURL: 'http://40.73.75.101:8080/sac',// 索奥斯
-	timeout: 50000
+	timeout: 50000,
+	headers: {
+	  'Accept': 'application/json',  
+	  'Content-Type': 'application/json'  
+	},
+	withCredentials: true
 })
 
 // Add a request interceptor

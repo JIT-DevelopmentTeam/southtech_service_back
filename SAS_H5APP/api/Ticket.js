@@ -73,3 +73,12 @@ export function getClientById(params) {
 		method: 'get'
 	})
 }
+
+/* 保存工单 */
+export function addWorkOrder(params) {
+	return http({
+		url:'/mobile/workOrder/add',
+		params: params,
+		method:'post'
+	});
+}
