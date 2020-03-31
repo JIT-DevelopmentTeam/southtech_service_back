@@ -35,8 +35,27 @@ public class MobileUploadController {
         return result;
     }
 
+    @RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+    public Result<?> uploadFile(@RequestParam(value = "file", required = false) MultipartFile[] files, HttpServletRequest req) {
+        String id = req.getParameter("id");
+        String progressReportId = req.getParameter("progressReportId");
+        Result<?> result = fileService.uploadFiles(files, "File", id, progressReportId);
+        return result;
+    }
+
     @RequestMapping(value = "/deleteULPicture", method = RequestMethod.GET)
     public Result<?> deleteULPicture(HttpServletRequest req) {
+        String ids = req.getParameter("ids");
+        String[] idArr = ids.split(",");
+        for (String id : idArr) {
+            org.jeecg.modules.management.file.entity.File file = fileService.getById(id);
+            if (file != null) {
+                String path = uploadpath + "/" + file.getUrl();
+                File delFile = new File(path);
+                delFile.delete();
+                fileService.removeById(id);
+            }
+        }
         return Result.ok();
     }
 

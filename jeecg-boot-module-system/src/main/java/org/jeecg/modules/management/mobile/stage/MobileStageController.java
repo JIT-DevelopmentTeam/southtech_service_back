@@ -68,7 +68,9 @@ public class MobileStageController {
         String reportId = req.getParameter("reportId");
         MobileReportDTO reportDTO = progressReportService.getByReportId(user.getUsername(), progressId, reportId);
         List<File> photoList = getByReportId(reportId, "Photo");
+        List<File> fileList = getByReportId(reportId, "File");
         reportDTO.setPhotoList(photoList);
+        reportDTO.setFileList(fileList);
         return Result.ok(reportDTO);
     }
 

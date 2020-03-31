@@ -3,10 +3,10 @@
 		<view class="imgs">
 			<!-- file -->
 			<view class="file" v-for="(item, key) in list" :key="key" v-if="item.type == 'file'">
-				<view class="noImg" @click="false ? downLoad(item.url) : ''" @longpress="deleteItem(key)">{{ item.fileName }}</view>
+				<view class="noImg" @click="false ? downLoad(item.url) : ''" @longpress="deleteItem(key, item.id)">{{ item.fileName }}</view>
 				<progress :percent="item.process" activeColor="#67C23A" :backgroundColor="item.process == 100 || item.process == undefined ? '#67C23A' : '#F56C6C'" stroke-width="3" v-if="mode == 'create' && showProcess" />
 				<view v-show="stageStatus != 1">
-					<view class="del" @tap="deleteItem(key)">×</view>
+					<view class="del" @tap="deleteItem(key, item.id)">×</view>
 				</view>
 			</view>
 			<!-- add button -->
@@ -51,9 +51,6 @@
 			stageStatus: {	// 阶段完成状态（为 1 就是已完成，只能查看；为 0 就是继续，可编辑）
 				type: String
 			},
-			fileArr: {	// 上传文件后 后端返回的id和name（查看的时候才用到）
-				type: Array
-			}
 		},
 		computed: {
 			list() {
@@ -123,7 +120,7 @@
 					}
 				});
 			},
-			deleteItem(index) {
+			deleteItem(index, id) {
 				uni.showModal({
 					title: '提示',
 					content: '确定要删除此项吗？',
@@ -132,20 +129,9 @@
 							if (this.list[index].process != 100) {
 								typeof this.list[index].uploadTask != 'undefined' && this.list[index].uploadTask.abort();
 							}
-							var id
-							this.fileList.forEach((i, idx) => {
-								if (i.id == this.list[index].id) {
-									uni.showToast({
-										title: '删除成功',
-										icon: 'none'
-									});
-									id = i.id
-									this.fileList.splice(idx, 1)
-								}
-							})
 							this.list.splice(index, 1);
 							this.$forceUpdate();
-							this.$emit('deleteSuccess', res,this.fileList, id);
+							this.$emit('deleteSuccess', this.list, id);
 							this.$emit('update:attachmentList', this.list);
 						}
 					}
@@ -235,56 +221,53 @@
 					// #endif
 				}
 		
+				this.$emit('uploadSuccess', tempFiles);
 				for (let i in tempFiles) {
 					let id = tempFiles[i].id
 					let path = tempFiles[i].path;
 					var fileName = tempFiles[i].name;
-					let index = this.list.length;
 					// 开始上传，先暂存文件
 					this.list.push({
 						id: id,
 						fileName: fileName,
 						url: path,
-						type: this.isImg(path) ? 'image' : 'file',
-						index: index,
-						uploadTask: uploadTask,
-						process: 0
+						type: this.isImg(path) ? 'image' : 'file'
 					});
 					this.$forceUpdate();
-					var uploadTask = await uni.uploadFile({
-						url: this.uploadFileUrl,
-						filePath: path,
-						name: this.fileKeyName,
-						header: this.header,
-						formData: {
-							id : id
-						},
-						success: res => {
-							 let json=JSON.parse(res.data);
-							 var  fileEntity =json.body.filesEntity;
-							 this.fileList.push(fileEntity);
-							 //var entityList= {"id":fileEntity.id,"fileName":fileEntity.fileName,"path":fileEntity.path};
-							 /* this.fileList.push(entityList);
-							 console.log("-----"+this.fileList); */
-							// 上传完成后处理
-							this.$emit('uploadSuccess', res,this.fileList);
-							if (res.statusCode  == 200) {
-								console.log('file', '上传成功');
-								this.$set(this.list[index], 'process', 100);
-								this.$emit('update:attachmentList', this.list);
-								this.$forceUpdate();
-							} else {
+					// var uploadTask = await uni.uploadFile({
+					// 	url: this.uploadFileUrl,
+					// 	filePath: path,
+					// 	name: this.fileKeyName,
+					// 	header: this.header,
+					// 	formData: {
+					// 		id : id
+					// 	},
+					// 	success: res => {
+					// 		 let json=JSON.parse(res.data);
+					// 		 var  fileEntity =json.body.filesEntity;
+					// 		 this.fileList.push(fileEntity);
+					// 		 //var entityList= {"id":fileEntity.id,"fileName":fileEntity.fileName,"path":fileEntity.path};
+					// 		 /* this.fileList.push(entityList);
+					// 		 console.log("-----"+this.fileList); */
+					// 		// 上传完成后处理
+					// 		this.$emit('uploadSuccess', res,this.fileList);
+					// 		if (res.statusCode  == 200) {
+					// 			console.log('file', '上传成功');
+					// 			this.$set(this.list[index], 'process', 100);
+					// 			this.$emit('update:attachmentList', this.list);
+					// 			this.$forceUpdate();
+					// 		} else {
 								
-							}
-						}
-					});
-					uploadTask.onProgressUpdate(res => {
-						//此接口不显示真实进度， 所以需要特殊处理
-						if (res.progress < 90) {
-							this.$set(this.list[index], 'process', res.progress);
-							this.$forceUpdate();
-						}
-					});
+					// 		}
+					// 	}
+					// });
+					// uploadTask.onProgressUpdate(res => {
+					// 	//此接口不显示真实进度， 所以需要特殊处理
+					// 	if (res.progress < 90) {
+					// 		this.$set(this.list[index], 'process', res.progress);
+					// 		this.$forceUpdate();
+					// 	}
+					// });
 				}
 			},
 			//根据文件名，返回时是否是图片类型
@@ -296,7 +279,6 @@
 			}
 		},
 		mounted() {
-			this.fileList = this.fileArr
 		}
 	};
 </script>

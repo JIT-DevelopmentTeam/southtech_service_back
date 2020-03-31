@@ -62,24 +62,24 @@
 						</time-selector>
 					</conf-div>
 				</view>
-				<!-- <view v-if="stage.checkIn === 'true'"> -->
+				<view v-if="stage.checkIn === 'true'">
 					<conf-div title="签到时间:" :required="required">
 						<time-selector showType="yearToMinute" beginDate="1970-01-01" endDate="2030-12-31" beginTime="06:00:00" endTime="23:59:59"
 						 @btnConfirm="bindInTimeConfirm" :isClick="stageStatus ==1 ? true : false">
 							<text>当前选择：{{ signInTime }}</text>
 						</time-selector>
 					</conf-div>
-				<!-- </view> -->
-				<!-- <view v-if="stage.takePicture === 'true'"> -->
+				</view>
+				<view v-if="stage.takePicture === 'true'">
 					<conf-div title="现场拍照(最多只能上传9张):" :required="required">
 						<chooseImage :num="9" :isSave="false" :imageList="imageList" @uploadPhotoSuccess="uploadPhotoSuccess"
-						 @deletePhotoSuccess="deletePhotoSuccess" :stageStatus="stageStatus" :photoArr="photoArr" />
+						 @deletePhotoSuccess="deletePhotoSuccess" :stageStatus="stageStatus" />
 					</conf-div>
-				<!-- </view> -->
+				</view>
 				<conf-div title="完成情况:">
 					<radio-btn :items="completion" @radioChange="comChange" :stageStatus="stageStatus" type="complete"></radio-btn>
 				</conf-div>
-				<!-- <view v-if="formatModel == '故障研判'"> -->
+				<view v-if="formatModel == '故障研判'">
 					<conf-div title="故障判断:" :required="required">
 						<textarea placeholder="请输入故障判断" v-model="faultJudgement" :disabled="stageStatus ==1 ? true : false" />
 						<view class="separator"></view>
@@ -100,7 +100,7 @@
 							</view>
 						</fl-picker>
 					</conf-div>
-				<!-- </view> -->
+				</view>
 				<view v-if="stage.costTemplate === 'true'">
 					<conf-div title="是否保质期内:">
 						<radio-btn :items="yes_no" @radioChange="yes_noChange" :stageStatus="stageStatus" type="isQGP"></radio-btn>
@@ -109,12 +109,12 @@
 						<input placeholder="请输入费用合计(元)" type="number" v-model="cost" :disabled="stageStatus ==1 ? true : false"/>
 					</conf-div>
 				</view>
-				<!-- <view v-if="stage.attachment === 'true'"> -->
+				<view v-if="stage.attachment === 'true'">
 					<conf-div title="附件(最多只能上传9份):" :required="required">
-						<Attachment mode="create" :canUploadFile="true" :showProcess="true" :attachmentList.sync="attachmentList" @uploadSuccess="uploadSuccess" @deleteSuccess="deleteSuccess" :stageStatus="stageStatus" :fileArr="fileArr"></Attachment>
+						<Attachment :canUploadFile="true" :showProcess="true" :attachmentList.sync="attachmentList" @uploadSuccess="uploadSuccess" @deleteSuccess="deleteSuccess" :stageStatus="stageStatus"></Attachment>
 					</conf-div>
-				<!-- </view> -->
-				<!-- <view v-if="stage.checkOut === 'true'"> -->
+				</view>
+				<view v-if="stage.checkOut === 'true'">
 					<conf-div title="签出时间:" :required="required">
 							<time-selector
 							    showType="yearToMinute"
@@ -127,9 +127,8 @@
 							>
 							    <text>当前选择：{{ signOutTime }}</text>
 							</time-selector>
-						<!-- </view> -->
 					</conf-div>
-				<!-- </view> -->
+				</view>
 				<view v-if="stageStatus != 1">
 					<view class="occupying-box"></view>
 				</view>
@@ -177,6 +176,7 @@
 		data() {
 			return {
 				picRequestRUl: this.$IP + '/mobile/upload/uploadPicture',  // 请求地址
+				uploadFileUrl: this.$IP + '/mobile/upload/uploadFile',
 				reportId: '',
 				detailId: '',/* 工单明细id */
 				id: '',/* 阶段id */
@@ -211,26 +211,19 @@
 					}
 				],
 				attachmentList: [],
-				fileList:[],
 				imageList: [],
-				fileImag:[],
 				stage: {},/* 阶段对象 */
 				stageLists: [],/* 阶段列表（VUEX） */
 				person: '',/* 同行人员 */
 				person_DD_ID: '',/* 同行人员钉钉ID */
 				signInTime: '',/* 签到时间 */
 				signOutTime: '',/* 签出时间 */
-				arr: [],/* 图片选择数组 */
 				completeStatus: '',/* 完成情况 */
 				isQGP: '',/* 是否保质期内 */
 				faultJudgement: '',/* 故障判断 */
 				faultLocation: '',/* 故障部位 */
 				cost: '',/* 费用合计 */
-				fileArr: [],
-				photoArr: [],
 				faultLocaDefault: '',
-				del_photoId: '',/* 点击删除照片时 需要删除的照片id */
-				del_fileId: '',/* 点击删除文件时 需要删除的文件id */
 				required: true,
 				timeStamp: "", //签名的方法的参数
 				nonceStr: "",
@@ -241,7 +234,10 @@
 				signOutLatitude: 0.0,
 				/* ---------------- */
 				photoCommit: [],// 图片上传数组
+				photoDel: [],//要删除的图片数组
 				appointment: '',// 预约时间
+				fileCommit: [],// 文件上传数组
+				fileDel: [],// 要删除的文件数组
 			}
 		},
 		components: {
@@ -292,6 +288,7 @@
 						item.checked = false;
 						if (item.value == result.isCompleted) {
 							item.checked = true;
+							this.completeStatus = item.value;
 						}
 					});
 					this.faultLocation = result.faultLocation;
@@ -304,76 +301,14 @@
 						this.imageList.push(obj);
 						this.photoCommit.push(obj);
 					}
+					for (var i = 0; i < result.fileList.length; i++) {
+						let path = this.$IP + result.fileList[i].url;
+						let obj ={id: result.fileList[i].id, type: 'file', fileName: result.fileList[i].originalFilename}
+						this.attachmentList.push(obj);
+						this.fileCommit.push(obj);
+					}
 				})
 			}
-			// if (this.stage.stageProcess != undefined) {
-			// 	this.person = this.stage.stageProcess.person
-			// 	this.person_DD_ID = this.stage.stageProcess.personDDId
-			// 	var stageLogList = this.$store.getters['stage/getSign_Out'].filter(e=>e.stageId === this.id)
-			// 	var maxSignDate = 0
-			// 	var maxOutDate = 0
-			// 	for (var i = 0; i < stageLogList.length; i++) {
-			// 		if (stageLogList[i].signTime > maxSignDate) {
-			// 			maxSignDate = stageLogList[i].signTime;
-			// 			maxOutDate = stageLogList[i].outTime;
-			// 		}
-			// 	}
-			// 	var signIn = format(maxSignDate).split(' ')
-			// 	var signOut = format(maxOutDate).split(' ')
-			// 	this.signInTime = signIn[1]
-			// 	this.signOutTime = signOut[1]
-			// 	this.faultJudgement = this.stage.stageProcess.memo
-			// 	this.completion.forEach((i) => {
-			// 		if (i.value == this.stage.stageProcess.completeStatus) {
-			// 			i.checked = true
-			// 		}
-			// 	})
-				
-			// 	var photoList = this.stage.stageProcess.photoList
-			// 	if (photoList != undefined) {
-			// 		for (let i = 0; i < photoList.length; i++) {
-			// 			var path = this.$IP + photoList[i].path
-			// 			var obj ={id: photoList[i].id, path: path}
-			// 			this.imageList.push(obj)
-			// 			var photoArr = {id: photoList[i].id, fileName: photoList[i].fileName, path: photoList[i].path}
-			// 			this.photoArr.push(photoArr)
-			// 			this.fileImag = this.photoArr
-			// 		}
-			// 	}
-				
-			// 	var filesList = this.stage.stageProcess.filesList
-			// 	if (filesList != undefined) {
-			// 		for (let i = 0; i < filesList.length; i++) {
-			// 			var file = {'id': filesList[i].id, 'fileName': filesList[i].fileName, 'index': i, 'process': 100, 'type': 'file'}
-			// 			this.attachmentList.push(file)
-			// 			var fileArr = {'id': filesList[i].id, 'fileName': filesList[i].fileName, 'path': filesList[i].path}
-			// 			this.fileArr.push(fileArr)
-			// 			this.fileList = this.fileArr
-			// 		}
-			// 	}
-			// }
-			// if (this.stage.malfunction != undefined) {
-			// 	let faultLocaList = this.faultLocaList
-			// 	let faultType = this.stage.malfunction.faultType.split(',')
-			// 	for (let i in faultType) {
-			// 		for (let j in faultLocaList) {
-			// 			if (faultType[i] == faultLocaList[j].id) {
-			// 				if (this.faultLocaDefault == '') {
-			// 					this.faultLocaDefault = faultLocaList[j].value
-			// 				} else {
-			// 					this.faultLocaDefault += "," + faultLocaList[j].value
-			// 				}
-			// 			}
-			// 		}
-			// 	}
-			// }
-			
-			// this.yes_no.forEach((i) => {
-			// 	if (i.value == this.getTicket.warrantyPeriod) {
-			// 		i.checked = true
-			// 		this.isQGP = i.value
-			// 	}
-			// })
 			
 			this.completion.forEach((i) => {
 				if (i.checked) {
@@ -417,10 +352,10 @@
 					var faultJudgementRule = {value:this.faultJudgement, checkType:'String', errorMsg:'故障预判不能为空'}
 					rule.push(faultJudgementRule)
 				}
-				// if (this.stage.attachment === 'true') {
-				// 	var fileRule = {value:this.fileList, checkType:'length', errorMsg:'必须上传附件'}
-				// 	rule.push(fileRule)
-				// }
+				if (this.stage.attachment === 'true') {
+					var fileRule = {value:this.fileCommit, checkType:'length', errorMsg:'必须上传附件'}
+					rule.push(fileRule)
+				}
 				if (this.stage.checkOut === 'true') {
 					var singoutRule = {value:this.signOutTime, checkType:'String', errorMsg:'签出时间不能为空'}
 					rule.push(singoutRule)
@@ -436,21 +371,12 @@
 				}
 			},
 			formReset(e) {
-				// if (this.fileImag != undefined) {
-				// 	for (let i = 0; i < this.fileImag.length; i++) {
-				// 		this.delUploader(this.fileImag[i].id)
-				// 	}
-				// }
-				// if (this.fileList != undefined) {
-				// 	for (let i = 0; i < this.fileList.length; i++) {
-				// 		this.delUploader(this.fileList[i].id)
-				// 	}
-				// }
-				// uni.navigateBack({
-				// 	delta:1
-				// })
-				// var payload = {'ticketType': this.ticketType, 'ticketId': this.ticketId}
-				// this.$store.dispatch('stage/GetDataList', payload)
+				uni.navigateBack({
+					delta:1
+				});
+				var payload = {'workOrderId': this.ticketId}
+				this.$store.dispatch('workOrder/GetWorkOrderDetail', payload)
+				this.$store.dispatch('stage/GetDataList', payload)
 			},
 			initFaultLocation(valueArr) {
 				let faultArr = valueArr.split(",")
@@ -533,6 +459,8 @@
 				});
 			},
 			async commitInfo(){
+				this.delUploader(this.photoDel.join(","));
+				this.delUploader(this.fileDel.join(","));
 				let formData = new FormData();
 				formData.append("reportId", this.reportId);
 				formData.append("progressId", this.id);
@@ -553,7 +481,8 @@
 				
 				ticketRepairSave(formData).then(res => {
 					if (res.status === 200) {
-						this.savePhoto(res.data.result)
+						this.savePhoto(res.data.result);
+						this.saveFile(res.data.result);
 						uni.showToast({
 							title: '保存成功',
 							duration: 500,
@@ -569,83 +498,9 @@
 						})
 					}
 				})
-				
-				
-				// this.delUploader(this.del_photoId)/* 删除图片 */
-				// this.delUploader(this.del_fileId)/* 删除文件 */
-				// let formData = new FormData();
-				// var imageInfo = this.fileImag;
-				// var  imageId = ""; var imageName = ""; var imagePath = "";
-				// if( imageInfo != null){
-				// 	for (var i = 0; i < imageInfo.length; i++) {
-				// 		if(imageInfo.length-1 === i){
-				// 			imageId = imageId + imageInfo[i].id;
-				// 			imageName = imageName + imageInfo[i].fileName;
-				// 			imagePath = imagePath + imageInfo[i].path;
-				// 		}else{
-				// 			imageId = imageId + imageInfo[i].id+",";
-				// 			imageName = imageName + imageInfo[i].fileName+",";
-				// 			imagePath = imagePath + imageInfo[i].path + ",";
-				// 		}
-				// 	}
-				// }
-				// formData.append("photoId",imageId);
-				// formData.append("phototName",imageName);
-				// formData.append("photoPath", imagePath);
-				// formData.append('participant', this.person)/* 同行人员 */
-				// formData.append('participantDDId', this.person_DD_ID)/* 同行人员钉钉ID */
-				// formData.append('signInTime', this.signInTime)/* 签到时间 */
-				// formData.append('completeStatus', this.completeStatus)/* 完成情况 */
-				// formData.append('faultJudgement', this.faultJudgement)/* 故障判断 */
-				// formData.append('cost', this.cost)/* 费用合计 */
-				// formData.append('signOutTime', this.signOutTime)/* 签出时间 */
-				// var  fileId = "";
-				// var fileName = "";
-				// var filePath = "";
-				// var  fileList = this.fileList;
-				// if( fileList != null){
-				// 	for (var i = 0; i < fileList.length; i++) {
-				// 		if(fileList.length-1 === i){
-				// 			fileId = fileId + fileList[i].id;
-				// 			fileName = fileName + fileList[i].fileName; 
-				// 			filePath = filePath + fileList[i].path; 
-				// 		}else{
-				// 			fileId = fileId + fileList[i].id+",";
-				// 			fileName = fileName + fileList[i].fileName+","; 
-				// 			filePath = filePath + fileList[i].path + ","; 
-				// 		}
-				// 	}
-				// }
-				// formData.append('fileIds', fileId);
-				// formData.append('fileNames', fileName);
-				// formData.append('filePath', filePath);
-				// let header = {
-				// 	'ticketId': this.ticketId,
-				// 	'stageId': this.id
-				// }
-				// ticketRepairSave(formData, header).then(response => {
-				// 	console.log(response);
-				// 	if (response.status === 200) {
-				// 		uni.showToast({
-				// 			title: '保存成功',
-				// 			duration: 500,
-				// 			mask: true,
-				// 			complete: () => {
-				// 				uni.navigateBack({
-				// 					delta:1
-				// 				});
-				// 				var payload = {'ticketType': this.ticketType, 'ticketId': this.ticketId}
-				// 				this.$store.dispatch('stage/GetDataList', payload)
-				// 			}
-				// 		})
-				// 	}
-				// }).catch(error => {
-				// 	console.log(error);
-				// })
 			},
 			savePhoto(progressReportId) {
 				let photoRes = this.photoCommit
-				console.log(photoRes);
 				for (var i = 0; i < photoRes.length; i++) {
 					let _this = this;
 					uni.uploadFile({
@@ -662,25 +517,42 @@
 					})
 				}
 			},
+			saveFile(progressReportId) {
+				let fileRes = this.fileCommit;
+				for (var i = 0; i < fileRes.length; i++) {
+					let _this = this;
+					uni.uploadFile({
+						url: _this.uploadFileUrl,
+						filePath: fileRes[i].path,
+						name: 'file',
+						formData: {
+							id : fileRes[i].id,
+							progressReportId: progressReportId
+						},
+						success: res => {
+							console.log(res);
+						}
+					});
+				}
+			},
 			uploadPhotoSuccess(entityList) {
 				for (var i = 0; i < entityList.length; i++) {
 					this.photoCommit.push(entityList[i]);
 				}
 			},
-			deletePhotoSuccess(entityList) {
-				console.log(entityList);
+			deletePhotoSuccess(entityList, id) {
 				this.photoCommit = entityList;
+				this.photoDel.push(id);
 			},
-			uploadSuccess(result,entityList) {
-				if(result.statusCode == 200) {
-					this.fileList = entityList;
+			uploadSuccess(entityList) {
+				for (var i = 0; i < entityList.length; i++) {
+					this.fileCommit.push(entityList[i]);
 				}
+				console.log(this.fileCommit);
 			},
-			deleteSuccess(result, entityList, fileId) {
-				if(result.confirm) {
-					this.fileList = entityList;
-					this.del_fileId = fileId
-				}
+			deleteSuccess(entityList, id) {
+				this.fileCommit = entityList;
+				this.fileDel.push(id);
 			},
 			comChange(value) {
 				this.completeStatus = value
@@ -696,9 +568,9 @@
 				this.faultLocaDefault = data.textStr
 				this.faultLocation = data.valueStr
 			},
-			delUploader(id) {
-				if (id != '') {
-					delUploadFile(id).then(response => {
+			delUploader(ids) {
+				if (ids != '') {
+					delUploadFile(ids).then(response => {
 						if (response.status === 200) {
 							console.log('删除成功');
 						}
