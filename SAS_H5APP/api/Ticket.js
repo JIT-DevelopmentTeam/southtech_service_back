@@ -107,3 +107,11 @@ export function getClientByOpenId(params) {
 		method:'get'
 	});
 }
+
+/* 生成UUID */
+export function generateId() {
+	return http({
+		url:'/mobile/index/generateId',
+		method:'get'
+	});
+}

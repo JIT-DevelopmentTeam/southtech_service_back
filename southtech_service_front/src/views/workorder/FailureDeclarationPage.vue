@@ -68,11 +68,11 @@
               <j-date placeholder="请选择申报时间" v-decorator="[ 'declarationTime', validatorRules.declarationTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
             </a-form-item>
           </a-col>
-          <!-- <a-col :lg="6">
+          <a-col :lg="6">
             <a-form-item label="附件" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-upload v-decorator="['annex']" name="annex" :trigger-change="true"></j-upload>
             </a-form-item>
-          </a-col> -->
+          </a-col>
         </a-row>
 
         <!-- 子表单区域 -->
@@ -81,8 +81,7 @@
             <div>
               <a-row type="flex" style="margin-bottom:10px" :gutter="16">
                 <a-col :span="5">设备档案</a-col>
-                <a-col :span="5">故障部位</a-col>
-                <a-col :span="3">附件</a-col>
+                <a-col :span="7">故障部位</a-col>
                 <a-col :span="9">描述</a-col>
                 <a-col :span="2">操作</a-col>
               </a-row>
@@ -93,14 +92,9 @@
                     <j-dict-select-tag v-decorator="['workOrderDetailList['+index+'].deviceNumber', {'initialValue':item.deviceNumber,rules: [{ required: true, message: '请选择设备档案!' }]}]" placeholder="设备档案" :trigger-change="true" :dictCode="deviceNumberCondition()"/>
                   </a-form-item>
                 </a-col>
-                <a-col :span="5">
+                <a-col :span="7">
                   <a-form-item>
                     <j-multi-select-tag placeholder="故障部位" v-decorator="['workOrderDetailList['+index+'].faultLocation', {'initialValue':item.faultLocation,rules: [{ required: true, message: '请选择故障部位!' }]}]" dictCode="work_order_detail_fault_location"/>
-                  </a-form-item>
-                </a-col>
-                <a-col :span="3">
-                  <a-form-item>
-                    <j-upload v-decorator="['workOrderDetailList['+index+'].annex', {'initialValue':item.annex}]" :trigger-change="true" name="workOrderDetail"></j-upload>
                   </a-form-item>
                 </a-col>
                 <a-col :span="9">

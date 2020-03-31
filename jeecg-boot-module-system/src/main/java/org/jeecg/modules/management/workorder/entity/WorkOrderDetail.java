@@ -73,8 +73,6 @@ public class WorkOrderDetail implements Serializable {
     private java.util.Date plannedCompletionTime;
     /**当前进度id*/
     private java.lang.String currentProgress;
-    /**附件*/
-    private java.lang.String annex;
     /**预约服务时间*/
     private java.util.Date appointment;
 }
