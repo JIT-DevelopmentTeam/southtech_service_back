@@ -11,7 +11,7 @@
 				</view>
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>客户</view>
-					<button type="primary"  size="mini" @click="openClients">选择客户</button>
+					<button type="primary" size="mini" v-if="wechatOpendId" @click="openClients">选择客户</button>
 					<p><strong>当前选择:</strong>{{ client != null ? client.name : ''}}</p>
 				</view>
 				<view class="flex-item flex-item-V">
@@ -131,7 +131,7 @@
 	import uniPopup from "@dcloudio/uni-ui/lib/uni-popup/uni-popup"
 	import uniSearchBar from '@dcloudio/uni-ui/lib/uni-search-bar/uni-search-bar'
 	import validate from '@/components/form/validate'
-	import { getDicList,listUserByRoleCode,listClient,getClientById,addWorkOrder } from '@/api/Ticket.js'
+	import { getDicList,listUserByRoleCode,listClient,getClientById,addWorkOrder,getUserByEnterpriseId,getWxUserByOpenId } from '@/api/Ticket.js'
 	
 	export default {
 		name:'FailureDeclaration',
@@ -144,13 +144,35 @@
 			chooseImage,
 			validate
 		},
-	     mounted() {
-			// 初始化
-			listClient(null).then((res) => {
-				if (res.data.success) {
-					this.clientList = res.data.result.records;
-				}
-			});
+	     async mounted() {
+			 // 初始化
+			this.dingTalkUserId = this.$store.getters.getUserId;
+			this.wechatOpendId = this.$store.getters.openId;
+			if (this.dingTalkUserId) {
+				getUserByEnterpriseId(this.dingTalkUserId).then((res) => {
+					if (res.data.success) {
+						this.correspondentName = res.data.result.username;
+					}
+				});
+				listClient(null).then((res) => {
+					if (res.data.success) {
+						this.clientList = res.data.result.records;
+					}
+				});
+			}
+			if (this.wechatOpendId) {
+				await getWxUserByOpenId(this.wechatOpendId).then((res) => {
+					if (res.data.success) {
+						this.client = res.data.result;
+						this.model.clientId = res.data.result.id;
+					}
+				});
+				await getDicList("tb_contact,name,id,client_id="+this.client.id).then((res) => {
+					if (res.data.success) {
+						this.contactList = res.data.result;
+					}
+				});
+			}
 			getDicList("work_order_access_method").then((res) => {
 				if (res.data.success) {
 					this.accessMethodList = res.data.result;
@@ -193,6 +215,8 @@
 				declarationTime:null,
 				imageList:[],
 				client:{},
+				dingTalkUserId:null,
+				wechatOpendId:null,
 				model: {
 					number:'',
 					status:1,
@@ -203,6 +227,7 @@
 					emergencyLevel:null,
 					customerServiceName:null,
 					declarationTime:null,
+					correspondentName:null,
 					annox:null,
 					workOrderDetailList:[],
 				}
@@ -261,14 +286,29 @@
 					});
 					return;
 				}
-				let formData = Object.assign(this.model);
-				console.log("表单提交数据",formData)
-				addWorkOrder(formData).then((res) => {
+				let workOrderPageObject = {};
+				workOrderPageObject.number = this.model.number;
+				workOrderPageObject.status = this.model.status;
+				workOrderPageObject.type = this.model.type;
+				workOrderPageObject.status = this.model.status;
+				workOrderPageObject.clientId = this.model.clientId;
+				workOrderPageObject.contactId = this.model.contactId;
+				workOrderPageObject.accessMethod = this.model.accessMethod;
+				workOrderPageObject.emergencyLevel = this.model.emergencyLevel;
+				workOrderPageObject.customerServiceName = this.model.customerServiceName;
+				workOrderPageObject.declarationTime = this.model.declarationTime;
+				let workOrderDetailList = new Array();
+				for (let i = 0; i < this.model.workOrderDetailList.length; i++) {
+					workOrderDetailList.push({'deviceNumber':this.model.workOrderDetailList[i].deviceNumber,'faultLocation':this.model.workOrderDetailList[i].faultLocation,'description':this.model.workOrderDetailList[i].description});
+				}
+				workOrderPageObject.workOrderDetailList = workOrderDetailList;
+				addWorkOrder(workOrderPageObject).then((res) => {
 					if (res.data.success) {
 						uni.showToast({
 							title: res.data.message,
 							icon: 'none'
 						});
+						console.log(this.model);
 					}
 				});
 				

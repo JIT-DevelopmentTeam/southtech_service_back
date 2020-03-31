@@ -15,11 +15,11 @@
               <j-select-user-by-dep v-decorator="['serviceEngineerName',validatorRules.serviceEngineerName]" :multi="false" :trigger-change="true"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="12">
+          <!-- <a-col :lg="12">
             <a-form-item label="派工时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-date placeholder="请选择派工时间" v-decorator="[ 'dispatchTime', validatorRules.dispatchTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
             </a-form-item>
-          </a-col>
+          </a-col> -->
           <a-col :lg="12">
             <a-form-item label="计划完成时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-date placeholder="请选择计划完成时间" v-decorator="[ 'plannedCompletionTime', validatorRules.plannedCompletionTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
@@ -75,7 +75,6 @@
         validatorRules:{
         
         serviceEngineerName:{rules: [{ required: true, message: '请选择工程师!' }]},
-        dispatchTime:{rules: [{ required: true, message: '请选择派工时间!' }]},
         plannedCompletionTime:{rules: [{ required: true, message: '请选择计划完成时间!' }]},
         peers:{}
         },
@@ -112,7 +111,7 @@
             that.confirmLoading = true;
             let httpurl = '';
             let method = '';
-            httpurl+=this.url.edit+"?serviceEngineerName="+values.serviceEngineerName+"&dispatchTime="+values.dispatchTime+"&plannedCompletionTime="+values.plannedCompletionTime+"&workOrderDetailIds="+this.workOrderDetailIds;
+            httpurl+=this.url.edit+"?serviceEngineerName="+values.serviceEngineerName+"&plannedCompletionTime="+values.plannedCompletionTime+"&workOrderDetailIds="+this.workOrderDetailIds;
             if (values.peers) {
               httpurl += '&peers='+values.peers;
             }
@@ -136,7 +135,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'serviceEngineerName','dispatchTime','plannedCompletionTime','peers'))
+        this.form.setFieldsValue(pick(row,'serviceEngineerName','plannedCompletionTime','peers'))
       },
 
 

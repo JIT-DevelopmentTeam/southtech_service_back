@@ -78,7 +78,23 @@ export function getClientById(params) {
 export function addWorkOrder(params) {
 	return http({
 		url:'/mobile/workOrder/add',
-		params: params,
+		data: params,
 		method:'post'
+	});
+}
+
+/* 根据钉钉id获取实体 */
+export function getUserByEnterpriseId(params) {
+	return http({
+		url:'/mobile/user/getByEnterpriseId?enterpriseId='+params,
+		method:'get'
+	});
+}
+
+/* 根据openid获取微信用户信息 */
+export function getClientByOpenId(params) {
+	return http({
+		url:'/mobile/user/getClientByOpenId?openId='+params,
+		method:'get'
 	});
 }
