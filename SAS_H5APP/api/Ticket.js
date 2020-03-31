@@ -73,3 +73,12 @@ export function getClientById(params) {
 		method: 'get'
 	})
 }
+
+/* 根据id获取汇报历史记录 */
+export function getReportById(params) {
+	return http({
+		url: '/mobile/stage/getByReportId',
+		params: params,
+		method: 'get'
+	});
+}

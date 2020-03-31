@@ -22,7 +22,7 @@ public class MobileUploadController {
     public Result<?> uploadPicture(@RequestParam(value = "photo", required = false) MultipartFile[] photo, HttpServletRequest req) {
         String id = req.getParameter("id");
         String progressReportId = req.getParameter("progressReportId");
-        Result<?> result = fileService.uploadFiles(photo, "photo", id, progressReportId);
+        Result<?> result = fileService.uploadFiles(photo, "Photo", id, progressReportId);
         return result;
     }
 

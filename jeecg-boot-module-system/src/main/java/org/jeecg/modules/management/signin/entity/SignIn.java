@@ -49,6 +49,9 @@ public class SignIn implements Serializable {
 	/**类型*/
 	@Excel(name = "类型", width = 15)
     private java.lang.String type;
+	/**时间*/
+	@Excel(name = "时间", width = 15)
+	private java.util.Date time;
 	/**经度*/
 	@Excel(name = "经度", width = 15)
     private java.lang.Double longitude;
@@ -58,4 +61,6 @@ public class SignIn implements Serializable {
 	/**工程师*/
 	@Excel(name = "工程师", width = 15)
 	private java.lang.String serviceEngineerName;
+	/**汇报id*/
+	private java.lang.String reportId;
 }

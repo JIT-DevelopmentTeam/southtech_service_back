@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view v-for="(item, index) in showList" :key="index">
-			<view @click="dClick(item.detailId, item.progressId, item.isCompleted)">
+			<view @click="dClick(item.detailId, item.progressId, item.isCompleted, item.reportId)">
 				<uni-card class="uniCard">
 					<view>
 						<view class="inline">设备档案：</view>
@@ -68,11 +68,11 @@
 			this.$store.dispatch('workOrder/GetWorkOrderDetail', params)
 		},
 		methods: {
-			dClick(detailId, progressId, isCompleted) {
+			dClick(detailId, progressId, isCompleted, reportId) {
 				let stageStatus = 0;
 				if(isCompleted !== null && isCompleted === "1") {stageStatus = 1}
 				uni.navigateTo({
-					url: '../../mytask/repair/workOrderRepair?id=' + progressId + "&ticketId=" + this.ticketId + "&stageStatus=" + stageStatus + "&ticketType=" + this.ticketType + "&detailId=" + detailId
+					url: '../../mytask/repair/workOrderRepair?id=' + progressId + "&ticketId=" + this.ticketId + "&stageStatus=" + stageStatus + "&ticketType=" + this.ticketType + "&detailId=" + detailId + "&reportId=" + reportId
 				})
 			}
 		}

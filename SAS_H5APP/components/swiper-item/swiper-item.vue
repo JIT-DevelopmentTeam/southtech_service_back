@@ -3,7 +3,8 @@
 		<view class="example-body">
 			<step-device :options="stageList" active-color="#007AFF" :active="active" direction="column">
 				<template v-slot:todo="{todo,index}">
-					<view @click="toRepair(todo.id,ticketId, todo.finishTime, index)">
+					<!-- <view @click="toRepair(todo.id,ticketId, todo.finishTime, index)"> -->
+					<view>
 						<view class="sameLine">
 							<view class="uni-steps__column-title" :style="{color:index <=active ? index == active ?activeColor : goColor :deactiveColor}">
 								{{todo.name}}

@@ -56,4 +56,7 @@ public class File implements Serializable {
 	/**文件路径*/
 	@Excel(name = "文件路径", width = 15)
     private String url;
+	/**类型*/
+	@Excel(name = "类型", width = 15)
+    private String type;
 }
