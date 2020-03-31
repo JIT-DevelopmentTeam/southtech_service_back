@@ -35,4 +35,12 @@ public class MobileUserController {
         return Result.ok(userList);
     }
 
+    /**
+     * 根据钉钉企业应用UserId获取实体
+     */
+    @GetMapping(value = "/getByEnterpriseId")
+    public Result<?> getByEnterpriseId(@RequestParam("enterpriseId") String enterpriseId) {
+        return Result.ok(sysUserService.getByEnterpriseId(enterpriseId));
+    }
+
 }
