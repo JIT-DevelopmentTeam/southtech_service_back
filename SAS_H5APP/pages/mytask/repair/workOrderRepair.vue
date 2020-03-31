@@ -272,7 +272,7 @@
 			this.initFaultLocation(detail.faultLocation);
 			if (this.reportId !== 'null') {
 				let params = {
-					'userId': '15752589952308491',
+					'userId': this.$store.getters['getUserId'],
 					'progressId': this.id,
 					'reportId': this.reportId
 				}
@@ -466,8 +466,7 @@
 				formData.append("progressId", this.id);
 				formData.append("detailId", this.detailId);
 				formData.append("ticketId", this.ticketId);
-				// formData.append("userId", this.$store.getters['getUserId']);
-				formData.append("userId", '15752589952308491');
+				formData.append("userId", this.$store.getters['getUserId']);
 				formData.append("checkIn", this.signInTime);
 				formData.append("completeStatus", this.completeStatus);
 				formData.append("checkOut", this.signOutTime);

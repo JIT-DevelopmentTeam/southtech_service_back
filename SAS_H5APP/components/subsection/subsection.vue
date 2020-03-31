@@ -39,7 +39,7 @@
 					this.dataSource = [];
 					this.pageNo = 1;
 					let obj = {
-						userId: '15752589952308491',
+						userId: this.$store.getters['getUserId'],
 						status: this.current+2+"",
 						pageNo: this.pageNo,
 						pageSize: this.pageSize
@@ -56,7 +56,7 @@
 					this.load = true;
 					this.pageNo += 1;
 					let obj = {
-						userId: '15752589952308491',
+						userId: this.$store.getters['getUserId'],
 						status: this.current+2+"",
 						pageNo: this.pageNo,
 						pageSize: this.pageSize
@@ -92,13 +92,12 @@
 		},
 		created() {
 			let obj = {
-				userId: '15752589952308491',
+				userId: this.$store.getters['getUserId'],
 				status: this.current+2+"",
 				pageNo: this.pageNo,
 				pageSize: this.pageSize
 			}
 			this.loadTicketList(obj);
-			// this.$store.dispatch('workOrder/GetDataList', this.$store.getters['getUserId']);
 		}
 	}
 </script>

@@ -22,7 +22,6 @@ http.interceptors.request.use(function (config) {
 	config.headers.common['code'] = sessionStorage.getItem('code')
 	// if (config.url.indexOf('getAccessToken') < 0) {
 		config.headers.common['userId'] = sessionStorage.getItem('userId')
-		config.headers.common['unVerify'] = '1'
 	// }
     return config;
   }, function (error) {
