@@ -181,6 +181,16 @@
             }
           },
           {
+            title:'预约服务时间',
+            align:"center",
+            dataIndex: 'appointment'
+          },
+          {
+            title:'计划完成时间',
+            align:"center",
+            dataIndex: 'plannedCompletionTime'
+          },
+          {
             title: '操作',
             dataIndex: 'action',
             align:"center",

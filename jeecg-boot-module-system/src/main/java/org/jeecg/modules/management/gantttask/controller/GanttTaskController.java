@@ -84,14 +84,16 @@ public class GanttTaskController {
                 ganttTaskList.add(userGanttTask);
                 for (WorkOrderDetail workOrderDetail : addWorkOrderList) {
                     WorkOrder workOrder = workOrderService.getById(workOrderDetail.getWorkOrderId());
-                    GanttTask workDetailGanttTask = new GanttTask();
-                    workDetailGanttTask.setId(workOrderDetail.getId());
-                    workDetailGanttTask.setText(workOrder.getNumber());
-                    workDetailGanttTask.setStart_date(DateUtils.formatDate(workOrderDetail.getDispatchTime(),"yyyy-MM-dd HH:mm:ss"));
-                    workDetailGanttTask.setDuration(Integer.parseInt(DateUtils.getBetweenDays(workOrderDetail.getDispatchTime(),workOrderDetail.getPlannedCompletionTime())));
-                    workDetailGanttTask.setParent(userGanttTask.getId());
-                    workDetailGanttTask.setOpen(true);
-                    ganttTaskList.add(workDetailGanttTask);
+                    if (oConvertUtils.isNotEmpty(workOrderDetail.getAppointment()) && oConvertUtils.isNotEmpty(workOrderDetail.getPlannedCompletionTime())) {
+                        GanttTask workDetailGanttTask = new GanttTask();
+                        workDetailGanttTask.setId(workOrderDetail.getId());
+                        workDetailGanttTask.setText(workOrder.getNumber());
+                        workDetailGanttTask.setStart_date(DateUtils.formatDate(workOrderDetail.getAppointment(),"yyyy-MM-dd HH:mm:ss"));
+                        workDetailGanttTask.setDuration(Integer.parseInt(DateUtils.getBetweenDays(workOrderDetail.getAppointment(),workOrderDetail.getPlannedCompletionTime())));
+                        workDetailGanttTask.setParent(userGanttTask.getId());
+                        workDetailGanttTask.setOpen(true);
+                        ganttTaskList.add(workDetailGanttTask);
+                    }
                 }
             }
         }

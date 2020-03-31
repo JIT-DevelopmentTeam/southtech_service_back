@@ -15,11 +15,6 @@
               <j-select-user-by-dep v-decorator="['serviceEngineerName',validatorRules.serviceEngineerName]" :multi="false" :trigger-change="true"/>
             </a-form-item>
           </a-col>
-          <!-- <a-col :lg="12">
-            <a-form-item label="派工时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-date placeholder="请选择派工时间" v-decorator="[ 'dispatchTime', validatorRules.dispatchTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
-            </a-form-item>
-          </a-col> -->
           <a-col :lg="12">
             <a-form-item label="计划完成时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-date placeholder="请选择计划完成时间" v-decorator="[ 'plannedCompletionTime', validatorRules.plannedCompletionTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>

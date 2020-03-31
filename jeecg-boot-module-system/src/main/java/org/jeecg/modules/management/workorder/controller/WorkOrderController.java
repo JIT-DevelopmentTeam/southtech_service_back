@@ -303,7 +303,6 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
      * 批量派工
      * @param workOrderDetailIds 工单ids
      * @param serviceEngineerName 服务工程师
-     * @param dispatchTime 派工时间
      * @param plannedCompletionTime 计划完成时间
      * @param peers 同行人
      * @return
@@ -311,7 +310,6 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 	@PostMapping(value = "/dispatchWorkOrderDetailByIds")
     public Result<?> dispatchWorkOrderDetailByIds(@RequestParam("workOrderDetailIds") String workOrderDetailIds,
                                                   @RequestParam("serviceEngineerName") String serviceEngineerName,
-                                                  @RequestParam("dispatchTime") String dispatchTime,
                                                   @RequestParam("plannedCompletionTime") String plannedCompletionTime,
                                                   String peers) {
         String[] idsArray = workOrderDetailIds.split(",");
@@ -322,7 +320,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             WorkOrderDetail workOrderDetail = workOrderDetailService.getById(id);
             workOrderDetail.setServiceEngineerName(serviceEngineerName);
             try {
-                workOrderDetail.setDispatchTime(DateUtils.parseDate(dispatchTime,"yyyy-MM-dd HH:mm:ss"));
+                workOrderDetail.setDispatchTime(DateUtils.getDate());
                 workOrderDetail.setPlannedCompletionTime(DateUtils.parseDate(plannedCompletionTime,"yyyy-MM-dd HH:mm:ss"));
             } catch (ParseException e) {
                 e.printStackTrace();

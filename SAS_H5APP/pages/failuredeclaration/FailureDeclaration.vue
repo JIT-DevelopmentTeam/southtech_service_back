@@ -11,7 +11,7 @@
 				</view>
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>客户</view>
-					<button type="primary" size="mini" v-if="wechatOpendId" @click="openClients">选择客户</button>
+					<button type="primary" size="mini" @click="openClients">选择客户</button>
 					<p><strong>当前选择:</strong>{{ client != null ? client.name : ''}}</p>
 				</view>
 				<view class="flex-item flex-item-V">
@@ -52,10 +52,11 @@
 					<text v-model="model.declarationTime">当前选择:{{declarationTime}}</text>
 					</time-picker>
 				</view>
-				<!-- <view class="flex-item flex-item-V">
+				<view class="flex-item flex-item-V">
 					<view class="title">附件</view>
-					<chooseImage v-model="model.annox" :num="9" :size="150" :imageList="imageList" saveStr="annox"/>
-				</view> -->
+					<chooseImage v-model="model.annex" :num="9" :isSave="false" :imageList="imageList" @uploadPhotoSuccess="uploadPhotoSuccess"
+					 @deletePhotoSuccess="deletePhotoSuccess" />
+				</view>
 				<view class="uni-title">
 					<text>故障明细</text>
 				</view>
@@ -131,7 +132,7 @@
 	import uniPopup from "@dcloudio/uni-ui/lib/uni-popup/uni-popup"
 	import uniSearchBar from '@dcloudio/uni-ui/lib/uni-search-bar/uni-search-bar'
 	import validate from '@/components/form/validate'
-	import { getDicList,listUserByRoleCode,listClient,getClientById,addWorkOrder,getUserByEnterpriseId,getWxUserByOpenId } from '@/api/Ticket.js'
+	import { getDicList,listUserByRoleCode,listClient,getClientById,addWorkOrder,getUserByEnterpriseId,getWxUserByOpenId,generateId } from '@/api/Ticket.js'
 	
 	export default {
 		name:'FailureDeclaration',
@@ -146,33 +147,38 @@
 		},
 	     async mounted() {
 			 // 初始化
-			this.dingTalkUserId = this.$store.getters.getUserId;
-			this.wechatOpendId = this.$store.getters.openId;
-			if (this.dingTalkUserId) {
-				getUserByEnterpriseId(this.dingTalkUserId).then((res) => {
-					if (res.data.success) {
-						this.correspondentName = res.data.result.username;
-					}
-				});
-				listClient(null).then((res) => {
-					if (res.data.success) {
-						this.clientList = res.data.result.records;
-					}
-				});
-			}
-			if (this.wechatOpendId) {
-				await getWxUserByOpenId(this.wechatOpendId).then((res) => {
-					if (res.data.success) {
-						this.client = res.data.result;
-						this.model.clientId = res.data.result.id;
-					}
-				});
-				await getDicList("tb_contact,name,id,client_id="+this.client.id).then((res) => {
-					if (res.data.success) {
-						this.contactList = res.data.result;
-					}
-				});
-			}
+			// this.dingTalkUserId = this.$store.getters.getUserId;
+			// this.wechatOpendId = this.$store.getters.openId;
+			// if (this.dingTalkUserId) {
+			// 	getUserByEnterpriseId(this.dingTalkUserId).then((res) => {
+			// 		if (res.data.success) {
+			// 			this.correspondentName = res.data.result.username;
+			// 		}
+			// 	});
+			// 	listClient(null).then((res) => {
+			// 		if (res.data.success) {
+			// 			this.clientList = res.data.result.records;
+			// 		}
+			// 	});
+			// }
+			// if (this.wechatOpendId) {
+			// 	await getWxUserByOpenId(this.wechatOpendId).then((res) => {
+			// 		if (res.data.success) {
+			// 			this.client = res.data.result;
+			// 			this.model.clientId = res.data.result.id;
+			// 		}
+			// 	});
+			// 	await getDicList("tb_contact,name,id,client_id="+this.client.id).then((res) => {
+			// 		if (res.data.success) {
+			// 			this.contactList = res.data.result;
+			// 		}
+			// 	});
+			// }
+			listClient(null).then((res) => {
+				if (res.data.success) {
+					this.clientList = res.data.result.records;
+				}
+			});
 			getDicList("work_order_access_method").then((res) => {
 				if (res.data.success) {
 					this.accessMethodList = res.data.result;
@@ -217,6 +223,8 @@
 				client:{},
 				dingTalkUserId:null,
 				wechatOpendId:null,
+				photoCommit:[],
+				picRequestURL: this.$IP + '/mobile/upload/uploadDetailPicture',  // 请求地址
 				model: {
 					number:'',
 					status:1,
@@ -286,6 +294,7 @@
 					});
 					return;
 				}
+				this.savePhoto();
 				let workOrderPageObject = {};
 				workOrderPageObject.number = this.model.number;
 				workOrderPageObject.status = this.model.status;
@@ -297,6 +306,7 @@
 				workOrderPageObject.emergencyLevel = this.model.emergencyLevel;
 				workOrderPageObject.customerServiceName = this.model.customerServiceName;
 				workOrderPageObject.declarationTime = this.model.declarationTime;
+				workOrderPageObject.annox = this.model.annox;
 				let workOrderDetailList = new Array();
 				for (let i = 0; i < this.model.workOrderDetailList.length; i++) {
 					workOrderDetailList.push({'deviceNumber':this.model.workOrderDetailList[i].deviceNumber,'faultLocation':this.model.workOrderDetailList[i].faultLocation,'description':this.model.workOrderDetailList[i].description});
@@ -308,7 +318,6 @@
 							title: res.data.message,
 							icon: 'none'
 						});
-						console.log(this.model);
 					}
 				});
 				
@@ -343,7 +352,11 @@
 				});
 			},
 			addWorkOrderDetail: function () {
-				this.model.workOrderDetailList.push({});
+				generateId().then((res) => {
+					if (res.data.success) {
+						this.model.workOrderDetailList.push({id:res.data.result});
+					} 
+				});
 			},
 			delWorkOrderDetail: function(e) {
 				this.model.workOrderDetailList = this.model.workOrderDetailList.filter(f=>{return f!==e});
@@ -400,6 +413,31 @@
 		  selectFaultLocations:function(val,index) {
 			   this.model.workOrderDetailList[index].faultLocation = val.toString();
 		  },
+		  uploadPhotoSuccess:function(entityList) {
+			  for (var i = 0; i < entityList.length; i++) {
+			  	this.photoCommit.push(entityList[i]);
+			  }
+		  },
+		  deletePhotoSuccess:function(entityList) {
+			  this.photoCommit.splice()(entityList[i]);
+		  },
+		  savePhoto() {
+		  	let photoRes = this.photoCommit
+		  	for (var i = 0; i < photoRes.length; i++) {
+		  		let that = this;
+		  		uni.uploadFile({
+		  			url: that.picRequestURL ,
+		  			filePath: photoRes[i].path,
+					originalFileName:'workOrderDetail',
+		  			name: 'photo',
+		  			success: (res) => {
+		  				if (res.data.success) {
+							this.model.annox += res.data.message;
+						}
+		  			}
+		  		})
+		  	}
+		  }
 	  }
 	}
 </script>
