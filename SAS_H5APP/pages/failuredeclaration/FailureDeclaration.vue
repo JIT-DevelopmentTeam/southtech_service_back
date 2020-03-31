@@ -11,31 +11,30 @@
 				</view>
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>客户</view>
-					<picker v-model="model.clientId" mode ="selector" @change="pickerChange($event,'clientIndex');loadContact($event);loadDeviceNumber($event);" :value="dataIndex.clientIndex" :range="clientList" range-key="text">
-						<view class="uni-input">{{ clientList[dataIndex.clientIndex] != null ? clientList[dataIndex.clientIndex].text : '' }}</view>
-					</picker>
+					<button type="primary"  size="mini" @click="openClients">选择客户</button>
+					<p><strong>当前选择:</strong>{{ client != null ? client.name : ''}}</p>
 				</view>
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>联系人</view>
-					<picker v-model="model.contactId" mode ="selector" @change="pickerChange($event,'contactIndex');" :value="dataIndex.contactIndex" :range="contactList" range-key="text">
+					<picker v-model="model.contactId" mode ="selector" @change="pickerChange($event.target.value,'contactIndex');" :range="contactList" range-key="text">
 						<view class="uni-input">{{ contactList[dataIndex.contactIndex] != null ? contactList[dataIndex.contactIndex].text : '' }}</view>
 					</picker>
 				</view>
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>接入方式</view>
-					<picker v-model="model.accessMethod" mode ="selector" @change="pickerChange($event,'accessMethodIndex');" :value="dataIndex.accessMethodIndex" :range="accessMethodList" range-key="text">
+					<picker v-model="model.accessMethod" mode ="selector" @change="pickerChange($event.target.value,'accessMethodIndex');" :value="dataIndex.accessMethodIndex" :range="accessMethodList" range-key="text">
 						<view class="uni-input">{{ accessMethodList[dataIndex.accessMethodIndex] != null ? accessMethodList[dataIndex.accessMethodIndex].text : '' }}</view>
 					</picker>
 				</view>
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>紧急程度</view>
-					<picker v-model="model.emergencyLevel" mode ="selector" @change="pickerChange($event,'emergencyLevelIndex');" :value="dataIndex.emergencyLevelIndex" :range="emergencyLevelList" range-key="text">
+					<picker v-model="model.emergencyLevel" mode ="selector" @change="pickerChange($event.target.value,'emergencyLevelIndex');" :value="dataIndex.emergencyLevelIndex" :range="emergencyLevelList" range-key="text">
 						<view class="uni-input">{{ emergencyLevelList[dataIndex.emergencyLevelIndex] != null ? emergencyLevelList[dataIndex.emergencyLevelIndex].text : '' }}</view>
 					</picker>
 				</view>
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>客服</view>
-					<picker v-model="model.customerServiceName" mode ="selector" @change="pickerChange($event,'customerServiceIndex');" :value="dataIndex.customerServiceIndex" :range="customerServiceList" range-key="realname">
+					<picker v-model="model.customerServiceName" mode ="selector" @change="pickerChange($event.target.value,'customerServiceIndex');" :value="dataIndex.customerServiceIndex" :range="customerServiceList" range-key="realname">
 						<view class="uni-input">{{ customerServiceList[dataIndex.customerServiceIndex] != null ? customerServiceList[dataIndex.customerServiceIndex].realname : ''}}</view>
 					</picker>
 				</view>
@@ -71,8 +70,8 @@
 									<span style="color: red;">*</span>设备编号:
 								</view>
 								<view class="uni-list-cell-db">
-									<picker v-model="workOrderDetail.deviceNumber" @change="pickerChange($event,'deviceNumberIndex');" :value="dataIndex.deviceNumberIndex" :range="deviceNumberList" range-key="text">
-										<view class="uni-input">{{ deviceNumberList[dataIndex.deviceNumberIndex] != null ? deviceNumberList[dataIndex.deviceNumberIndex].text : '' }}</view>
+									<picker v-model="workOrderDetail.deviceNumber" @change="pickerDeviceNumberChange($event,index);" :range="deviceNumberList" range-key="text">
+										<view class="uni-input">{{ deviceNumberList[dataIndex.deviceNumberIndexList[index]] != null ? deviceNumberList[dataIndex.deviceNumberIndexList[index]].text : '' }}</view>
 									</picker>
 								</view>
 							</view>
@@ -84,9 +83,9 @@
 									<span style="color: red;">*</span>故障部位:
 								</view>
 								<view class="uni-list-cell-db">
-									<checkbox-group>
+									<checkbox-group @change="selectFaultLocations($event.target.value,index)" v-model="workOrderDetail.faultLocation">
 										<label style="display: block;" v-for="(faultLocation,index) in faultLocationList">
-											<checkbox :value="faultLocation.id" v-model="workOrderDetail.faultLocation" color="#FFCC33" style="transform:scale(0.7)" />{{faultLocation.text}}
+											<checkbox :value="faultLocation.value" color="#FFCC33" style="transform:scale(0.7)" />{{faultLocation.text}}
 										</label>
 									</checkbox-group>
 								</view>
@@ -94,7 +93,7 @@
 						</view>
 						<view class="uni-list">
 							<view class="uni-title uni-common-pl">描述</view>
-							<textarea  v-model="workOrderDetail.description" auto-height/>
+							<textarea v-model="workOrderDetail.description" auto-height/>
 						</view>
 						<template v-slot:footer><button type="warn" size="mini" @click="delWorkOrderDetail(workOrderDetail)">删除</button></template>
 					</uni-card>
@@ -104,15 +103,35 @@
 				</view>
     		</view>
     	</form>
+		<uni-popup ref="popup" type="center">
+			<view class="uni-flex uni-column" style="background: white;">
+				<view class="flex-item flex-item-V">
+					<uni-search-bar @input="searchClientByName" ></uni-search-bar>
+				</view>
+				<view class="flex-item flex-item-V">
+					<radio-group @change="selectClient">
+						<label class="uni-list-cell uni-list-cell-pd" v-for="(client, index) in clientList" :key="client.id">
+							<view>
+								<radio :value="client.id" :title="client.name"/>
+							</view>
+							<view>{{client.name}}</view>
+						</label>
+					</radio-group>
+				</view>
+			</view>
+		</uni-popup>
     </view>
 </template>
 
 <script>
-	import uniCard from "@dcloudio/uni-ui/lib/uni-card/uni-card.vue"
+	import uniCard from "@dcloudio/uni-ui/lib/uni-card/uni-card"
 	import uniCombox from "@dcloudio/uni-ui/lib/uni-combox/uni-combox"
-	import timePicker from '@/components/wing-time-selector/wing-time-selector.vue'
-	import chooseImage from '@/components/xyz-choose-image/xyz-choose-image.vue'
-	import { getDicList,listUserByRoleCode } from '@/api/Ticket.js'
+	import timePicker from '@/components/wing-time-selector/wing-time-selector'
+	import chooseImage from '@/components/xyz-choose-image/xyz-choose-image'
+	import uniPopup from "@dcloudio/uni-ui/lib/uni-popup/uni-popup"
+	import uniSearchBar from '@dcloudio/uni-ui/lib/uni-search-bar/uni-search-bar'
+	import validate from '@/components/form/validate'
+	import { getDicList,listUserByRoleCode,listClient,getClientById,addWorkOrder } from '@/api/Ticket.js'
 	
 	export default {
 		name:'FailureDeclaration',
@@ -120,22 +139,16 @@
 			uniCard,
 			uniCombox,
 			timePicker,
-			chooseImage
+			uniPopup,
+			uniSearchBar,
+			chooseImage,
+			validate
 		},
-		async mounted() {
+	     mounted() {
 			// 初始化
-			let clientId = null;
-			await getDicList("tb_client,name,id").then((res) => {
+			listClient(null).then((res) => {
 				if (res.data.success) {
-					this.clientList = res.data.result;
-					if (res.data.result.length > 0) {
-						clientId = res.data.result[0].value;
-					}
-				}
-			});
-			await getDicList("tb_contact,name,id,client_id="+clientId).then((res) => {
-				if (res.data.success) {
-					this.contactList = res.data.result;
+					this.clientList = res.data.result.records;
 				}
 			});
 			getDicList("work_order_access_method").then((res) => {
@@ -153,11 +166,6 @@
 					this.customerServiceList = res.data.result;
 				}
 			});
-			await getDicList("tb_device_number,name,id,client_id="+clientId).then((res) => {
-				if (res.data.success) {
-					this.deviceNumberList = res.data.result;
-				}
-			});
 			getDicList("work_order_detail_fault_location").then((res) => {
 				if (res.data.success) {
 					this.faultLocationList = res.data.result;
@@ -167,13 +175,12 @@
 		data() {
 			return {
 				dataIndex:{
-					clientIndex:0,
-					contactIndex:0,
-					accessMethodIndex:0,
-					emergencyLevelIndex:0,
-					customerServiceIndex:0,
-					deviceNumberIndex:0,
-					faultLocationIndex:[0]
+					contactIndex:null,
+					accessMethodIndex:null,
+					emergencyLevelIndex:null,
+					customerServiceIndex:null,
+					deviceNumberIndexList:[],
+					faultLocationIndex:[]
 				},
 				checkDetailIndexList:[],
 				clientList: [],
@@ -185,6 +192,7 @@
 				faultLocationList:[],
 				declarationTime:null,
 				imageList:[],
+				client:{},
 				model: {
 					number:'',
 					status:1,
@@ -192,13 +200,12 @@
 					clientId:null,
 					contactId:null,
 					accessMethod:null,
-					correspondentName:null,
 					emergencyLevel:null,
 					customerServiceName:null,
 					declarationTime:null,
 					annox:null,
 					workOrderDetailList:[],
-				},
+				}
 			}
 		},
 		computed: {
@@ -206,23 +213,85 @@
 		},
 		methods: {
 			formSubmit: function(e) {
+				var fields = [
+					{value:this.model.number, checkType:'String', errorMsg:'请输入编号!'},
+					{value:this.model.clientId, checkType:'String', errorMsg:'请选择客户!'},
+					{value:this.model.contactId, checkType:'String', errorMsg:'请选择联系人!'},
+					{value:this.model.accessMethod, checkType:'String', errorMsg:'请选择接入方式!'},
+					{value:this.model.emergencyLevel, checkType:'String', errorMsg:'请选择紧急程度!'},
+					{value:this.model.customerServiceName, checkType:'String', errorMsg:'请选择客服!'},
+					{value:this.model.declarationTime, checkType:'String', errorMsg:'请选择申报时间!'}
+				];
+				var checkFields = validate.check(fields)
+				if (!checkFields) {
+					uni.showToast({
+						title:validate.error,
+						icon:'none'
+					});
+					return;
+				}
+				if (this.model.workOrderDetailList.length == 0) {
+					uni.showToast({
+						title:'请至少添加一条工单明细!',
+						icon:'none'
+					});
+					return;
+				}
+				let selectDeviceNumber = true;
+				let selectFaultLocations = true;
+				for (let i = 0; i < this.model.workOrderDetailList.length; i++) {
+					if (this.model.workOrderDetailList[i].deviceNumber == undefined) {
+						selectDeviceNumber = false;
+					}
+					if (this.model.workOrderDetailList[i].faultLocation == undefined) {
+						selectFaultLocations = false;
+					}
+				}
+				if (!selectDeviceNumber) {
+					uni.showToast({
+						title:'请选择设备编号!',
+						icon:'none'
+					});
+					return;
+				}
+				if (!selectFaultLocations) {
+					uni.showToast({
+						title:'请选择故障部位!',
+						icon:'none'
+					});
+					return;
+				}
+				let formData = Object.assign(this.model);
+				console.log("表单提交数据",formData)
+				addWorkOrder(formData).then((res) => {
+					if (res.data.success) {
+						uni.showToast({
+							title: res.data.message,
+							icon: 'none'
+						});
+					}
+				});
 				
-				console.log(JSON.stringify(this.model));
 			},
 			formReset: function() {
 				
 			},
-			pickerChange: function(e,val) {
-				this.dataIndex[val] = e.target.value
-			},
-			loadContact: function(e) {
-				this.contactList.splice(0,this.contactList.length);
-				let clientId = this.clientList[e.target.value].value;
-				getDicList("tb_contact,name,id,client_id="+clientId).then((res) => {
-					if (res.data.susccess) {
-						this.contactList = res.data.result;
-					}
-				});
+			pickerChange: function(val,fieldName) {
+				this.dataIndex[fieldName] = val;
+				switch(fieldName) {
+					case 'contactIndex':
+						this.model.contactId = this.contactList[val].value;
+						break;
+					case 'accessMethodIndex':
+						this.model.accessMethod = this.accessMethodList[val].value;
+						break;
+					case 'emergencyLevelIndex':
+						this.model.emergencyLevel = this.emergencyLevelList[val].value;
+						break;
+					case 'customerServiceIndex':
+						this.model.customerServiceName = this.customerServiceList[val].username;
+						break;
+				}
 			},
 			loadDeviceNumber: function (e) {
 				this.deviceNumberList.splice(0,this.deviceNumberList.length);
@@ -241,14 +310,57 @@
 			},
 			btnConfirm: function(e) {
 				let year = e.year;
-				let month = e.month > 10 ? e.month : "0" + e.month;
-				let day = e.day > 10 ? e.day : "0" + e.day;
-				let hour = e.hour > 10 ? e.hour : "0" + e.hour;
-				let minute = e.minute > 10 ? e.minute : "0" + e.minute;
+				let month = e.month >= 10 ? e.month : "0" + e.month;
+				let day = e.day >= 10 ? e.day : "0" + e.day;
+				let hour = e.hour >= 10 ? e.hour : "0" + e.hour;
+				let minute = e.minute >= 10 ? e.minute : "0" + e.minute;
 				this.declarationTime = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00";
 				this.model.declarationTime = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00";
 			},
-		}
+			openClients:function(){
+				this.$refs.popup.open();
+			},
+			close:function(){
+				this.$refs.popup.close();
+			},
+		  searchClientByName:function(e) {
+			 if (e.value) {
+				listClient({name:e.value}).then((res) => {
+					if (res.data.success) {
+						this.clientList = res.data.result.records;
+					}
+				});
+			 }
+		  },
+		  selectClient:function(e) {
+			 this.model.clientId = e.target.value;
+			 getClientById(e.target.value).then((res) => {
+				 if (res.data.success) {
+					this.dataIndex.contactIndex = null;
+					this.dataIndex.deviceNumberIndexList = [];
+					this.client = res.data.result;
+					this.close();
+				 }
+			  });
+			  getDicList("tb_contact,name,id,client_id="+e.target.value).then((res) => {
+				if (res.data.success) {
+					this.contactList = res.data.result;
+				}
+			  });
+			  getDicList("tb_device_number,name,id,client_id="+e.target.value).then((res) => {
+				if (res.data.success) {
+					this.deviceNumberList = res.data.result;
+				}
+			  });
+		  },
+		  pickerDeviceNumberChange:function(e,index) {
+			  this.dataIndex.deviceNumberIndexList.push(e.target.value);
+			  this.model.workOrderDetailList[index].deviceNumber = this.deviceNumberList[e.target.value].value;
+		  },
+		  selectFaultLocations:function(val,index) {
+			   this.model.workOrderDetailList[index].faultLocation = val.toString();
+		  },
+	  }
 	}
 </script>
 
