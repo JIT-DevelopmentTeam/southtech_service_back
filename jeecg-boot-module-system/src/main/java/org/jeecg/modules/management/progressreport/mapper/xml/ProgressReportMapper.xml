@@ -2,4 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.management.progressreport.mapper.ProgressReportMapper">
 
+    <select id="getByReportId" resultType="org.jeecg.modules.management.progressreport.vo.MobileReportDTO">
+        SELECT
+            report.description as "description",
+            report.is_completed as "isCompleted",
+            report.fault_location as "faultLocation",
+            GROUP_CONCAT(t.time) as "time"
+        FROM
+            ic_progress_report report
+            LEFT JOIN (
+            SELECT
+            DISTINCT
+                s1.report_id,
+                s1.time
+            FROM
+                ic_sign_in s1
+                INNER JOIN ( SELECT MAX( create_time ) AS 'create_time' FROM ic_sign_in WHERE service_engineer_name = #{userName} AND progress_id = #{progressId} GROUP BY type ORDER BY type ) s2 ON s1.create_time = s2.create_time
+            ) t ON t.report_id = report.id
+        WHERE
+            report.id = #{reportId}
+    </select>
 </mapper>

@@ -74,6 +74,15 @@ export function getClientById(params) {
 	})
 }
 
+/* 根据id获取汇报历史记录 */
+export function getReportById(params) {
+	return http({
+		url: '/mobile/stage/getByReportId',
+		params: params,
+		method: 'get'
+	});
+}
+
 /* 保存工单 */
 export function addWorkOrder(params) {
 	return http({

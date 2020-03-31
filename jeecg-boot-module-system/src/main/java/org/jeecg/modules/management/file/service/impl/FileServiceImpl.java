@@ -7,6 +7,8 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.management.file.entity.File;
 import org.jeecg.modules.management.file.mapper.FileMapper;
 import org.jeecg.modules.management.file.service.IFileService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +24,12 @@ import java.util.*;
  */
 @Service
 public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IFileService {
+
+    @Autowired
+    private FileMapper fileMapper;
+
+    @Value(value = "${jeecg.path.upload}")
+    private String uploadpath;
 
     @Override
     public Result<File> uploadFiles(MultipartFile[] files, String dic, String sid, String progressReportId) {
@@ -53,6 +61,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
             fileEntity.setUrl(params.get("path").toString());
             fileEntity.setId(sid);
             fileEntity.setProgressReportId(progressReportId);
+            fileEntity.setType(dis);
+            fileMapper.insert(fileEntity);
             String oldFileName = params.get("oldFileName").toString();
             String path = params.get("path").toString();
             String id = fileEntity.getId();
@@ -74,8 +84,10 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
 
     public List<Map> uploadFile(MultipartFile[] files, String dis) {
         List<Map> objectList = Lists.newArrayList();
-        String yearByMoth = getYearByMoth();
-        String path = getClasspath() + "temp/" + dis + "/"+ yearByMoth;
+        String ctxPath = uploadpath;
+        String bizPath = dis;
+        String nowday = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        String path = ctxPath + java.io.File.separator + bizPath + java.io.File.separator + nowday;
         //判断file数组不能为空并且长度大于0
         if (files != null && files.length > 0) {
             //循环获取file数组中得文件
@@ -96,8 +108,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
                         // 保存数据库url路径
                         String fileUrl = "";
                         String newFileName = dis + uuid +"."+suffix;
-                        savePath = path + "/"+ newFileName;
-                        fileUrl ="/temp/"+ dis + "/"+  yearByMoth +"/"+ newFileName;
+                        savePath = path + java.io.File.separator + newFileName;
+                        fileUrl = bizPath + java.io.File.separator + nowday + newFileName;
                         java.io.File filepath = new java.io.File(path);
                         if (!filepath.exists())
                             filepath.mkdirs();
@@ -121,18 +133,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
         return objectList;
     }
 
-    private String getYearByMoth(){
-        Calendar cale = Calendar.getInstance();
-        int year = cale.get(Calendar.YEAR);
-        int month = cale.get(Calendar.MONTH) + 1;
-        return year + "" + month;
-    }
-
     /**获取classpath1
      * @return
      */
     public static String getClasspath(){
-        String path = (String.valueOf(Thread.currentThread().getContextClassLoader().getResource(""))+"../../").replaceAll("file:/", "").replaceAll("%20", " ").trim();
+        String path = (String.valueOf(Thread.currentThread().getContextClassLoader().getResource(""))).replaceAll("file:/", "").replaceAll("%20", " ").trim();
         if(path.indexOf(":") != 1){
             path = java.io.File.separator + path;
         }

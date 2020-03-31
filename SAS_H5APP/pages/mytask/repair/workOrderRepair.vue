@@ -160,6 +160,7 @@
 	import {delUploadFile} from '@/api/Ticket.js'
 	import * as dd from 'dingtalk-jsapi'
 	import {GetJsapiTicket} from '@/api/ddjsapi.js'
+	import {getReportById} from '@/api/Ticket.js'
 	
 	var formChecker = require('@/components/form/validate.js')
 	export default {
@@ -167,6 +168,7 @@
 		data() {
 			return {
 				picRequestRUl: this.$IP + '/mobile/upload/uploadPicture',  // 请求地址
+				reportId: '',
 				detailId: '',/* 工单明细id */
 				id: '',/* 阶段id */
 				ticketId: "",/* 工单id */
@@ -247,14 +249,44 @@
 		},
 		onLoad(option) {
 			console.log(option);
+			this.reportId = option.reportId
 			this.detailId = option.detailId
 			this.id = option.id
 			this.ticketId = option.ticketId
 			this.stageStatus = option.stageStatus
 			this.ticketType = option.ticketType
+			/**-------阶段配置型显示-------*/
 			this.stageLists = this.$store.getters['stage/getStageList']
 			this.stage = this.stageLists.filter(e=>e.id === this.id)[0]
 			console.log(this.stage);
+			/**-------故障部位初始化--------*/
+			let detailList = this.$store.getters['workOrder/getTicketDetailList'];
+			let detail = detailList.filter(e=>e.detailId === this.detailId)[0];
+			this.initFaultLocation(detail.faultLocation);
+			if (this.reportId !== 'null') {
+				let params = {
+					'userId': '15752589952308491',
+					'progressId': this.id,
+					'reportId': this.reportId
+				}
+				getReportById(params).then(res => {
+					console.log(res);
+					let result = res.data.result;
+					if (result.isCompleted === '1') {
+						let timeArr = result.time.split(",");
+						this.signInTime = timeArr[0];
+						this.signOutTime = timeArr[1];
+					}
+					this.completion.forEach(item => {
+						item.checked = false;
+						if (item.value == result.isCompleted) {
+							item.checked = true;
+						}
+					});
+					this.initFaultLocation(result.faultLocation);
+					this.faultJudgement = result.description;
+				})
+			}
 			// if (this.stage.stageProcess != undefined) {
 			// 	this.person = this.stage.stageProcess.person
 			// 	this.person_DD_ID = this.stage.stageProcess.personDDId
@@ -397,6 +429,18 @@
 				// var payload = {'ticketType': this.ticketType, 'ticketId': this.ticketId}
 				// this.$store.dispatch('stage/GetDataList', payload)
 			},
+			initFaultLocation(valueArr) {
+				let faultArr = valueArr.split(",")
+				let resultArr = []
+				for (var i = 0; i < faultArr.length; i++) {
+					for (var j = 0; j < this.faultLocaList.length; j++) {
+						if (faultArr[i] === this.faultLocaList[j].value) {
+							resultArr.push(this.faultLocaList[j].text);
+						}
+					}
+				}
+				this.faultLocaDefault = resultArr.join(",");
+			},
 			selectUser() {
 				console.log('选择人员');
 				var params = {
@@ -464,6 +508,7 @@
 			},
 			async commitInfo(){
 				let formData = new FormData();
+				formData.append("reportId", this.reportId);
 				formData.append("progressId", this.id);
 				formData.append("detailId", this.detailId);
 				formData.append("ticketId", this.ticketId);
@@ -573,6 +618,7 @@
 			},
 			savePhoto(progressReportId) {
 				let photoRes = this.photoCommit
+				console.log(photoRes);
 				for (var i = 0; i < photoRes.length; i++) {
 					let _this = this;
 					uni.uploadFile({
@@ -584,7 +630,7 @@
 							progressReportId: progressReportId
 						},
 						success: (res) => {
-							
+							console.log(res);
 						}
 					})
 				}

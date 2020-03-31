@@ -109,7 +109,7 @@
 				var temp = {}
 				for(let item in this.listArr){
 					let defalutSelect = false;
-					if(defaultArr.length>0 && defaultArr.indexOf(this.listArr[item].value)!=-1) defalutSelect = true;
+					if(defaultArr.length>0 && defaultArr.indexOf(this.listArr[item].text)!=-1) defalutSelect = true;
 					temp[item] = {index:item,name:this.listArr[item].text,select:defalutSelect,value:this.listArr[item].value}
 				}
 				this.listArrNew = temp;

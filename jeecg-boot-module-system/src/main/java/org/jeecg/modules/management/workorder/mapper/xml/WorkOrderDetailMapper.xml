@@ -19,11 +19,13 @@
 	<select id="getByWorkOrderId" resultType="org.jeecg.modules.management.workorder.vo.MobileWorkOrderDetailDTO">
 		SELECT
 			detail.id AS "detailId",
+			detail.fault_location AS "faultLocation",
 			device.`name` AS "deviceName",
 			user.realname AS "enginerName",
 			progress.`name` AS "currentProgress",
 			progress.id AS "progressId",
-			report.is_completed AS "isCompleted"
+			report.is_completed AS "isCompleted",
+			(SELECT id FROM ic_progress_report WHERE work_order_detail_id = detail.id and progress_id = progress.id) AS "reportId"
 		FROM
 			ic_work_order_detail detail
 			LEFT JOIN tb_device_number device ON device.id = detail.device_number

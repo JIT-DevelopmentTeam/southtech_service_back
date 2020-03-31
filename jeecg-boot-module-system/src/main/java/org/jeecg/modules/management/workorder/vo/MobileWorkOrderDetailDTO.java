@@ -17,5 +17,9 @@ public class MobileWorkOrderDetailDTO {
     private String progressId;
     // 完成状态
     private String isCompleted;
+    // 汇报id
+    private String reportId;
+    // 故障部位
+    private String faultLocation;
 
 }
