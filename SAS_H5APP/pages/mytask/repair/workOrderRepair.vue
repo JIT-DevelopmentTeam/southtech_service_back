@@ -54,10 +54,18 @@
 						<span class="iconfont icontianjiayonghu iconStyle Btn" @click="stageStatus != 1 ? selectUser() : ''"></span>
 					</view>
 				</conf-div> -->
+				<view v-if="formatModel == '工单预约'">
+					<conf-div title="预约时间:" :required="required">
+						<time-selector showType="yearToMinute" beginDate="1970-01-01" endDate="2030-12-31" beginTime="06:00:00" endTime="23:59:59"
+						 @btnConfirm="bindAppointmentConfirm" :isClick="stageStatus ==1 ? true : false">
+							<text>当前选择：{{ appointment }}</text>
+						</time-selector>
+					</conf-div>
+				</view>
 				<!-- <view v-if="stage.checkIn === 'true'"> -->
 					<conf-div title="签到时间:" :required="required">
 						<time-selector showType="yearToMinute" beginDate="1970-01-01" endDate="2030-12-31" beginTime="06:00:00" endTime="23:59:59"
-						 @btnConfirm="bindInTimeConfirm">
+						 @btnConfirm="bindInTimeConfirm" :isClick="stageStatus ==1 ? true : false">
 							<text>当前选择：{{ signInTime }}</text>
 						</time-selector>
 					</conf-div>
@@ -115,6 +123,7 @@
 							    beginTime="06:00:00"
 							    endTime="23:59:59"
 							    @btnConfirm="bindOutTimeConfirm" 
+								:isClick="stageStatus ==1 ? true : false"
 							>
 							    <text>当前选择：{{ signOutTime }}</text>
 							</time-selector>
@@ -231,7 +240,8 @@
 				signOutLongitude: 0.0,
 				signOutLatitude: 0.0,
 				/* ---------------- */
-				photoCommit: []// 图片上传数组
+				photoCommit: [],// 图片上传数组
+				appointment: '',// 预约时间
 			}
 		},
 		components: {
@@ -262,6 +272,7 @@
 			/**-------故障部位初始化--------*/
 			let detailList = this.$store.getters['workOrder/getTicketDetailList'];
 			let detail = detailList.filter(e=>e.detailId === this.detailId)[0];
+			this.faultLocation = detail.faultLocation;
 			this.initFaultLocation(detail.faultLocation);
 			if (this.reportId !== 'null') {
 				let params = {
@@ -283,8 +294,16 @@
 							item.checked = true;
 						}
 					});
+					this.faultLocation = result.faultLocation;
 					this.initFaultLocation(result.faultLocation);
 					this.faultJudgement = result.description;
+					this.appointment = result.appointment;
+					for (var i = 0; i < result.photoList.length; i++) {
+						let path = this.$IP + result.photoList[i].url;
+						let obj ={id: result.photoList[i].id, path: path}
+						this.imageList.push(obj);
+						this.photoCommit.push(obj);
+					}
 				})
 			}
 			// if (this.stage.stageProcess != undefined) {
@@ -382,6 +401,10 @@
 		methods: {
 			formSubmit(e) {
 				var rule = []
+				if (this.formatModel == '工单预约') {
+					var appointmentRule = {value:this.appointment, checkType:'String', errorMsg:'预约时间不能为空'}
+					rule.push(appointmentRule)
+				}
 				if (this.stage.checkIn === 'true') {
 					var singinRule = {value:this.signInTime, checkType:'String', errorMsg:'签到时间不能为空'}
 					rule.push(singinRule)
@@ -455,6 +478,9 @@
 					
 				})
 			},
+			bindAppointmentConfirm(e) {
+				this.appointment = e.key;
+			},
 			bindInTimeConfirm(e) {
 				this.signInTime = e.key;
 				let params = {
@@ -523,6 +549,7 @@
 				formData.append("signOutLatitude", this.signOutLatitude);
 				formData.append("faultLocation", this.faultLocation);
 				formData.append('faultJudgement', this.faultJudgement);
+				formData.append("appointment", this.appointment);
 				
 				ticketRepairSave(formData).then(res => {
 					if (res.status === 200) {
@@ -641,6 +668,7 @@
 				}
 			},
 			deletePhotoSuccess(entityList) {
+				console.log(entityList);
 				this.photoCommit = entityList;
 			},
 			uploadSuccess(result,entityList) {

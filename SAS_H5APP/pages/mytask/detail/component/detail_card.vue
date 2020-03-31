@@ -21,6 +21,10 @@
 							<view class="inline">{{item.isCompleted === '1' ? '完成' : '' || item.isCompleted === '0' ? '继续' : ''}}</view>
 						</view>
 					</view>
+					<view v-if="item.currentProgress === '工单预约'">
+						<view class="inline">预约时间：</view>
+						<view class="inline">{{item.appointment}}</view>
+					</view>
 				</uni-card>
 			</view>
 		</view>

@@ -20,6 +20,7 @@
 		SELECT
 			detail.id AS "detailId",
 			detail.fault_location AS "faultLocation",
+			detail.appointment AS "appointment",
 			device.`name` AS "deviceName",
 			user.realname AS "enginerName",
 			progress.`name` AS "currentProgress",

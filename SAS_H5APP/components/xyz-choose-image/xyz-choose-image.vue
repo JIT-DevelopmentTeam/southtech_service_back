@@ -98,33 +98,6 @@ export default {
 					}
 					
 					_this.$emit("uploadPhotoSuccess", _this.commitList)
-					
-					// for (let i = 0; i < _this.commitList.length; i++) {
-					// 	uni.uploadFile({
-					// 		url: _this.uploadPhotoUrl ,
-					// 		filePath: _this.commitList[i].path,
-					// 		name: 'photo',
-					// 		formData: {
-					// 			id : _this.commitList[i].id
-					// 		},
-					// 		success: (res) => {
-					// 			let json=JSON.parse(res.data);
-					// 			var  fileEntity =json.body.filesEntity;
-					// 			_this.fileImage.push(fileEntity);
-					// 			console.log('fileImage -> ', _this.fileImage);
-					// 			_this.$emit('uploadPhotoSuccess', res,_this.fileImage);
-					// 			if (res.statusCode  == 200) {
-					// 				_this.$emit('update:photoList', _this.commitList);
-					// 				_this.$forceUpdate();
-					// 			} else {
-									
-					// 			}
-					// 		},
-					// 		fail: (err) => {
-								
-					// 		}
-					// 	})
-					// }
 				}
 			});
 		},
