@@ -5,6 +5,8 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.management.file.entity.File;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * @Description: 文件表
  * @Author: jeecg-boot
@@ -14,5 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface IFileService extends IService<File> {
 
     Result<?> uploadFiles(MultipartFile[] files, String dic, String sid, String progressId);
+
+    List<File> getByReportId(String reportId, String type);
 
 }

@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view v-for="(item, index) in showList" :key="index">
-			<view @click="dClick(item.detailId, item.progressId, item.isCompleted, item.reportId)">
+			<view @click="item.enterpriseId === this.$store.getters['getUserId'] ? dClick(item.detailId, item.progressId, item.isCompleted, item.reportId) : ''">
 				<uni-card class="uniCard">
 					<view>
 						<view class="inline">设备档案：</view>
@@ -20,6 +20,10 @@
 							<view class="inline">完成状态：</view>
 							<view class="inline">{{item.isCompleted === '1' ? '完成' : '' || item.isCompleted === '0' ? '继续' : ''}}</view>
 						</view>
+					</view>
+					<view v-if="item.currentProgress === '工单预约'">
+						<view class="inline">预约时间：</view>
+						<view class="inline">{{item.appointment}}</view>
 					</view>
 				</uni-card>
 			</view>

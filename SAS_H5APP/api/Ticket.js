@@ -42,9 +42,9 @@ export function ticketRepairSave(params/* , header */) {
 	})
 }
 
-export function delUploadFile(id) {
+export function delUploadFile(ids) {
 	return http({
-		url: '/f/mobile/upload/deleteUpFile?id=' + id,
+		url: '/mobile/upload/deleteULPicture?ids=' + ids,
 		method: 'get'
 	})
 }

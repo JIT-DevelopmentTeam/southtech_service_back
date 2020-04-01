@@ -1,6 +1,8 @@
 package org.jeecg.modules.management.mobile.stage;
 
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.modules.management.file.entity.File;
+import org.jeecg.modules.management.file.service.IFileService;
 import org.jeecg.modules.management.progressreport.entity.ProgressReport;
 import org.jeecg.modules.management.progressreport.service.IProgressReportService;
 import org.jeecg.modules.management.progressreport.vo.MobileReportDTO;
@@ -8,6 +10,7 @@ import org.jeecg.modules.management.signin.entity.SignIn;
 import org.jeecg.modules.management.signin.service.ISignInService;
 import org.jeecg.modules.management.stage.service.IStageService;
 import org.jeecg.modules.management.stage.vo.MobileStageDTO;
+import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
 import org.jeecg.modules.management.workorder.entity.WorkOrderProgress;
 import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderProgressService;
@@ -49,6 +52,9 @@ public class MobileStageController {
     @Autowired
     private IWorkOrderProgressService workOrderProgressService;
 
+    @Autowired
+    private IFileService fileService;
+
     @RequestMapping(value = "/queryStageByWorkOrderId")
     public Result<?> queryStageByWorkOrderId(HttpServletRequest req) {
         List<MobileStageDTO> list = stageService.queryStageByWorkOrderId(req.getParameter("workOrderId"));
@@ -61,18 +67,29 @@ public class MobileStageController {
         String progressId = req.getParameter("progressId");
         String reportId = req.getParameter("reportId");
         MobileReportDTO reportDTO = progressReportService.getByReportId(user.getUsername(), progressId, reportId);
+        List<File> photoList = getByReportId(reportId, "Photo");
+        List<File> fileList = getByReportId(reportId, "File");
+        reportDTO.setPhotoList(photoList);
+        reportDTO.setFileList(fileList);
         return Result.ok(reportDTO);
+    }
+
+    public List<File> getByReportId(String reportId, String type) {
+        List<File> fileList = fileService.getByReportId(reportId, type);
+        return  fileList;
     }
 
     @RequestMapping(value = "/progressReport", method = RequestMethod.POST)
     public Result<?> progressReport(@RequestParam Map<String, Object> params) {
         Result<String> result = new Result<>();
         SysUser user = sysUserService.getByEnterpriseId(params.get("userId").toString());
+        // 工单预约阶段更新预约时间
+        updateAppointment(params);
         // 进度汇报保存
         String progressReportId = reportSave(params);
         // 签到 签出保存
-        signInSave("1", params, user, signInService, progressReportId);
-        signInSave("2", params, user, signInService, progressReportId);
+        signInSave("1", params, user, progressReportId);
+        signInSave("2", params, user, progressReportId);
         // 检查当前工单下面的所以工单明细是否已经完成
         checkAllCompleted(params.get("ticketId").toString(), params.get("progressId").toString());
         result.setSuccess(true);
@@ -81,14 +98,26 @@ public class MobileStageController {
         return result;
     }
 
+    private void updateAppointment(Map<String, Object> params) {
+        if (!"".equals(params.get("appointment"))) {
+            try {
+                WorkOrderDetail workOrderDetail = new WorkOrderDetail();
+                workOrderDetail.setId(params.get("detailId").toString());
+                workOrderDetail.setAppointment(new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(params.get("appointment").toString()));
+                workOrderDetailService.updateById(workOrderDetail);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /**
      * 签到表（保存操作）
      * @param type
      * @param params
      * @param user
-     * @param signInService
      */
-    private void signInSave(String type, Map<String, Object> params, SysUser user, ISignInService signInService, String reportId) {
+    private void signInSave(String type, Map<String, Object> params, SysUser user, String reportId) {
         SignIn signIn = new SignIn();
         signIn.setProgressId(params.get("progressId").toString());
         signIn.setServiceEngineerName(user.getUsername());

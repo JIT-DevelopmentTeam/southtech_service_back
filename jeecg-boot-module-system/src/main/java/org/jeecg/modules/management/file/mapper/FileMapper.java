@@ -1,10 +1,10 @@
 package org.jeecg.modules.management.file.mapper;
 
-import java.util.List;
-
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.management.file.entity.File;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
  * @Description: 文件表
@@ -13,5 +13,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @Version: V1.0
  */
 public interface FileMapper extends BaseMapper<File> {
+
+    List<File> getByReportId(@Param("reportId") String reportId, @Param("type") String type);
 
 }

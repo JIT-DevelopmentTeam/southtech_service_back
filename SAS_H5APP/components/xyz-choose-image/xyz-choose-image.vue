@@ -3,7 +3,7 @@
 		<view style="position: relative;" v-for="(item, index) in imgList" :key="index" :style="{ width: size + 'rpx', height: size + 'rpx' }">
 			<image :src="imgList[index].path" :style="{ width: size + 'rpx', height: size + 'rpx' }" mode="aspectFill" @click="viewImg(imgList[index].path)"></image>
 			<view v-show="stageStatus != 1">
-				<view class="icon_close " style="position: absolute;" @click="delImg(index)">
+				<view class="icon_close " style="position: absolute;" @click="delImg(index, imgList[index].id)">
 					<i class="iconfont iconjiaocha" style=""></i>
 				</view>
 			</view>
@@ -55,9 +55,6 @@ export default {
 			type: String,
 			default: '0'
 		},
-		photoArr: {
-			type: Array
-		},
 		requestRUl:{
 			type: String
 		}
@@ -66,8 +63,6 @@ export default {
 		return {
 			imgList: [],
 			base64: '',
-			uploadPhotoUrl: this.$IP + '/mobile/upload/uploadPicture', //替换成你的后端接收文件地址
-			fileImage:[],
 			commitList: []
 		};
 	},
@@ -84,7 +79,6 @@ export default {
 				sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
 				sourceType: ['album', 'camera'], //从相册选择
 				success: function(res) {
-					console.log(res);
 					_this.commitList = []
 					for (var i = 0; i < res.tempFilePaths.length; i++) {
 						var obj = {id: guid(), path: res.tempFilePaths[i]}
@@ -98,56 +92,18 @@ export default {
 					}
 					
 					_this.$emit("uploadPhotoSuccess", _this.commitList)
-					
-					// for (let i = 0; i < _this.commitList.length; i++) {
-					// 	uni.uploadFile({
-					// 		url: _this.uploadPhotoUrl ,
-					// 		filePath: _this.commitList[i].path,
-					// 		name: 'photo',
-					// 		formData: {
-					// 			id : _this.commitList[i].id
-					// 		},
-					// 		success: (res) => {
-					// 			let json=JSON.parse(res.data);
-					// 			var  fileEntity =json.body.filesEntity;
-					// 			_this.fileImage.push(fileEntity);
-					// 			console.log('fileImage -> ', _this.fileImage);
-					// 			_this.$emit('uploadPhotoSuccess', res,_this.fileImage);
-					// 			if (res.statusCode  == 200) {
-					// 				_this.$emit('update:photoList', _this.commitList);
-					// 				_this.$forceUpdate();
-					// 			} else {
-									
-					// 			}
-					// 		},
-					// 		fail: (err) => {
-								
-					// 		}
-					// 	})
-					// }
 				}
 			});
 		},
-		delImg(idx) {
+		delImg(idx, id) {
 			uni.showModal({
 				title: '提示',
 				content: '确定要删除此项吗？',
 				success: res => {
 					if (res.confirm) {
-						var id
-						this.fileImage.forEach((i, index) => {
-							if (i.id == this.imgList[idx].id) {
-								uni.showToast({
-									title: '删除成功',
-									icon: 'none'
-								});
-								id = i.id
-								this.fileImage.splice(index, 1)
-							}
-						})
 						this.imgList.splice(idx, 1);
 						this.$forceUpdate();
-						this.$emit('deletePhotoSuccess', this.imgList);
+						this.$emit('deletePhotoSuccess', this.imgList, id);
 						// this.$emit('update:photoList', this.imgList);
 					}
 				}
@@ -169,7 +125,6 @@ export default {
 	},
 	mounted() {
 		this.imgList = this.imageList
-		this.fileImage = this.photoArr
 		if (this.isSave) {
 			let str = uni.getStorageSync(this.saveStr);
 			if (str != '') {

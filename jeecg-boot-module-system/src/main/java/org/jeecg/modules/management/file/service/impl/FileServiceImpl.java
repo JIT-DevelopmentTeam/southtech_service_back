@@ -32,6 +32,11 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
     private String uploadpath;
 
     @Override
+    public List<File> getByReportId(String reportId, String type) {
+        return fileMapper.getByReportId(reportId, type);
+    }
+
+    @Override
     public Result<File> uploadFiles(MultipartFile[] files, String dic, String sid, String progressReportId) {
         Result<File> result = new Result<>();
         File filesEntity = files(files, dic,sid, progressReportId);
@@ -47,38 +52,49 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
     }
 
     public synchronized File files(MultipartFile[] files, String dis,String sid, String progressReportId) {
-        List<Map> list = uploadFile(files, dis);
-        File fileEntity = null;
-        String fileName = "";
-        String filePath = "";
-        String fileId = "";
-        File file = new File();
-        for (int i = 0; i < list.size(); i++) {
-            Map<String, Object> params = list.get(i);
-            fileEntity =new File();
-            fileEntity.setOriginalFilename(params.get("oldFileName").toString());
-            fileEntity.setFilename(params.get("newFileName").toString());
-            fileEntity.setUrl(params.get("path").toString());
-            fileEntity.setId(sid);
-            fileEntity.setProgressReportId(progressReportId);
-            fileEntity.setType(dis);
-            fileMapper.insert(fileEntity);
-            String oldFileName = params.get("oldFileName").toString();
-            String path = params.get("path").toString();
-            String id = fileEntity.getId();
-            if(list.size() - 1 == i){
-                fileName = fileName + oldFileName;
-                filePath = filePath + path;
-                fileId = fileId + id;
-            }else{
-                fileName = fileName + oldFileName +",";
-                filePath = filePath + path+",";
-                fileId = fileId + id+",";
+        boolean open = true;
+        List<File> fileList = fileMapper.selectList(null);
+        for (File file : fileList) {
+            if (sid.equals(file.getId())) {
+                open = false;
+                break;
             }
         }
-        file.setId(fileId);
-        file.setUrl(filePath);
-        file.setFilename(fileName);
+        File file = new File();
+        if (open) {
+            List<Map> list = uploadFile(files, dis);
+            File fileEntity = null;
+            String fileName = "";
+            String filePath = "";
+            String fileId = "";
+            for (int i = 0; i < list.size(); i++) {
+                Map<String, Object> params = list.get(i);
+                fileEntity =new File();
+                fileEntity.setOriginalFilename(params.get("oldFileName").toString());
+                fileEntity.setFilename(params.get("newFileName").toString());
+                fileEntity.setUrl(params.get("path").toString());
+                fileEntity.setId(sid);
+                fileEntity.setProgressReportId(progressReportId);
+                fileEntity.setType(dis);
+                // todo 查询数据库
+                fileMapper.insert(fileEntity);
+                String oldFileName = params.get("oldFileName").toString();
+                String path = params.get("path").toString();
+                String id = fileEntity.getId();
+                if(list.size() - 1 == i){
+                    fileName = fileName + oldFileName;
+                    filePath = filePath + path;
+                    fileId = fileId + id;
+                }else{
+                    fileName = fileName + oldFileName +",";
+                    filePath = filePath + path+",";
+                    fileId = fileId + id+",";
+                }
+            }
+            file.setId(fileId);
+            file.setUrl(filePath);
+            file.setFilename(fileName);
+        }
         return file;
     }
 
@@ -87,7 +103,7 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
         String ctxPath = uploadpath;
         String bizPath = dis;
         String nowday = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        String path = ctxPath + java.io.File.separator + bizPath + java.io.File.separator + nowday;
+        String path = ctxPath + "/" + bizPath + "/" + nowday;
         //判断file数组不能为空并且长度大于0
         if (files != null && files.length > 0) {
             //循环获取file数组中得文件
@@ -108,8 +124,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
                         // 保存数据库url路径
                         String fileUrl = "";
                         String newFileName = dis + uuid +"."+suffix;
-                        savePath = path + java.io.File.separator + newFileName;
-                        fileUrl = bizPath + java.io.File.separator + nowday + newFileName;
+                        savePath = path + "/" + newFileName;
+                        fileUrl = "/" + bizPath + "/" + nowday + "/" + newFileName;
                         java.io.File filepath = new java.io.File(path);
                         if (!filepath.exists())
                             filepath.mkdirs();
@@ -131,17 +147,6 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, File> implements IF
             }
         }
         return objectList;
-    }
-
-    /**获取classpath1
-     * @return
-     */
-    public static String getClasspath(){
-        String path = (String.valueOf(Thread.currentThread().getContextClassLoader().getResource(""))).replaceAll("file:/", "").replaceAll("%20", " ").trim();
-        if(path.indexOf(":") != 1){
-            path = java.io.File.separator + path;
-        }
-        return path;
     }
 
 }
