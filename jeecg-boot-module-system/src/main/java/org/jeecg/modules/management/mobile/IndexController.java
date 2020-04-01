@@ -10,12 +10,10 @@ import com.dingtalk.api.response.OapiUserGetuserinfoResponse;
 import com.taobao.api.ApiException;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.util.RedisUtil;
-import org.jeecg.common.util.UUIDGenerator;
 import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.dingtalk.exception.OApiException;
 import org.jeecg.modules.dingtalk.exception.OApiResultException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,13 +34,16 @@ public class IndexController {
 
     @RequestMapping(value = "/getUserInfo", method = RequestMethod.GET)
     public Result<?> getUserInfo(HttpServletRequest req) {
+        Result<String> result = new Result<>();
         try {
             DingTalkClient client = new DefaultDingTalkClient(DingTalkConstant.GET_USER_INFO);
             OapiUserGetuserinfoRequest request = new OapiUserGetuserinfoRequest();
             request.setCode(req.getHeader("code"));
             request.setHttpMethod("GET");
             OapiUserGetuserinfoResponse response = client.execute(request, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
-            return Result.ok(response.getUserid());
+            result.setSuccess(true);
+            result.setResult(response.getUserid());
+            return result;
         } catch (ApiException e) {
             e.printStackTrace();
             return Result.error("获取用户userId失败！");
