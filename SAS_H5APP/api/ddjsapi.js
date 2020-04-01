@@ -11,11 +11,10 @@ export function GetJsapiTicket(params) {
 }
 
 //获取UserId（鉴权）
-export function GetUserInfo(params) {
+export function GetUserInfo() {
     return http({
         url:"/mobile/index/getUserInfo",
-        method:"get",
-		params:params
+        method:"get"
     })
 }
 

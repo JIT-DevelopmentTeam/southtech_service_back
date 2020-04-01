@@ -166,8 +166,7 @@
 		},
 		onLoad() {
 			this.$store.dispatch("GET_CODE", this.$corpId).then(async res => {
-				var obj = {'code': this.$store.getters['getCode']}
-				await this.$store.dispatch("GET_USER_INFO", obj)
+				await this.$store.dispatch("GET_USER_INFO")
 			})
 		},
 		methods: {

@@ -67,7 +67,7 @@ const actions = {
 	},
 	GET_USER_INFO({commit, state}, payload) {
 		return new Promise((resolve, reject) => {
-			GetUserInfo(payload).then(res => {
+			GetUserInfo().then(res => {
 				uni.showModal({
 					title: 'info',
 					content: JSON.stringify(res)

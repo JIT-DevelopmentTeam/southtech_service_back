@@ -20,9 +20,6 @@ http.interceptors.request.use(function (config) {
 		mask: true
 	});
 	config.headers.common['code'] = sessionStorage.getItem('code')
-	// if (config.url.indexOf('getAccessToken') < 0) {
-		config.headers.common['userId'] = sessionStorage.getItem('userId')
-	// }
     return config;
   }, function (error) {
     // Do something with request error
