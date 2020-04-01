@@ -316,11 +316,11 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         WorkOrderDetail findParent = workOrderDetailService.getById(idsArray[0]);
         WorkOrder workOrder = workOrderService.getById(findParent.getWorkOrderId());
+        SysUser serviceEngineer = sysUserService.getUserByName(serviceEngineerName);
         for (String id : idsArray) {
             WorkOrderDetail workOrderDetail = workOrderDetailService.getById(id);
             workOrderDetail.setServiceEngineerName(serviceEngineerName);
             try {
-                workOrderDetail.setDispatchTime(DateUtils.getDate());
                 workOrderDetail.setPlannedCompletionTime(DateUtils.parseDate(plannedCompletionTime,"yyyy-MM-dd HH:mm:ss"));
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -357,33 +357,32 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             workOrderService.updateById(workOrder);
         }
         // 钉钉发起待办
-//        Client client = clientService.getById(workOrder.getClientId());
-//        List<SysMessageTemplate> messageTemplateList = sysMessageTemplateService.selectByCode("dingTalk_dispatch_remind");
-//        if (!messageTemplateList.isEmpty()) {
-//            DingTalkClient dingTalkClient = new DefaultDingTalkClient(DingTalkConstant.ADD_WORK_RECORD_URL);
-//            OapiWorkrecordAddRequest req = new OapiWorkrecordAddRequest();
-//            req.setUserid(serviceEngineer.getEnterpriseId());
-//            req.setCreateTime(System.currentTimeMillis());
-//            req.setTitle("待办");
-//            // TODO 跳转应用
-//            req.setUrl("https://www.baidu.com");
-//            List<OapiWorkrecordAddRequest.FormItemVo> list2 = new ArrayList<>();
-//            OapiWorkrecordAddRequest.FormItemVo obj3 = new OapiWorkrecordAddRequest.FormItemVo();
-//            list2.add(obj3);
-//            obj3.setTitle(messageTemplateList.get(0).getTemplateName());
-//            obj3.setContent(messageTemplateList.get(0).getTemplateContent().replace("${clientServiceName}",loginUser.getRealname()).replace("${clientName}",client.getName()));
-//            req.setFormItemList(list2);
-//            try {
-//                OapiWorkrecordAddResponse rsp = dingTalkClient.execute(req, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
-//                if (rsp.isSuccess()) {
-//                    log.info("钉钉派单待办提醒发送成功!");
-//                } else {
-//                    log.info("钉钉派单待办提醒发送失败,错误码:"+rsp.getCode()+",错误信息:"+rsp.getErrmsg());
-//                }
-//            } catch (ApiException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        Client client = clientService.getById(workOrder.getClientId());
+        List<SysMessageTemplate> messageTemplateList = sysMessageTemplateService.selectByCode("dingTalk_dispatch_remind");
+        if (!messageTemplateList.isEmpty()) {
+            DingTalkClient dingTalkClient = new DefaultDingTalkClient(DingTalkConstant.ADD_WORK_RECORD_URL);
+            OapiWorkrecordAddRequest req = new OapiWorkrecordAddRequest();
+            req.setUserid(serviceEngineer.getEnterpriseId());
+            req.setCreateTime(System.currentTimeMillis());
+            req.setTitle("待办");
+            req.setUrl("http://www.southtech.cn/H5_WEB");
+            List<OapiWorkrecordAddRequest.FormItemVo> list2 = new ArrayList<>();
+            OapiWorkrecordAddRequest.FormItemVo obj3 = new OapiWorkrecordAddRequest.FormItemVo();
+            list2.add(obj3);
+            obj3.setTitle(messageTemplateList.get(0).getTemplateName());
+            obj3.setContent(messageTemplateList.get(0).getTemplateContent().replace("${clientServiceName}",loginUser.getRealname()).replace("${clientName}",client.getName()));
+            req.setFormItemList(list2);
+            try {
+                OapiWorkrecordAddResponse rsp = dingTalkClient.execute(req, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
+                if (rsp.isSuccess()) {
+                    log.info("钉钉派单待办提醒发送成功!");
+                } else {
+                    log.info("钉钉派单待办提醒发送失败,错误码:"+rsp.getCode()+",错误信息:"+rsp.getErrmsg());
+                }
+            } catch (ApiException e) {
+                e.printStackTrace();
+            }
+        }
 	    return Result.ok("派工成功!");
     }
 

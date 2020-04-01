@@ -1,7 +1,5 @@
 package org.jeecg.modules.wechat.token.util;
 
-import com.jeecg.qywx.api.base.JwAccessTokenAPI;
-import com.jeecg.qywx.api.core.common.AccessToken;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.SpringContextUtils;

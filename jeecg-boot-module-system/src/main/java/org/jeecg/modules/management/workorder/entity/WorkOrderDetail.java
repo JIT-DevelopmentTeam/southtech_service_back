@@ -55,11 +55,6 @@ public class WorkOrderDetail implements Serializable {
 	/**描述*/
 	@Excel(name = "描述", width = 15)
 	private java.lang.String description;
-	/**派工时间*/
-	@Excel(name = "派工时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-	private java.util.Date dispatchTime;
 	/**同行人员*/
 	@Excel(name = "同行人员", width = 15)
 	private java.lang.String peers;
