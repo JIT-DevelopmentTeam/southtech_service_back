@@ -65,7 +65,7 @@
 
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <!-- <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button> -->
+      <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
       <a-button
         type="primary"
         v-has="'workOrder:returnVisits'"
@@ -73,20 +73,23 @@
         icon="message"
         @click="handleServiceVisits"
       >回访意见</a-button>
-      <a-button
-        type="primary"
-        v-has="'workOrder:finish'"
-        v-if="selectedRowKeys.length > 0"
-        @click="setStatus(3)"
-        icon="check"
-      >完成</a-button>
-      <a-button
-        type="primary"
-        v-has="'workOrder:close'"
-        v-if="selectedRowKeys.length > 0"
-        @click="setStatus(4)"
-        icon="close"
-      >关闭</a-button>
+      <a-dropdown v-if="selectedRowKeys.length > 0">
+        <a-menu slot="overlay">
+          <a-menu-item key="1" @click="batchDel">
+            <a-icon type="delete" />删除
+          </a-menu-item>
+           <a-menu-item key="2" v-has="'workOrder:finish'" @click="setStatus(3)">
+            <a-icon type="check" />完成
+          </a-menu-item>
+           <a-menu-item key="3" v-has="'workOrder:close'" @click="setStatus(4)">
+            <a-icon type="close" />关闭
+          </a-menu-item>
+        </a-menu>
+        <a-button style="margin-left: 8px">
+          批量操作
+          <a-icon type="down" />
+        </a-button>
+      </a-dropdown>
     </div>
 
     <!-- table区域-begin -->

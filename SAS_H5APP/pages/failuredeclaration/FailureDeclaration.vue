@@ -11,7 +11,7 @@
 				</view>
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>客户</view>
-					<button type="primary" size="mini" @click="openClients">选择客户</button>
+					<button type="primary" v-if="wechatOpendId" size="mini" @click="openClients">选择客户</button>
 					<p><strong>当前选择:</strong>{{ client != null ? client.name : ''}}</p>
 				</view>
 				<view class="flex-item flex-item-V">
@@ -132,7 +132,7 @@
 	import uniPopup from "@dcloudio/uni-ui/lib/uni-popup/uni-popup"
 	import uniSearchBar from '@dcloudio/uni-ui/lib/uni-search-bar/uni-search-bar'
 	import validate from '@/components/form/validate'
-	import { getDicList,listUserByRoleCode,listClient,getClientById,addWorkOrder,getUserByEnterpriseId,getWxUserByOpenId,generateId } from '@/api/Ticket.js'
+	import { getDicList,listUserByRoleCode,listClient,getClientById,addWorkOrder,getUserByEnterpriseId,getClientByOpenId } from '@/api/Ticket.js'
 	
 	export default {
 		name:'FailureDeclaration',
@@ -147,38 +147,48 @@
 		},
 	     async mounted() {
 			 // 初始化
-			// this.dingTalkUserId = this.$store.getters.getUserId;
-			// this.wechatOpendId = this.$store.getters.openId;
-			// if (this.dingTalkUserId) {
-			// 	getUserByEnterpriseId(this.dingTalkUserId).then((res) => {
-			// 		if (res.data.success) {
-			// 			this.correspondentName = res.data.result.username;
-			// 		}
-			// 	});
-			// 	listClient(null).then((res) => {
-			// 		if (res.data.success) {
-			// 			this.clientList = res.data.result.records;
-			// 		}
-			// 	});
-			// }
-			// if (this.wechatOpendId) {
-			// 	await getWxUserByOpenId(this.wechatOpendId).then((res) => {
-			// 		if (res.data.success) {
-			// 			this.client = res.data.result;
-			// 			this.model.clientId = res.data.result.id;
-			// 		}
-			// 	});
-			// 	await getDicList("tb_contact,name,id,client_id="+this.client.id).then((res) => {
-			// 		if (res.data.success) {
-			// 			this.contactList = res.data.result;
-			// 		}
-			// 	});
-			// }
-			listClient(null).then((res) => {
-				if (res.data.success) {
-					this.clientList = res.data.result.records;
-				}
-			});
+			this.dingTalkUserId = this.$store.getters.getUserId;
+			this.wechatOpendId = this.$store.getters.openId;
+			if (this.dingTalkUserId) {
+				getUserByEnterpriseId(this.dingTalkUserId).then((res) => {
+					if (res.data.success) {
+						this.correspondentName = res.data.result.username;
+					}
+				});
+				listClient(null).then((res) => {
+					if (res.data.success) {
+						this.clientList = res.data.result.records;
+					}
+				});
+			}
+			if (this.wechatOpendId) {
+				await getClientByOpenId(this.wechatOpendId).then((res) => {
+					if (res.data.success) {
+						this.client = res.data.result;
+						this.model.clientId = res.data.result.id;
+					} else {
+						uni.showModal({
+							title:'提示',
+							content:'您的账户尚未通过审核,请联系工作人员!',
+							showCancel:false,
+							success:function() {
+								window.location.reload();
+							}
+						});
+						return;
+					}
+				});
+				await getDicList("tb_contact,name,id,client_id="+this.client.id).then((res) => {
+					if (res.data.success) {
+						this.contactList = res.data.result;
+					}
+				});
+			}
+			// listClient(null).then((res) => {
+			// 	if (res.data.success) {
+			// 		this.clientList = res.data.result.records;
+			// 	}
+			// });
 			getDicList("work_order_access_method").then((res) => {
 				if (res.data.success) {
 					this.accessMethodList = res.data.result;
@@ -236,7 +246,7 @@
 					customerServiceName:null,
 					declarationTime:null,
 					correspondentName:null,
-					annox:null,
+					annex:null,
 					workOrderDetailList:[],
 				}
 			}
@@ -245,7 +255,7 @@
 			
 		},
 		methods: {
-			formSubmit: function(e) {
+		    formSubmit(e) {
 				var fields = [
 					{value:this.model.number, checkType:'String', errorMsg:'请输入编号!'},
 					{value:this.model.clientId, checkType:'String', errorMsg:'请选择客户!'},
@@ -294,33 +304,33 @@
 					});
 					return;
 				}
-				this.savePhoto();
-				let workOrderPageObject = {};
-				workOrderPageObject.number = this.model.number;
-				workOrderPageObject.status = this.model.status;
-				workOrderPageObject.type = this.model.type;
-				workOrderPageObject.status = this.model.status;
-				workOrderPageObject.clientId = this.model.clientId;
-				workOrderPageObject.contactId = this.model.contactId;
-				workOrderPageObject.accessMethod = this.model.accessMethod;
-				workOrderPageObject.emergencyLevel = this.model.emergencyLevel;
-				workOrderPageObject.customerServiceName = this.model.customerServiceName;
-				workOrderPageObject.declarationTime = this.model.declarationTime;
-				workOrderPageObject.annox = this.model.annox;
-				let workOrderDetailList = new Array();
-				for (let i = 0; i < this.model.workOrderDetailList.length; i++) {
-					workOrderDetailList.push({'deviceNumber':this.model.workOrderDetailList[i].deviceNumber,'faultLocation':this.model.workOrderDetailList[i].faultLocation,'description':this.model.workOrderDetailList[i].description});
-				}
-				workOrderPageObject.workOrderDetailList = workOrderDetailList;
-				addWorkOrder(workOrderPageObject).then((res) => {
-					if (res.data.success) {
-						uni.showToast({
-							title: res.data.message,
-							icon: 'none'
-						});
+			    this.savePhoto().then(()=>{
+					let workOrderPageObject = {};
+					workOrderPageObject.number = this.model.number;
+					workOrderPageObject.status = this.model.status;
+					workOrderPageObject.type = this.model.type;
+					workOrderPageObject.status = this.model.status;
+					workOrderPageObject.clientId = this.model.clientId;
+					workOrderPageObject.contactId = this.model.contactId;
+					workOrderPageObject.accessMethod = this.model.accessMethod;
+					workOrderPageObject.emergencyLevel = this.model.emergencyLevel;
+					workOrderPageObject.customerServiceName = this.model.customerServiceName;
+					workOrderPageObject.declarationTime = this.model.declarationTime;
+					workOrderPageObject.annex = this.model.annex;
+					let workOrderDetailList = new Array();
+					for (let i = 0; i < this.model.workOrderDetailList.length; i++) {
+						workOrderDetailList.push({'deviceNumber':this.model.workOrderDetailList[i].deviceNumber,'faultLocation':this.model.workOrderDetailList[i].faultLocation,'description':this.model.workOrderDetailList[i].description});
 					}
+					workOrderPageObject.workOrderDetailList = workOrderDetailList;
+					addWorkOrder(workOrderPageObject).then((res) => {
+						if (res.data.success) {
+							uni.showToast({
+								title: res.data.message,
+								icon: 'none'
+							});
+						}
+					});
 				});
-				
 			},
 			formReset: function() {
 				
@@ -352,11 +362,7 @@
 				});
 			},
 			addWorkOrderDetail: function () {
-				generateId().then((res) => {
-					if (res.data.success) {
-						this.model.workOrderDetailList.push({id:res.data.result});
-					} 
-				});
+				this.model.workOrderDetailList.push({});
 			},
 			delWorkOrderDetail: function(e) {
 				this.model.workOrderDetailList = this.model.workOrderDetailList.filter(f=>{return f!==e});
@@ -421,22 +427,36 @@
 		  deletePhotoSuccess:function(entityList) {
 			  this.photoCommit.splice()(entityList[i]);
 		  },
-		  savePhoto() {
-		  	let photoRes = this.photoCommit
-		  	for (var i = 0; i < photoRes.length; i++) {
-		  		let that = this;
-		  		uni.uploadFile({
-		  			url: that.picRequestURL ,
-		  			filePath: photoRes[i].path,
-					originalFileName:'workOrderDetail',
-		  			name: 'photo',
-		  			success: (res) => {
-		  				if (res.data.success) {
-							this.model.annox += res.data.message;
+		  async savePhoto() {
+			return new Promise(async (resolve,reject)=>{
+				let photoRes = this.photoCommit
+				for (let i = 0; i < photoRes.length; i++) {
+					let that = this;
+					await uni.uploadFile({
+						url: that.picRequestURL ,
+						filePath: photoRes[i].path,
+						name: 'photos',
+						success: (res) => {
+							let data = JSON.parse(res.data);
+							if (data.success) {
+								if (i === 0) {
+									this.model.annex = data.result;
+								} else {
+									this.model.annex += ','+data.result;
+								}
+							}
+						},
+						complete: () => {
+							if (i === photoRes.length-1) {
+								resolve();
+							}
 						}
-		  			}
-		  		})
-		  	}
+					})
+				 	}
+					
+			});
+		  	
+		 
 		  }
 	  }
 	}

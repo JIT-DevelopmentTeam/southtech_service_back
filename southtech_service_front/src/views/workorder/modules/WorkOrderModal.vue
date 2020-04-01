@@ -72,7 +72,7 @@
           </a-col>
           <a-col :lg="8">
             <a-form-item label="附件" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-upload v-decorator="['annex']" name="annex" :trigger-change="true"></j-upload>
+              <j-upload v-decorator="['annex']" name="workOrderDetail" :trigger-change="true"></j-upload>
             </a-form-item>
           </a-col>
         </a-row>

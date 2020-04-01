@@ -1,6 +1,7 @@
 package org.jeecg.modules.management.mobile.upload;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.management.file.service.IFileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/mobile/upload")
@@ -41,30 +44,33 @@ public class MobileUploadController {
     }
 
     @PostMapping(value = "/uploadDetailPicture")
-    public Result<?> uploadDetailPicture(HttpServletRequest request){
-        Result<?> result = new Result<>();
+    public Result<?> uploadDetailPicture(@RequestParam(value = "photos", required = false) MultipartFile[] files){
+        Result<String> result = new Result<>();
         try {
             String ctxPath = uploadpath;
-            String fileName = null;
             String bizPath = "files";
             String nowday = new SimpleDateFormat("yyyyMMdd").format(new Date());
             File file = new File(ctxPath + File.separator + bizPath + File.separator + nowday);
             if (!file.exists()) {
                 file.mkdirs();// 创建文件根目录
             }
-            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-            MultipartFile mf = multipartRequest.getFile("file");// 获取上传文件对象
-            String orgName = "workOrderDetail";// 文件名
-            fileName = orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
-            String savePath = file.getPath() + File.separator + fileName;
-            File savefile = new File(savePath);
-            FileCopyUtils.copy(mf.getBytes(), savefile);
-            String dbpath = bizPath + File.separator + nowday + File.separator + fileName;
-            if (dbpath.contains("\\")) {
-                dbpath = dbpath.replace("\\", "/");
+            StringBuffer dbpaths = new StringBuffer();
+            for (MultipartFile multipartFile : files) {
+                String orgName = "workOrderDetail";// 文件名
+                String fileName = orgName + "_" + System.currentTimeMillis()+"."+FilenameUtils.getExtension(multipartFile.getOriginalFilename());
+                String savePath = file.getPath() + File.separator + fileName;
+                File savefile = new File(savePath);
+                FileCopyUtils.copy(multipartFile.getBytes(), savefile);
+                String dbpath = bizPath + File.separator + nowday + File.separator + fileName;
+                if (dbpath.contains("\\")) {
+                    dbpath = dbpath.replace("\\", "/");
+                }
+                dbpaths.append(dbpath+",");
             }
-            result.setMessage(dbpath);
-            result.setSuccess(true);
+            if (dbpaths.length() > 0) {
+                result.setResult(dbpaths.deleteCharAt(dbpaths.length()-1).toString());
+                result.setSuccess(true);
+            }
         } catch (IOException e) {
             result.setSuccess(false);
             result.setMessage(e.getMessage());

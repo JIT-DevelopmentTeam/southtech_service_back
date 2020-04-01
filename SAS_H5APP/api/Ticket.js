@@ -103,15 +103,7 @@ export function getUserByEnterpriseId(params) {
 /* 根据openid获取微信用户信息 */
 export function getClientByOpenId(params) {
 	return http({
-		url:'/mobile/user/getClientByOpenId?openId='+params,
-		method:'get'
-	});
-}
-
-/* 生成UUID */
-export function generateId() {
-	return http({
-		url:'/mobile/index/generateId',
+		url:'/mobile/wxUser/getClientByOpenId?openId='+params,
 		method:'get'
 	});
 }

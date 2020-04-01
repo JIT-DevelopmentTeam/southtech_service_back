@@ -52,7 +52,6 @@ public class MobileWorkOrderController {
 
     @PostMapping(value = "/add")
     public Result<?> add(@RequestBody WorkOrderPage workOrderPage) {
-        // TODO 区分申报渠道
         WorkOrder workOrder = new WorkOrder();
         BeanUtils.copyProperties(workOrderPage, workOrder);
         workOrderService.saveMain(workOrder, workOrderPage.getWorkOrderDetailList());

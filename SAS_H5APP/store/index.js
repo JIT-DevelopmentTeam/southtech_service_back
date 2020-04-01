@@ -13,8 +13,8 @@ Vue.use(Vuex)
 const debug = process.env.NODE_ENV !== 'production'
 
 const state = {
-	code: '',
-	userId: '',
+	code: null,
+	userId: null,
 	weChatUser: {},
 }
 

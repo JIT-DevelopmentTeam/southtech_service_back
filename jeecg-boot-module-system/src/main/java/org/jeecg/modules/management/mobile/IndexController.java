@@ -98,16 +98,4 @@ public class IndexController {
         return result;
     }
 
-    /**
-     * 生成UUID
-     * @return
-     */
-    @GetMapping(value = "/generateId")
-    public Result<?> generateId() {
-        Result<String> result = new Result<>();
-        result.setSuccess(true);
-        result.setResult(UUIDGenerator.generate());
-        return result;
-    }
-
 }
