@@ -23,6 +23,7 @@
 			detail.appointment AS "appointment",
 			device.`name` AS "deviceName",
 			user.realname AS "enginerName",
+			user.enterprise_id AS "enterpriseId",
 			progress.`name` AS "currentProgress",
 			progress.id AS "progressId",
 			report.is_completed AS "isCompleted",

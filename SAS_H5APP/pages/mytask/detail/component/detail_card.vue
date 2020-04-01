@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view v-for="(item, index) in showList" :key="index">
-			<view @click="dClick(item.detailId, item.progressId, item.isCompleted, item.reportId)">
+			<view @click="item.enterpriseId === this.$store.getters['getUserId'] ? dClick(item.detailId, item.progressId, item.isCompleted, item.reportId) : ''">
 				<uni-card class="uniCard">
 					<view>
 						<view class="inline">设备档案：</view>

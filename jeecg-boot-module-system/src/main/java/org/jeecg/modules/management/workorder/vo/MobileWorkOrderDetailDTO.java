@@ -29,5 +29,7 @@ public class MobileWorkOrderDetailDTO {
     @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private Date appointment;
+    // 钉钉userid
+    private String enterpriseId;
 
 }
