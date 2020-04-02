@@ -75,10 +75,6 @@ const actions = {
 				commit("SET_USERID", res.data.body.userId)
 				resolve()
 			}).catch(err => {
-				uni.showModal({
-					title: 'err',
-					content: JSON.stringify(err)
-				});
 				reject()
 			})
 		})
