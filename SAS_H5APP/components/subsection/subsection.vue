@@ -77,7 +77,6 @@
 					})
 					const dataList = this.dataSource.slice(0);
 					this.$store.commit('workOrder/setTicketList', dataList)
-					alert(this.dataSource.length);
 				});
 			}
 		},
