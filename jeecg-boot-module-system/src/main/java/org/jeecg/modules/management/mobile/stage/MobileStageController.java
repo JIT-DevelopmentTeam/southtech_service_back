@@ -10,10 +10,12 @@ import org.jeecg.modules.management.signin.entity.SignIn;
 import org.jeecg.modules.management.signin.service.ISignInService;
 import org.jeecg.modules.management.stage.service.IStageService;
 import org.jeecg.modules.management.stage.vo.MobileStageDTO;
+import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
 import org.jeecg.modules.management.workorder.entity.WorkOrderProgress;
 import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderProgressService;
+import org.jeecg.modules.management.workorder.service.IWorkOrderService;
 import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDetailDTO;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -55,6 +57,9 @@ public class MobileStageController {
     @Autowired
     private IFileService fileService;
 
+    @Autowired
+    private IWorkOrderService workOrderService;
+
     @RequestMapping(value = "/queryStageByWorkOrderId")
     public Result<?> queryStageByWorkOrderId(HttpServletRequest req) {
         List<MobileStageDTO> list = stageService.queryStageByWorkOrderId(req.getParameter("workOrderId"));
@@ -92,6 +97,8 @@ public class MobileStageController {
         signInSave("2", params, user, progressReportId);
         // 检查当前工单下面的所以工单明细是否已经完成
         checkAllCompleted(params.get("ticketId").toString(), params.get("progressId").toString());
+        // 检查当前进度是否是最后一个，如果是并且进度状态为完成则修改工单状态为完成
+        checkWorkOrderIsCompleted(params.get("ticketId").toString(), params.get("progressId").toString(), params.get("completeStatus").toString());
         result.setSuccess(true);
         result.setResult(progressReportId);
         result.setMessage("保存成功");
@@ -184,6 +191,18 @@ public class MobileStageController {
             if (!"".equals(currentProgressId)) {
                 workOrderDetailService.updateCurrentProgressByWorkOrderId(currentProgressId, workOrderId);
             }
+        }
+    }
+
+    public void checkWorkOrderIsCompleted(String workOrderId, String progressId, String isCompleted) {
+        // 根据工单id查出所有进度
+        List<WorkOrderProgress> progressList = workOrderProgressService.selectByMainId(workOrderId);
+        // 判断：如果当前进度id等于进度list的最后一个，并且isCompleted为1则执行更新工单状态为已完成
+        if (progressId.equals(progressList.get(progressList.size()-1).getId()) && "1".equals(isCompleted)) {
+            WorkOrder workOrder = new WorkOrder();
+            workOrder.setId(workOrderId);
+            workOrder.setStatus("3");
+            workOrderService.updateById(workOrder);
         }
     }
 
