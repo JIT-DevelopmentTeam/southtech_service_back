@@ -445,13 +445,12 @@
 					    withReGeocode : true,
 					    useCache:true, //默认是true，如果需要频繁获取地理位置，请设置false
 					    onSuccess : function(result) {
-							alert(result)
 							if (type === 'signIn') {
-								this.signInLongitude = result.longitude;
-								this.signInLatitude = result.latitude;
+								_this.signInLongitude = result.longitude;
+								_this.signInLatitude = result.latitude;
 							} else {
-								this.signOutLongitude = result.longitude;
-								this.signOutLatitude = result.latitude;
+								_this.signOutLongitude = result.longitude;
+								_this.signOutLatitude = result.latitude;
 							}
 					    },
 					    onFail : function(err) {}
