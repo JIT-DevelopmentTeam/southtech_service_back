@@ -38,7 +38,11 @@ public class MobileWorkOrderController {
         Page<MobileWorkOrderDTO> pageList = new Page<>(pageNo, pageSize);
         String enterpriseId = req.getParameter("userId");
         SysUser user = sysUserService.getByEnterpriseId(enterpriseId);
-        System.out.println("---> " + user);
+        if (user == null) {
+            result.setSuccess(false);
+            result.setMessage("用户不存在！");
+            return result;
+        }
         pageList = workOrderService.queryMobileList(pageList, user.getUsername(), req.getParameter("status"));
         result.setSuccess(true);
         result.setResult(pageList);
