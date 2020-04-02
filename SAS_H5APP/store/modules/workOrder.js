@@ -44,7 +44,7 @@ const actions = {
 				resolve(res)
 			}).catch(error => {
 				console.log(error);
-				reject()
+				reject(error)
 			})
 		})
 		

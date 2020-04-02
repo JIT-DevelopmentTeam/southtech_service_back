@@ -12,7 +12,6 @@ import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,13 +30,15 @@ public class MobileWorkOrderController {
     @Autowired
     private IWorkOrderDetailService workOrderDetailService;
 
-    @RequestMapping(value = "/workOrderList")
+    @RequestMapping(value = "/workOrderList", method = RequestMethod.GET)
     public Result<?> workOrderList(@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
                                    @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
                                    HttpServletRequest req) {
         Result<Page<MobileWorkOrderDTO>> result = new Result<Page<MobileWorkOrderDTO>>();
         Page<MobileWorkOrderDTO> pageList = new Page<>(pageNo, pageSize);
-        SysUser user = sysUserService.getByEnterpriseId(req.getParameter("userId"));
+        String enterpriseId = req.getParameter("userId");
+        SysUser user = sysUserService.getByEnterpriseId(enterpriseId);
+        System.out.println("---> " + user);
         pageList = workOrderService.queryMobileList(pageList, user.getUsername(), req.getParameter("status"));
         result.setSuccess(true);
         result.setResult(pageList);

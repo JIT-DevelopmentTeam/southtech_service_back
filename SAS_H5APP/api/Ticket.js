@@ -28,6 +28,7 @@ export function getStageList(params) {
 export function getWorkOrderList(params) {
 	return http({
 		url: '/mobile/workOrder/workOrderList',
+		method: 'get',
 		params: params
 	})
 }
