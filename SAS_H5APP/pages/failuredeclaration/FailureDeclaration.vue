@@ -180,7 +180,7 @@
 				});
 				await getDicList("tb_contact,name,id,client_id="+this.client.id).then((res) => {
 					if (res.data.success) {
-						this.contactList = res.data.result;
+				js if		this.contactList = res.data.result;
 					}
 				});
 			}
@@ -305,31 +305,7 @@
 					return;
 				}
 			    this.savePhoto().then(()=>{
-					let workOrderPageObject = {};
-					workOrderPageObject.number = this.model.number;
-					workOrderPageObject.status = this.model.status;
-					workOrderPageObject.type = this.model.type;
-					workOrderPageObject.status = this.model.status;
-					workOrderPageObject.clientId = this.model.clientId;
-					workOrderPageObject.contactId = this.model.contactId;
-					workOrderPageObject.accessMethod = this.model.accessMethod;
-					workOrderPageObject.emergencyLevel = this.model.emergencyLevel;
-					workOrderPageObject.customerServiceName = this.model.customerServiceName;
-					workOrderPageObject.declarationTime = this.model.declarationTime;
-					workOrderPageObject.annex = this.model.annex;
-					let workOrderDetailList = new Array();
-					for (let i = 0; i < this.model.workOrderDetailList.length; i++) {
-						workOrderDetailList.push({'deviceNumber':this.model.workOrderDetailList[i].deviceNumber,'faultLocation':this.model.workOrderDetailList[i].faultLocation,'description':this.model.workOrderDetailList[i].description});
-					}
-					workOrderPageObject.workOrderDetailList = workOrderDetailList;
-					addWorkOrder(workOrderPageObject).then((res) => {
-						if (res.data.success) {
-							uni.showToast({
-								title: res.data.message,
-								icon: 'none'
-							});
-						}
-					});
+					this.saveWorkOrder();
 				});
 			},
 			formReset: function() {
@@ -452,11 +428,39 @@
 							}
 						}
 					})
-				 	}
-					
+				}
+				if (photoRes.length === 0) {
+					this.saveWorkOrder();
+				}
 			});
-		  	
-		 
+		  },
+		  saveWorkOrder:function () {
+			  let formData = Object.assign({},this.model);
+			  // let workOrderPageObject = {};
+			  // workOrderPageObject.number = this.model.number;
+			  // workOrderPageObject.status = this.model.status;
+			  // workOrderPageObject.type = this.model.type;
+			  // workOrderPageObject.status = this.model.status;
+			  // workOrderPageObject.clientId = this.model.clientId;
+			  // workOrderPageObject.contactId = this.model.contactId;
+			  // workOrderPageObject.accessMethod = this.model.accessMethod;
+			  // workOrderPageObject.emergencyLevel = this.model.emergencyLevel;
+			  // workOrderPageObject.customerServiceName = this.model.customerServiceName;
+			  // workOrderPageObject.declarationTime = this.model.declarationTime;
+			  // workOrderPageObject.annex = this.model.annex;
+			  // let workOrderDetailList = new Array();
+			  // for (let i = 0; i < this.model.workOrderDetailList.length; i++) {
+			  // 	workOrderDetailList.push({'deviceNumber':this.model.workOrderDetailList[i].deviceNumber,'faultLocation':this.model.workOrderDetailList[i].faultLocation,'description':this.model.workOrderDetailList[i].description});
+			  // }
+			  // workOrderPageObject.workOrderDetailList = workOrderDetailList;
+			  addWorkOrder(formData).then((res) => {
+			  	if (res.data.success) {
+			  		uni.showToast({
+			  			title: res.data.message,
+			  			icon: 'none'
+			  		});
+			  	}
+			  });
 		  }
 	  }
 	}
