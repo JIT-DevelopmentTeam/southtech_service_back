@@ -15,11 +15,11 @@
               <j-select-user-by-dep v-decorator="['serviceEngineerName',validatorRules.serviceEngineerName]" :disabled="true" :multi="false" :trigger-change="true"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="12">
-            <a-form-item label="派工时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-date placeholder="请选择派工时间" v-decorator="[ 'dispatchTime', validatorRules.dispatchTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
-            </a-form-item>
-          </a-col>
+<!--          <a-col :lg="12">-->
+<!--            <a-form-item label="派工时间" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
+<!--              <j-date placeholder="请选择派工时间" v-decorator="[ 'dispatchTime', validatorRules.dispatchTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>-->
+<!--            </a-form-item>-->
+<!--          </a-col>-->
           <a-col :lg="12">
             <a-form-item label="计划完成时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-date placeholder="请选择计划完成时间" v-decorator="[ 'plannedCompletionTime', validatorRules.plannedCompletionTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
@@ -112,7 +112,7 @@
             that.confirmLoading = true;
             let httpurl = '';
             let method = '';
-            httpurl+=this.url.edit+"?serviceEngineerName="+values.serviceEngineerName+"&dispatchTime="+values.dispatchTime+"&plannedCompletionTime="+values.plannedCompletionTime+"&workOrderDetailIds="+this.workOrderDetailIds;
+            httpurl+=this.url.edit+"?serviceEngineerName="+values.serviceEngineerName+"&plannedCompletionTime="+values.plannedCompletionTime+"&workOrderDetailIds="+this.workOrderDetailIds;
             if (values.peers) {
               httpurl += '&peers='+values.peers;
             }

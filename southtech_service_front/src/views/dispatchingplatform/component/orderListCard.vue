@@ -56,51 +56,6 @@
     </div>
     <dis-patch-modal ref="dispatchModalForm" @ok="modalFormOk"></dis-patch-modal>
   </a-popover>
-  <!--<div class="card">
-    &lt;!&ndash;    <div :style="{ borderBottom: '1px solid #E9E9E9', height: '50px' }">&ndash;&gt;
-    &lt;!&ndash;      <a-row>&ndash;&gt;
-    &lt;!&ndash;        <a-col :span="8" style="margin-left: 10px;">&ndash;&gt;
-    &lt;!&ndash;          <a-button type="danger">关闭工单</a-button>&ndash;&gt;
-    &lt;!&ndash;        </a-col>&ndash;&gt;
-    &lt;!&ndash;      </a-row>&ndash;&gt;
-    &lt;!&ndash;    </div>&ndash;&gt;
-    <div class="content" @scroll="hscroll($event)">
-      <a-spin :spinning="spinning">
-        <div id="card" @click="cardClick(item)" v-for="(item, index) in showList" :key="index">
-          <a-card v-bind:class="{actived:item.id===activeItem.id}">
-            <a-row>
-              <a-col :span="12">
-                <span class="title">{{ workTypeText.getText( item.type ) }}</span>
-              </a-col>
-              <a-col :span="12" class="status">
-                <span>{{ workEmLevelText.getText( item.emergencyLevel ) }}</span>
-              </a-col>
-            </a-row>
-            <a-row>
-              <a-col :span="24">
-                <a-icon type="crown" theme="filled"/>
-                <span>{{ item.clientName }}</span>
-              </a-col>
-            </a-row>
-            <a-row>
-              <a-col :span="18">
-                <span>报障时间：{{ item.declarationTime }}</span>
-              </a-col>
-              <a-col :span="6">
-                <span class="time">过去4小时</span>
-              </a-col>
-            </a-row>
-            <a-row>
-              <a-col :span="24">
-                <a-icon type="environment" theme="filled"/>
-                <span>{{ item.province + item.city + item.area + item.community + item.address }}</span>
-              </a-col>
-            </a-row>
-          </a-card>
-        </div>
-      </a-spin>
-    </div>
-  </div>-->
 </template>
 
 <script>
@@ -185,7 +140,9 @@
         let enginerList = this.enginerList;
         let p1 = [item.longitude, item.latitude];
         enginerList.sort(function (a, b) {
-          return AMap.GeometryUtil.distance(p1, [a.longitude, a.latitude]) - AMap.GeometryUtil.distance(p1, [b.longitude, b.latitude])
+          if (a.longitude != null && a.latitude != null && b.longitude != null && b.latitude != null) {
+            return AMap.GeometryUtil.distance(p1, [a.longitude, a.latitude]) - AMap.GeometryUtil.distance(p1, [b.longitude, b.latitude])
+          }
         })
         if (enginerList.length > 0) {
           this.radioValue = enginerList[0].userName;

@@ -67,8 +67,8 @@
 			scroll() {
 				// console.log("滚动了");
 			},
-			async loadTicketList(obj) {
-				await this.$store.dispatch('workOrder/GetDataList', obj).then(res=>{
+			loadTicketList(obj) {
+				this.$store.dispatch('workOrder/GetDataList', obj).then(res=>{
 					this.total = res.total
 					let result = res.list
 					result.forEach(item => {
@@ -77,6 +77,7 @@
 					})
 					const dataList = this.dataSource.slice(0);
 					this.$store.commit('workOrder/setTicketList', dataList)
+					alert(this.dataSource.length);
 				});
 			}
 		},

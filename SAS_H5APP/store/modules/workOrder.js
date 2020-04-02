@@ -37,13 +37,21 @@ const actions = {
 		return new Promise((resolve, reject) => {
 			getWorkOrderList(payload).then(response => {
 				// commit("setTicketList",response.data.result.records)
-				let res = {
-					list: response.data.result.records,
-					total: response.data.result.total
+				if (response.data.success) {
+					let res = {
+						list: response.data.result.records,
+						total: response.data.result.total
+					}
+					resolve(res)
+				} else {
+					uni.showToast({
+						title: response.data.message,
+						icon: 'none',
+						mask: true,
+						duration: 2000
+					})
 				}
-				resolve(res)
 			}).catch(error => {
-				console.log(error);
 				reject(error)
 			})
 		})
