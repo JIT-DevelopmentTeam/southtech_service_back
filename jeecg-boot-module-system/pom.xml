@@ -71,7 +71,7 @@
                 <!--</configuration>-->
             <!--</plugin>-->
         <!--</plugins>-->
-        <finalName>southtech_service</finalName>
+        <finalName>jeecg-boot</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

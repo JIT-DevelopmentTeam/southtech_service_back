@@ -23,7 +23,7 @@ public class MobileDicController {
     private ISysDictService sysDictService;
 
     @RequestMapping(value = "/getDictItemByCode", method = RequestMethod.GET)
-    public Result<?> getDictItemByCode(@RequestParam("dictCode") String dictCode) {
+    public Result<?> getDictItemByCode(@RequestParam(value = "dictCode",required = false) String dictCode) {
         log.info(" dictCode : "+ dictCode);
         Result<List<DictModel>> result = new Result<List<DictModel>>();
         List<DictModel> ls = null;
