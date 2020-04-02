@@ -180,7 +180,7 @@
 				});
 				await getDicList("tb_contact,name,id,client_id="+this.client.id).then((res) => {
 					if (res.data.success) {
-				js if		this.contactList = res.data.result;
+				 		this.contactList = res.data.result;
 					}
 				});
 			}
