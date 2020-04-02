@@ -23,6 +23,8 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -34,15 +36,17 @@ public class IndexController {
 
     @RequestMapping(value = "/getUserInfo", method = RequestMethod.GET)
     public Result<?> getUserInfo(HttpServletRequest req) {
-        Result<String> result = new Result<>();
+        Result<Map<String, Object>> result = new Result<>();
         try {
             DingTalkClient client = new DefaultDingTalkClient(DingTalkConstant.GET_USER_INFO);
             OapiUserGetuserinfoRequest request = new OapiUserGetuserinfoRequest();
             request.setCode(req.getHeader("code"));
             request.setHttpMethod("GET");
             OapiUserGetuserinfoResponse response = client.execute(request, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
+            Map<String, Object> map = new HashMap<>();
+            map.put("userId", response.getUserid());
             result.setSuccess(true);
-            result.setResult(response.getUserid());
+            result.setResult(map);
             return result;
         } catch (ApiException e) {
             e.printStackTrace();

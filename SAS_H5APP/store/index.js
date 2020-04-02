@@ -68,11 +68,7 @@ const actions = {
 	GET_USER_INFO({commit, state}, payload) {
 		return new Promise((resolve, reject) => {
 			GetUserInfo().then(res => {
-				uni.showModal({
-					title: 'info',
-					content: JSON.stringify(res)
-				});
-				commit("SET_USERID", res.data.body.userId)
+				commit("SET_USERID", res.data.result.userId)
 				resolve()
 			}).catch(err => {
 				reject()
