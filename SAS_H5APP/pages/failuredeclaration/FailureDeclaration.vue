@@ -11,7 +11,7 @@
 				</view>
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>客户</view>
-					<button type="primary" v-if="wechatOpendId" size="mini" @click="openClients">选择客户</button>
+					<button type="primary" v-if="dingTalkUserId" size="mini" @click="openClients">选择客户</button>
 					<p><strong>当前选择:</strong>{{ client != null ? client.name : ''}}</p>
 				</view>
 				<view class="flex-item flex-item-V">
@@ -147,8 +147,8 @@
 		},
 	     async mounted() {
 			 // 初始化
-			this.dingTalkUserId = this.$store.getters.getUserId;
-			this.wechatOpendId = this.$store.getters.openId;
+			this.dingTalkUserId = this.$store.getters['getUserId'];
+			this.wechatOpendId = this.$store.getters['getWeChatUser'];
 			if (this.dingTalkUserId) {
 				getUserByEnterpriseId(this.dingTalkUserId).then((res) => {
 					if (res.data.success) {
@@ -328,15 +328,6 @@
 						break;
 				}
 			},
-			loadDeviceNumber: function (e) {
-				this.deviceNumberList.splice(0,this.deviceNumberList.length);
-				let clientId = this.clientList[e.target.value].value;
-				getDicList("tb_device_number,name,id,client_id="+clientId).then((res) => {
-					if (res.data.success) {
-						this.deviceNumberList = res.data.result;
-					}
-				});
-			},
 			addWorkOrderDetail: function () {
 				this.model.workOrderDetailList.push({});
 			},
@@ -368,6 +359,9 @@
 			 }
 		  },
 		  selectClient:function(e) {
+			 if (!e.target.value) {
+				 return;
+			 }
 			 this.model.clientId = e.target.value;
 			 getClientById(e.target.value).then((res) => {
 				 if (res.data.success) {
