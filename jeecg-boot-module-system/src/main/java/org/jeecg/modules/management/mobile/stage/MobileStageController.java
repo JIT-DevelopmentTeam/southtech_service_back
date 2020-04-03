@@ -93,8 +93,12 @@ public class MobileStageController {
         // 进度汇报保存
         String progressReportId = reportSave(params);
         // 签到 签出保存
-        signInSave("1", params, user, progressReportId);
-        signInSave("2", params, user, progressReportId);
+        if (!"".equals(params.get("checkIn"))) {
+            signInSave("1", params, user, progressReportId);
+        }
+        if (!"".equals(params.get("checkOut"))) {
+            signInSave("2", params, user, progressReportId);
+        }
         // 检查当前工单下面的所以工单明细是否已经完成
         checkAllCompleted(params.get("ticketId").toString(), params.get("progressId").toString());
         // 检查当前进度是否是最后一个，如果是并且进度状态为完成则修改工单状态为完成

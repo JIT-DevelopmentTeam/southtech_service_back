@@ -55,4 +55,12 @@ public interface IWorkOrderService extends IService<WorkOrder> {
 	 * @return
 	 */
 	Page<MobileWorkOrderDTO> queryMobileList(Page<MobileWorkOrderDTO> page, String userName, String status);
+
+	/**
+	 * 服务号-查询所有工单
+	 * @param page
+	 * @param status
+	 * @return
+	 */
+	Page<MobileWorkOrderDTO> queryWXworkOrderList(Page<MobileWorkOrderDTO> page, String openId, String status);
 }

@@ -59,9 +59,8 @@ const actions = {
 	
 	/* 服务号 */
 	GetServiceDataList({commit, state}, payload) {
-		getServiceStageList(payload.ticketType, payload.ticketId).then(response => {
-			commit("setServiceStageList",response.data.body.pageList)
-			commit("setServiceSign_out", response.data.body.stageLogList)
+		getServiceStageList(payload).then(response => {
+			commit("setServiceStageList",response.data.result)
 		}).catch(error => {
 			console.log(error);
 		})

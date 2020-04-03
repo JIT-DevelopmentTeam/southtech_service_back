@@ -3,19 +3,20 @@
 		<view class="example-body">
 			<step-device :options="stageList" active-color="#007AFF" :active="active" direction="column">
 				<template v-slot:todo="{todo,index}">
-					<view @click="toRepair(todo.id,ticketId, todo.stageStatus, index)">
+					<!-- <view @click="toRepair(todo.id,ticketId, todo.stageStatus, index)"> -->
+					<view>
 						<view class="sameLine">
 							<view class="uni-steps__column-title" :style="{color:index <=active ? index == active ?activeColor : goColor :deactiveColor}">
 								{{todo.name}}
 								<!-- <span class="iconfont iconnaozhong alarmClock" ></span> -->
 								<!-- <span class="descstyle">{{dateTime(todo.date)}}</span> -->
 							</view>
-							<view class="uni-steps__column-desc" v-if="todo.stageProcess != undefined && todo.stageProcess.completedDate != undefined">
-								{{ formatDate(todo.stageProcess.completedDate) }}	
+							<view class="uni-steps__column-desc" v-if="todo.finishTime != undefined">
+								{{ formatDate(todo.finishTime) }}	
 							</view>
 						</view>
 						<view class="sameLine fiexRight">
-							<span v-if="todo.stageStatus === 1">
+							<span v-if="todo.finishTime !== null">
 								<span class="iconfont iconchenggong iconSuccess" ></span>
 							</span>
 							<span v-else>
@@ -47,7 +48,7 @@
 				}
 			},
 			ticketType: {
-				type: Number,
+				type: String,
 				default () {
 					return ""
 				}
@@ -99,19 +100,17 @@
 			},
 			stageList() {
 				let stageLists = this.$store.getters['stage/getServiceStageList']
-				this.active = 0
 				stageLists.forEach((list, index) => {
-					if (list.current == 1) {
-						this.active = index
+					if (list.finishTime !== null) {
+						this.active = index+1
 					}
 				})
 				return stageLists
 			}
 		},
 		created() {
-			let ticketType = this.ticketType
 			let ticketId = this.ticketId
-			var payload = {'ticketType': ticketType, 'ticketId': ticketId}
+			var payload = {'workOrderId': ticketId}
 			this.$store.dispatch('stage/GetServiceDataList', payload)
 		}
 	}

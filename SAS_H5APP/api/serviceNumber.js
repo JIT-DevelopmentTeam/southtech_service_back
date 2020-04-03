@@ -20,15 +20,11 @@ export function authorizeJoin(params) {
 }
 
 /* 获取工单列表 */
-export function getServiceWorkOrderList(clientId,clientUsersId,openId) {
+export function getServiceWorkOrderList(params) {
 	return http({
-		url: '/f/weChat/ticket/list',
-		method: 'post',
-		params: {
-			clientId: clientId,
-			clientUsersId: clientUsersId,
-			openId : openId
-		}
+		url: '/mobile/workOrder/WXworkOrderList',
+		method: 'get',
+		params: params
 	})
 }
 
@@ -72,22 +68,17 @@ export function saveSuggest(params) {
 }
 
 /* 获取对应数据字段列表 */
-export function getServiceDicList(treeName) {
+export function getServiceDicList(dictCode) {
 	return http({
-		url: '/f/weChat/dic/list',
-		params: {
-			treeName: treeName
-		}
+		url: '/mobile/dic/getDictItemByCode?dictCode='+dictCode,
+		method: 'get'
 	})
 }
 
 /* 获取阶段列表 */
-export function getServiceStageList(ticketType, ticketId) {
+export function getServiceStageList(params) {
 	return http({
-		url: '/f/weChat/stage/getStagelist',
-		params: {
-			ticketType: ticketType,
-			ticketId: ticketId
-		}
+		url: '/mobile/stage/queryStageByWorkOrderId',
+		params: params
 	})
 }

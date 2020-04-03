@@ -3,14 +3,25 @@
 		<uni-card class="uniCard title" note="true">
 			<view class="info">
 				<view class="line">
-						<view class="sameLine">
-							<view class="label sameLine fontsmall bold">
-								工单编号：
-							</view>
-							<view class="label sameLine fontsmall">
-								{{getTicket.ticketNum}}
-							</view>
+					<view class="label">{{getTicket.clientName}}</view>
+				</view>
+				<view class="line">
+					<view class="sameLine">
+						<view class="label sameLine fontsmall bold">
+							工单编号：
 						</view>
+						<view class="label sameLine fontsmall">
+							{{getTicket.number}}
+						</view>
+					</view>
+					<view class="sameLine">
+						<view class="label sameLine fontsmall bold">
+							分配时间：
+						</view>
+						<view class="label sameLine fontsmall">
+							{{formatTime(getTicket.assignedTime)}}
+						</view>
+					</view>
 				</view>
 			</view>
 			<view class="btn">
@@ -18,62 +29,41 @@
 			</view>
 			<template v-slot:footer>
 				<view class="line">
-						<view class="sameLine">
-							<view class="label sameLine fontsmall bold">
-								设备编号：
-							</view>
-							<view class="label sameLine fontsmall">
-								{{getTicket.equipmentNum}}
-							</view>
+					<view class="sameLine">
+						<view class="label sameLine fontsmall bold">
+							客户地址：
 						</view>
-						<view class="sameLine">
-							<view class="label sameLine fontsmall bold">
-								申报时间：
-							</view>
-							<view class="label sameLine fontsmall">
-								{{formatTime(getTicket.faulApplyTime,"YYYY-MM-DD")}}
-							</view>
-						</view>
+						<location :labelStyle="labelStyle" :label="getTicket.province+getTicket.city+getTicket.area+getTicket.community+getTicket.address" :left_right="left_right"></location>
+					</view>
 				</view>
 				<view class="line">
-						<view class="sameLine">
-							<view class="label sameLine fontsmall bold">
-								设备名称：
-							</view>
-							<view class="label sameLine fontsmall">
-								{{getTicket.name}}
-							</view>
+					<view class="sameLine">
+						<view class="label sameLine fontsmall bold">
+							主联系人：
 						</view>
+						<view class="label sameLine fontsmall">
+							{{getTicket.contactName}}
+						</view>
+					</view>
 				</view>
 				<view class="line">
-						<view class="sameLine">
-							<view class="label sameLine fontsmall bold">
-								主联系人：
-							</view>
-							<view class="label sameLine fontsmall">
-								{{getTicket.enginnerName}}
-							</view>
+					<view class="sameLine">
+						<view class="label sameLine fontsmall bold">
+							联系方式：
 						</view>
-				</view>
-				<view class="line">
-						<view class="sameLine">
-							<view class="label sameLine fontsmall bold">
-								联系方式：
-							</view>
-							<view class="label sameLine fontsmall">
-								{{getTicket.enginnerMobile}}
-							</view>
+						<view class="label sameLine fontsmall">
+							{{getTicket.contactPhone}}
 						</view>
-						<phone :phoneNum="getTicket.enginnerMobile"></phone>
+					</view>
 				</view>
 			</template>
 		</uni-card>
-		<segment-control :ticketId="getTicket.id" :ticketType="getTicket.ticketModelId" :isNavigateTo="false"></segment-control>
+		<segment-control :ticketId="getTicket.id" :ticketType="getTicket.type"></segment-control>
 	</view>
 </template>
 
 <script>
-	import {formatDate} from '@/utils/formatDate.js'
+	import {format} from '@/utils/formatDate.js'
 
 	export default {
 		name: "mytaskDetail",
@@ -100,15 +90,15 @@
 		computed: {
 			getTicket() {
 				let ticketList = this.$store.getters['workOrder/getServiceTicketList']
-				return ticketList.filter(e => e.ticketId === this.id)[0]
+				return ticketList.filter(e => e.id === this.id)[0]
 			},
 			formatModel() {
 				let dic = this.$store.getters['dic/getServiceTypeList']
-				return dic.filter(e=>e.key == this.getTicket.ticketModelId)[0].value
+				return dic.filter(e=>e.value == this.getTicket.type)[0].text
 			},
-			formatTime(dateTime,prop) {
-				return (dateTime,prop) =>{
-					return formatDate(dateTime,prop)
+			formatTime(dateTime) {
+				return (dateTime) =>{
+					return format(dateTime)
 				}
 			}
 		},
