@@ -78,7 +78,7 @@ const actions = {
 		})
 	},
 	GET_WECHAT_OPENID({commit, state}, payload) {
-		alert(GetUrlKey());
+		GetUrlKey(payload);
 	},
 }
 
