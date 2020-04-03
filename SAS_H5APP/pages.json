@@ -103,6 +103,14 @@
             "path" : "pages/failuredeclaration/FailureDeclaration",
             "style" : {}
         }
+        ,{
+            "path" : "pages/wechat_service/mydevice/mydevice",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/wechat_service/index",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

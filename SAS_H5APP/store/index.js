@@ -7,6 +7,7 @@ import contact from './modules/contact.js'
 import clientUser from './modules/clientUser.js'
 import * as dd from 'dingtalk-jsapi'
 import {GetUserInfo} from '@/api/ddjsapi.js'
+import {GetUrlKey} from '@/api/wechatapi.js'
 
 Vue.use(Vuex)
 
@@ -15,7 +16,7 @@ const debug = process.env.NODE_ENV !== 'production'
 const state = {
 	code: null,
 	userId: null,
-	weChatUser: {},
+	openId: null
 }
 
 const getters = {
@@ -25,8 +26,8 @@ const getters = {
 	getUserId() {
 		return state.userId
 	},
-	getWeChatUser(){
-		return stage.openId
+	getWeChatOpenId(){
+		return state.openId
 	}
 }
 
@@ -39,7 +40,8 @@ const mutations = {
 		sessionStorage.setItem('userId', payload)
 		state.userId = payload
 	},
-	SET_WECHAT_USER(state, payload){
+	SET_WECHAT_OPENID(state, payload){
+		sessionStorage.setItem('openId', payload);
 		state.openId = payload
 	}
 }
@@ -75,8 +77,8 @@ const actions = {
 			})
 		})
 	},
-	GET_WECHAT_USER({commit, state}, payload) {
-		commit("SET_WECHAT_USER", payload)
+	GET_WECHAT_OPENID({commit, state}, payload) {
+		alert(GetUrlKey());
 	},
 }
 

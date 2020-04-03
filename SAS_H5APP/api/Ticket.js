@@ -108,3 +108,12 @@ export function getClientByOpenId(params) {
 		method:'get'
 	});
 }
+
+/* 根据客户id获取设备信息 */
+export function listDeviceNumberByMainId(params) {
+	return http({
+		url:'/mobile/client/listDeviceNumberByMainId',
+		method:'get',
+		params:params
+	})
+}

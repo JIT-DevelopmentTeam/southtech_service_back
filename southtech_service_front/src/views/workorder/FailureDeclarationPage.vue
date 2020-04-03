@@ -10,18 +10,18 @@
         :confirmLoading="confirmLoading"
         @ok="handleOk"
       >
-        <a-row class="form-row" :gutter="16">
-          <a-col :lg="6">
+        <a-row class="form-row" :gutter="32">
+          <a-col :lg="8">
             <a-form-item label="编号" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-input v-decorator="[ 'number', validatorRules.number]" placeholder="请输入编号"></a-input>
             </a-form-item>
           </a-col>
-          <a-col :lg="6">
+          <a-col :lg="8">
             <a-form-item label="类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
                 <j-dict-select-tag type="list" :disabled="true" v-decorator="['type',validatorRules.type]" :trigger-change="true" dictCode="work_order_type" placeholder="请选择类型"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="6">
+          <a-col :lg="8">
             <a-form-item label="客户" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-search-select-tag
                 placeholder="请选择客户"
@@ -33,42 +33,42 @@
               </j-search-select-tag>
             </a-form-item>
           </a-col>
-          <a-col :lg="6">
+          <a-col :lg="8">
            <a-form-item label="接入方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-dict-select-tag type="list" v-decorator="['accessMethod',validatorRules.accessMethod]" :trigger-change="true" dictCode="work_order_access_method" placeholder="请选择接入方式"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="6">
+          <a-col :lg="8">
            <a-form-item label="联系人" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-dict-select-tag v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" :trigger-change="true" :dictCode="contactCondition()" @change="selectContact($event)"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="6">
+          <a-col :lg="8">
            <a-form-item label="联系电话" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-input placeholder="请选择联系人" :value="contact != null ? contact.mobilePhone : ''" :disabled="true"></a-input>
             </a-form-item>
           </a-col>
-          <a-col :lg="6">
+          <a-col :lg="8">
            <a-form-item label="代报人" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-select-user-by-dep v-decorator="['correspondentName',validatorRules.correspondentName]" :multi="false" :trigger-change="true"/>
             </a-form-item>
           </a-col>
-           <a-col :lg="6">
+           <a-col :lg="8">
             <a-form-item label="紧急程度" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-dict-select-tag type="list" v-decorator="['emergencyLevel',validatorRules.emergencyLevel]" :trigger-change="true" dictCode="work_order_emergency_level" placeholder="请选择紧急程度"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="6">
+          <a-col :lg="8">
             <a-form-item label="客服" :labelCol="labelCol" :wrapperCol="wrapperCol">
                 <j-select-user-by-dep v-decorator="['customerServiceName',validatorRules.customerServiceName]" :multi="false" :trigger-change="true"/>
               </a-form-item>
           </a-col>
-          <a-col :lg="6">
+          <a-col :lg="8">
             <a-form-item label="申报时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-date placeholder="请选择申报时间" v-decorator="[ 'declarationTime', validatorRules.declarationTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="6">
+          <a-col :lg="8">
             <a-form-item label="附件" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-upload v-decorator="['annex']" name="annex" :trigger-change="true"></j-upload>
             </a-form-item>

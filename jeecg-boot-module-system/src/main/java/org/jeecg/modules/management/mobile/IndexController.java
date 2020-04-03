@@ -1,6 +1,7 @@
 package org.jeecg.modules.management.mobile;
 
 import com.alibaba.fastjson.JSONObject;
+import com.auth0.jwt.JWTCreator;
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.OapiGetJsapiTicketRequest;
@@ -9,10 +10,12 @@ import com.dingtalk.api.response.OapiGetJsapiTicketResponse;
 import com.dingtalk.api.response.OapiUserGetuserinfoResponse;
 import com.taobao.api.ApiException;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.dingtalk.exception.OApiException;
 import org.jeecg.modules.dingtalk.exception.OApiResultException;
+import org.jeewx.api.wxuser.user.JwUserAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

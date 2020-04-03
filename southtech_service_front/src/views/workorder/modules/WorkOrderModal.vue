@@ -368,6 +368,7 @@
               this.form.setFieldsValue({
                   customerServiceName: this.customerService.username
               });
+              console.log(this.form.getFieldsValue());
             }
           });
         }

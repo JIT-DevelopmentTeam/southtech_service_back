@@ -148,11 +148,11 @@
 	     async mounted() {
 			 // 初始化
 			this.dingTalkUserId = this.$store.getters['getUserId'];
-			this.wechatOpendId = this.$store.getters['getWeChatUser'];
+			this.wechatOpenId = this.$store.getters['getWeChatUser'];
 			if (this.dingTalkUserId) {
 				getUserByEnterpriseId(this.dingTalkUserId).then((res) => {
 					if (res.data.success) {
-						this.correspondentName = res.data.result.username;
+						this.model.correspondentName = res.data.result.username;
 					}
 				});
 				listClient(null).then((res) => {
@@ -161,8 +161,8 @@
 					}
 				});
 			}
-			if (this.wechatOpendId) {
-				await getClientByOpenId(this.wechatOpendId).then((res) => {
+			if (this.wechatOpenId) {
+				await getClientByOpenId(this.wechatOpenId).then((res) => {
 					if (res.data.success) {
 						this.client = res.data.result;
 						this.model.clientId = res.data.result.id;
@@ -184,11 +184,6 @@
 					}
 				});
 			}
-			// listClient(null).then((res) => {
-			// 	if (res.data.success) {
-			// 		this.clientList = res.data.result.records;
-			// 	}
-			// });
 			getDicList("work_order_access_method").then((res) => {
 				if (res.data.success) {
 					this.accessMethodList = res.data.result;
@@ -232,7 +227,7 @@
 				imageList:[],
 				client:{},
 				dingTalkUserId:null,
-				wechatOpendId:null,
+				wechatOpenId:null,
 				photoCommit:[],
 				picRequestURL: this.$IP + '/mobile/upload/uploadDetailPicture',  // 请求地址
 				model: {
@@ -430,23 +425,6 @@
 		  },
 		  saveWorkOrder:function () {
 			  let formData = Object.assign({},this.model);
-			  // let workOrderPageObject = {};
-			  // workOrderPageObject.number = this.model.number;
-			  // workOrderPageObject.status = this.model.status;
-			  // workOrderPageObject.type = this.model.type;
-			  // workOrderPageObject.status = this.model.status;
-			  // workOrderPageObject.clientId = this.model.clientId;
-			  // workOrderPageObject.contactId = this.model.contactId;
-			  // workOrderPageObject.accessMethod = this.model.accessMethod;
-			  // workOrderPageObject.emergencyLevel = this.model.emergencyLevel;
-			  // workOrderPageObject.customerServiceName = this.model.customerServiceName;
-			  // workOrderPageObject.declarationTime = this.model.declarationTime;
-			  // workOrderPageObject.annex = this.model.annex;
-			  // let workOrderDetailList = new Array();
-			  // for (let i = 0; i < this.model.workOrderDetailList.length; i++) {
-			  // 	workOrderDetailList.push({'deviceNumber':this.model.workOrderDetailList[i].deviceNumber,'faultLocation':this.model.workOrderDetailList[i].faultLocation,'description':this.model.workOrderDetailList[i].description});
-			  // }
-			  // workOrderPageObject.workOrderDetailList = workOrderDetailList;
 			  addWorkOrder(formData).then((res) => {
 			  	if (res.data.success) {
 			  		uni.showToast({

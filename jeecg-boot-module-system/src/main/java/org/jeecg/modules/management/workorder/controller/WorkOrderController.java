@@ -34,11 +34,13 @@ import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -317,6 +319,12 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         WorkOrderDetail findParent = workOrderDetailService.getById(idsArray[0]);
         WorkOrder workOrder = workOrderService.getById(findParent.getWorkOrderId());
         SysUser serviceEngineer = sysUserService.getUserByName(serviceEngineerName);
+        String domainName = null;
+        try {
+            domainName = PropertiesLoaderUtils.loadAllProperties(("domainname/domain_name_config.properties")).getProperty("domain_name");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         for (String id : idsArray) {
             WorkOrderDetail workOrderDetail = workOrderDetailService.getById(id);
             workOrderDetail.setServiceEngineerName(serviceEngineerName);
@@ -365,7 +373,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             req.setUserid(serviceEngineer.getEnterpriseId());
             req.setCreateTime(System.currentTimeMillis());
             req.setTitle("待办");
-            req.setUrl("http://www.southtech.cn/H5_WEB");
+            req.setUrl(domainName+"/H5_WEB");
             List<OapiWorkrecordAddRequest.FormItemVo> list2 = new ArrayList<>();
             OapiWorkrecordAddRequest.FormItemVo obj3 = new OapiWorkrecordAddRequest.FormItemVo();
             list2.add(obj3);
