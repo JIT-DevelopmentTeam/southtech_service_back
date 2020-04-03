@@ -7,12 +7,6 @@
 			}
 		},
 		{
-			"path":"pages/wechat_service_num/workOrder/index",//  工单列表
-			"style":{
-				// "disableScroll": true
-			}
-		},
-		{
 			"path":"pages/mytask/index",// 我的工单
 			"style":{
 				// "disableScroll": true
@@ -43,52 +37,13 @@
 			}
 		},
 		{
-			"path":"pages/wechat_service_num/equipment/equipment",// 设备
-			"style":{
-				// "disableScroll":true,
-				"app-plus":{
-				    "bounce":"none"
-				}
-			}
-		},
-		{
-			"path":"pages/wechat_service_num/login/index",//  服务号登录页面
+			"path":"pages/wechat_service/workOrder/index",//  工单列表
 			"style":{
 				// "disableScroll": true
 			}
 		},
 		{
-			"path":"pages/wechat_service_num/login/oauth",//  授权页面
-			"style":{
-				// "disableScroll": true
-			}
-		},
-		{
-			"path":"pages/wechat_service_num/declare/declare",// 故障申报
-			"style":{
-				// "disableScroll": true
-			}
-		},
-		{
-			"path":"pages/wechat_service_num/evaluate/evaluate",//  服务评价
-			"style":{
-				// "disableScroll": true
-			}
-		},
-		{
-			"path":"pages/wechat_service_num/suggests/suggest",//  投诉建议
-			"style":{
-				// "disableScroll": true
-			}
-		},
-		{
-			"path":"pages/wechat_service_num/workOrder/index",//  工单列表
-			"style":{
-				// "disableScroll": true
-			}
-		},
-		{
-			"path":"pages/wechat_service_num/workOrder/detail/work-order-detail",//  工单详情
+			"path":"pages/wechat_service/workOrder/detail/work-order-detail",//  工单详情
 			"style":{
 				// "disableScroll": true
 			}
