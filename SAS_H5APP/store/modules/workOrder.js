@@ -70,12 +70,18 @@ const actions = {
 	},
 	// 服务工单信息
 	GetServiceDataList({commit,state}, payload){
-		getServiceWorkOrderList(payload).then(response => {
-			commit("setServiceTicketList",response.data.body.ticketList)
-		}).catch(error => {
-			console.log(error);
+		return new Promise((resolve, reject) => {
+			getServiceWorkOrderList(payload).then(response => {
+				// commit("setServiceTicketList",response.data.body.ticketList)
+				let res = {
+					list: response.data.result.records,
+					total: response.data.result.total
+				}
+				resolve(res)
+			}).catch(error => {
+				reject(error)
+			})
 		})
-		
 	}
 }
 

@@ -30,6 +30,8 @@ public class MobileWorkOrderController {
     @Autowired
     private IWorkOrderDetailService workOrderDetailService;
 
+
+    //-----------------------------------钉钉----------------------------------
     @RequestMapping(value = "/workOrderList", method = RequestMethod.GET)
     public Result<?> workOrderList(@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
                                    @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
@@ -61,6 +63,31 @@ public class MobileWorkOrderController {
         BeanUtils.copyProperties(workOrderPage, workOrder);
         workOrderService.saveMain(workOrder, workOrderPage.getWorkOrderDetailList());
         return Result.ok("添加成功！");
+    }
+
+    //--------------------------------------服务号----------------------------------------
+    @RequestMapping(value = "/WXworkOrderList", method = RequestMethod.GET)
+    public Result<?> WXworkOrderList(@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+                                     @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+                                     HttpServletRequest req) {
+        Result<Page<MobileWorkOrderDTO>> result = new Result<Page<MobileWorkOrderDTO>>();
+        Page<MobileWorkOrderDTO> pageList = new Page<>(pageNo, pageSize);
+        String status = req.getParameter("status");
+        switch (status) {
+            case "0":
+                status = "('1','2','7')";
+                break;
+            case "1":
+                status = "('3','4')";
+                break;
+            case "2":
+                status = "";
+                break;
+        }
+        pageList = workOrderService.queryWXworkOrderList(pageList, req.getParameter("openId"), status);
+        result.setSuccess(true);
+        result.setResult(pageList);
+        return result;
     }
 
 }

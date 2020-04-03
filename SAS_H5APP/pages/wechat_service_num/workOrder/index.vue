@@ -2,12 +2,11 @@
 	<view class="content">
 		<uni-segmented-control class="borderStyle" :current="current" :values="items" style-type="button" active-color="#09a0f7" @clickItem="onClickItem"></uni-segmented-control>
 		<scroll-view :scroll-top="scrollTop" scroll-y="true" class="scroll-Y" @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll">
-			<work-order-list :list="displayList"></work-order-list>
+			<uni-swipe-action id="swipe">
+				<work-order-list v-for="(item,index) in dataSource" :info="item" :key="index"></work-order-list>
+			</uni-swipe-action>
+			<uni-load-more :status="'loading'" v-show="load"></uni-load-more>
 		</scroll-view>
-		<view class="gird">
-			<button form-type="reset" type="default" size="mini" @click="btnEquipment">我的设备</button>
-			<button form-type="submit" type="primary" size="mini" @click="btnDetail">故障详情</button>
-		</view>
 	</view>
 </template>
 
@@ -16,7 +15,9 @@
 		name: 'subSection',
 		components: {
 			uniSegmentedControl: () => import('@dcloudio/uni-ui/lib/uni-segmented-control/uni-segmented-control.vue'), 
-			workOrderList: () => import('./component/work-order-list.vue')
+			workOrderList: () => import('./component/work-order-list.vue'),
+			uniLoadMore: () => import('@dcloudio/uni-ui/lib/uni-load-more/uni-load-more.vue'),
+			uniSwipeAction: () => import('@dcloudio/uni-ui/lib/uni-swipe-action/uni-swipe-action.vue')
 		},
 		data() {
 			return {
@@ -26,6 +27,11 @@
 				old: {
 					scrollTop: 0
 				},
+				load: false,
+				pageNo: 1,
+				pageSize: 5,
+				dataSource: [],
+				total: 0
 			}
 		},
 		methods: {
@@ -35,54 +41,59 @@
 			onClickItem(e) {
 				if (this.current !== e.currentIndex) {
 					this.current = e.currentIndex;
+					this.dataSource = [];
+					this.pageNo = 1;
+					let obj = {
+						openId: this.$store.getters['getWeChatUser'],
+						status: this.current,
+						pageNo: this.pageNo,
+						pageSize: this.pageSize
+					}
+					this.loadTicketList(obj)
 				}
-			},
-			btnEquipment(){
-				uni.navigateTo({
-					url: '../equipment/equipment'
-				})
-			},
-			btnDetail(){
-				/* uni.navigateTo({
-					url: '../declare/declare'
-				}) */
-			},
-			btn2(){
-				uni.navigateTo({
-					url: '../evaluate/evaluate'
-				})
-			},
-			btn3(){
-				uni.navigateTo({
-					url: '../suggests/suggest'
-				})
 			},
 			upper() {
 				// console.log("到顶了");
 			},
 			lower() {
 				// console.log("到底了");
+				if (this.dataSource.length != this.total) {
+					this.load = true;
+					this.pageNo += 1;
+					let obj = {
+						openId: this.$store.getters['getWeChatUser'],
+						status: this.current,
+						pageNo: this.pageNo,
+						pageSize: this.pageSize
+					}
+					this.loadTicketList(obj)
+				}
 			},
 			scroll() {
 				// console.log("滚动了");
 			},
-		},
-		computed:{
-			displayList(){
-				//this.$store.getters.weChatUser
-				let item = this.$store.getters['workOrder/getServiceTicketList']
-				if (this.current != 2) {
-					item = item.filter(e=>e.ticketStatus === this.current + 3)
-				}
-				return item;
+			loadTicketList(obj) {
+				this.$store.dispatch('workOrder/GetServiceDataList', obj).then(res=>{
+					this.total = res.total
+					let result = res.list
+					result.forEach(item => {
+						this.dataSource.push(item)
+						this.load = false;
+					})
+					const dataList = this.dataSource.slice(0);
+					this.$store.commit('workOrder/setServiceTicketList', dataList)
+				});
 			}
 		},
 		onLoad(option) {
-			console.log(option.openId);
-			console.log(option.clientUserId);
-			console.log(option.clientId);
-			this.$store.dispatch('dic/GetServiceTypeList', '工单类型').then(res=>{
-				this.$store.dispatch('workOrder/GetServiceDataList')
+			this.$store.dispatch('dic/GetServiceTypeList', 'work_order_type').then(res=>{
+				let obj = {
+					openId: this.$store.getters['getWeChatUser'],
+					status: this.current,
+					pageNo: this.pageNo,
+					pageSize: this.pageSize
+				}
+				this.loadTicketList(obj)
 			})
 		}
 	}
@@ -92,30 +103,31 @@
 	.borderStyle {
 		margin: 15upx;
 	}
+	.borderStyle /deep/ .segmented-control__text {
+		font-size: 0.6rem !important;
+	}
 	/* iphone X */
 	@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
 		.scroll-Y {
-			height: calc(100vh - 29px - 60px);
+			height: calc(100vh - 180px - 36px - 100px);
 		}
 	}
 	/* iphone 6~8 */
 	@media only screen and (device-width : 375px) and (device-height : 667px) and (-webkit-device-pixel-ratio : 2) {
 		.scroll-Y {
-			height: calc(100vh - 29px - 60px);
+			height: calc(100vh - 180px - 36px - 70px);
 		}
 	}
 	/* iphone 6 plus~8 plus */
 	@media only screen and (device-width : 414px) and (device-height : 736px) and (-webkit-device-pixel-ratio : 3) {
 		.scroll-Y {
-			height: calc(100vh - 29px - 60px);
+			height: calc(100vh - 180px - 36px - 70px);
 		}
 	}
 	.scroll-Y {
 		height: calc(100vh - 29px - 60px);
 	}
-	.gird {
-		margin: 4px 2px;
-		display: flex;
-		grid-template-columns: 50% 50%;
+	#swipe /deep/ .uni-swipe_box {
+		background-color: transparent !important;
 	}
 </style>

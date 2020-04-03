@@ -88,21 +88,21 @@ const actions = {
 	/* 服务号 */
 	GetRegionList({commit, state}, payload) {
 		getServiceDicList(payload).then(response => {
-			commit("setRegionList",response.data.body.dicList)
+			commit("setRegionList",response.data.result)
 		}).catch(error => {
 			console.log(error);
 		})
 	},
 	GetServiceTypeList({commit, state}, payload) {
 		getServiceDicList(payload).then(response => {
-			commit("setServiceTypeList", response.data.body.dicList)
+			commit("setServiceTypeList", response.data.result)
 		}).catch(error => {
 			console.log(error);
 		})
 	},
 	GetServiceFaultLocaList({commit, state}, payload) {
 		getServiceDicList(payload).then(response => {
-			commit("setServiceFaultLocaList", response.data.body.dicList)
+			commit("setServiceFaultLocaList", response.data.result)
 		}).catch(error => {
 			console.log(error);
 		})
