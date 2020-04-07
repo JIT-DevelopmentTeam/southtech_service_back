@@ -766,6 +766,11 @@
 		grid-template-columns: 50% 50%;
 	}
 	
+	.occupying-box {
+		height: 120px;
+		background-color: #f5f6f8;
+	}
+	
 	/* iphone X */
 	@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
 		.occupying-box {
