@@ -140,4 +140,9 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     public Page<MobileWorkOrderDTO> queryWXworkOrderList(Page<MobileWorkOrderDTO> page, String openId, String status) {
         return page.setRecords(workOrderMapper.queryWXworkOrderList(page, openId, status));
     }
+
+    @Override
+    public List<WorkOrder> queryWorkOrderByComment(String clientId, String status) {
+        return workOrderMapper.queryWorkOrderByComment(clientId,status);
+    }
 }

@@ -173,6 +173,9 @@
       <a-tab-pane tab="回访记录" key="3">
         <ServiceVisitsList ref="ServiceVisitsList" :workOrderNum="workOrder.number"/>
       </a-tab-pane>
+	  <a-tab-pane tab="服务评价" key="4" forceRender>
+        <service-commentery-list :mainId="selectedMainId" />
+      </a-tab-pane>
     </a-tabs>
 
     <workOrder-modal ref="modalForm" @ok="modalFormOk"></workOrder-modal>
@@ -186,6 +189,7 @@ import WorkOrderModal from './modules/WorkOrderModal'
 import { getAction, postAction } from '@/api/manage'
 import WorkOrderDetailList from './WorkOrderDetailList'
 import WorkOrderProgressPage from './WorkOrderProgressPage'
+import ServiceCommenteryList from './ServiceCommenteryList'
 import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
 import { initDictOptions, filterMultiDictText } from '@/components/dict/JDictSelectUtil'
 import ServiceVisits from '@/views/servicevists/modules/ServiceVisitsModal'
@@ -198,6 +202,7 @@ export default {
     JDictSelectTag,
     WorkOrderDetailList,
     WorkOrderProgressPage,
+	ServiceCommenteryList,
     WorkOrderModal,
     ServiceVisits,
     ServiceVisitsList

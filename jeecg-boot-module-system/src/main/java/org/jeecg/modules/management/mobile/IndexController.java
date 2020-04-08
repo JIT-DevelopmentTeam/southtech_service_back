@@ -2,6 +2,7 @@ package org.jeecg.modules.management.mobile;
 
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.JWTCreator;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.OapiGetJsapiTicketRequest;
@@ -9,30 +10,45 @@ import com.dingtalk.api.request.OapiUserGetuserinfoRequest;
 import com.dingtalk.api.response.OapiGetJsapiTicketResponse;
 import com.dingtalk.api.response.OapiUserGetuserinfoResponse;
 import com.taobao.api.ApiException;
+import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.util.JwtUtil;
+import org.jeecg.common.util.HttpHelper;
 import org.jeecg.common.util.RedisUtil;
+import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.dingtalk.exception.OApiException;
 import org.jeecg.modules.dingtalk.exception.OApiResultException;
+import org.jeecg.modules.management.client.entity.WxUser;
+import org.jeecg.modules.management.client.service.IWxUserService;
+import org.jeecg.modules.management.client.service.impl.WxUserServiceImpl;
+import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.wechat.constant.WechatConstant;
+import org.jeewx.api.core.exception.WexinReqException;
+import org.jeewx.api.mp.aes.WXBizMsgCrypt;
 import org.jeewx.api.wxuser.user.JwUserAPI;
+import org.jeewx.api.wxuser.user.model.Wxuser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/mobile/index")
 public class IndexController {
+
+    @Autowired
+    private IWxUserService wxUserService;
 
     @Autowired
     private RedisUtil redisUtil;
@@ -104,6 +120,56 @@ public class IndexController {
         String result = formatter.toString();
         formatter.close();
         return result;
+    }
+
+    /**
+     * 获取微信用户信息
+     * @param code
+     * @return
+     */
+    @GetMapping(value = "/getWxUserInfo")
+    public Result<?> getWxUserInfo(@RequestParam("code") String code) {
+        JSONObject result = HttpHelper.httpGet(WechatConstant.GET_USER_TOKEN_URL.replace("APPID",WechatConstant.APP_ID).replace("SECRET",WechatConstant.SECRET).replace("CODE",code));
+        if (oConvertUtils.isEmpty(result)) {
+            log.error("获取微信用户信息失败,请求出错!");
+            return Result.error("获取微信用户信息失败");
+        }
+        String accessToken = result.getString("access_token");
+        Long accessTokenExpireId = result.getLong("expires_in");
+        String refreshToken = result.getString("refresh_token");
+        String openId = result.getString("openid");
+        QueryWrapper<WxUser> wxUserQueryWrapper = new QueryWrapper<>();
+        wxUserQueryWrapper.eq("open_id",openId);
+        WxUser wxUser = wxUserService.getOne(wxUserQueryWrapper);
+        if (oConvertUtils.isEmpty(wxUser)) {
+            log.error("本地暂无同步该用户信息!");
+            return Result.error("本地暂无同步该用户信息!");
+        }
+        wxUser.setAccessToken(accessToken);
+        wxUser.setAccessTokenExpireId(new Timestamp(System.currentTimeMillis() + accessTokenExpireId * 1000));
+        wxUser.setRefreshToken(refreshToken);
+        wxUser.setAccessTokenExpireId(new Timestamp(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 30));
+        wxUserService.updateById(wxUser);
+        Wxuser wxuser = null;
+        try {
+            wxuser = JwUserAPI.getWxuser(accessToken,openId);
+        } catch (WexinReqException e) {
+            e.printStackTrace();
+        }
+        return Result.ok(wxuser);
+    }
+
+    /**
+     * 根据openid获取微信用户信息
+     * @param openId
+     * @return
+     */
+    @GetMapping(value = "/getWxUserInfoByOpenId")
+    public Result<?> getWxUserInfoByAccessToken(@RequestParam(value = "openId") String openId) {
+        QueryWrapper<WxUser> wxUserQueryWrapper = new QueryWrapper<>();
+        wxUserQueryWrapper.eq("open_id",openId);
+        WxUser wxUser = wxUserService.getOne(wxUserQueryWrapper);
+        return Result.ok(wxUser);
     }
 
 }

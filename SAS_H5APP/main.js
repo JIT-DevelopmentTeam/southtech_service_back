@@ -24,14 +24,14 @@ Vue.prototype.$url = 'http://www.southtech.cn/H5_WEB/'
 Vue.prototype.$appId = 'wx35360545b97a547b'  // 微信appId
 // Vue.prototype.$oauthUrl = 'http://192.168.0.106:8691/#/pages/wechat_service_num/login/index'  // 本地
 // Vue.prototype.$oauthUrl = 'http://120.77.40.245:8691/#/pages/wechat_service_num/login/index'  // 捷特
-Vue.prototype.$oauthUrl = 'http://www.southtech.cn/H5_WEB/#/pages/wechat_service_num/login/index'      // 索奥斯
+Vue.prototype.$oauthUrl = 'http://www.southtech.cn/H5_WEB/#/pages/wechat_service/index'      // 索奥斯
 /* -------------------END-------------------- */
 
 moment.locale('cn')
 Vue.prototype.$moment = moment
 // Vue.prototype.$IP = 'http://120.77.40.245:8080/sac'//捷特
-Vue.prototype.$IP = 'http://40.73.75.101:8080/jeecg-boot'// 索奥斯
-// Vue.prototype.$IP = 'http://localhost:8080/jeecg-boot' // 
+//Vue.prototype.$IP = 'http://40.73.75.101:8080/jeecg-boot/'// 索奥斯
+ Vue.prototype.$IP = 'http://localhost:8080/jeecg-boot/' // 
 
 App.mpType = 'app'
 

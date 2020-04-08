@@ -1,7 +1,10 @@
 package org.jeecg.modules.management.mobile.workOrder;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -49,6 +53,12 @@ public class MobileWorkOrderController {
         result.setSuccess(true);
         result.setResult(pageList);
         return result;
+    }
+
+    //-----------------------------------服务号----------------------------------
+    @GetMapping(value = "/worderOrderListByComment")
+    public Result<?> worderOrderListByComment(@RequestParam(value = "clientId") String clientId) {
+        return Result.ok(workOrderService.queryWorkOrderByComment(clientId,"3"));
     }
 
     @RequestMapping(value = "/getAllDetail", method = RequestMethod.GET)

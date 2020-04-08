@@ -90,4 +90,20 @@
                 </if>
     </select>
 
+    <select id="queryWorkOrderByComment" resultType="org.jeecg.modules.management.workorder.entity.WorkOrder" parameterType="String">
+        SELECT
+            workOrder.*
+        FROM
+            ic_work_order workOrder
+        WHERE
+            1=1
+        <if test="clientId != null and clientId != ''">
+            AND workOrder.client_id = '1237673199555178498'
+        </if>
+        <if test="status != null and status != ''">
+            AND workOrder.`status` = '3'
+        </if>
+            AND ( SELECT COUNT(*) FROM ic_service_commentery WHERE work_order_id = workOrder.id ) = 0
+    </select>
+
 </mapper>

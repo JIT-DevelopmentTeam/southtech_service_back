@@ -1,12 +1,16 @@
 package org.jeecg.modules.wechat.token.util;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.jeecg.common.util.HttpHelper;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.SpringContextUtils;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.wechat.constant.WechatConstant;
 import org.jeewx.api.core.exception.WexinReqException;
 import org.jeewx.api.wxbase.wxtoken.JwTokenAPI;
+import org.jeewx.api.wxuser.user.JwUserAPI;
+import org.jeewx.api.wxuser.user.model.Wxuser;
 
 /**
  * 公众号AccessToken工具
@@ -32,6 +36,15 @@ public class WechatTokenUtils {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * 设置用户Token
+     * @param code
+     */
+    public static void setUserToken(String code) {
+        // TODO 缓存获取 判断如果AccessToken过期 可以使用refresh_token进行刷新
+        JSONObject result = HttpHelper.httpGet(WechatConstant.GET_USER_TOKEN_URL.replace("APPID",WechatConstant.APP_ID).replace("SECRET",WechatConstant.SECRET).replace("CODE",code));
     }
 
 }

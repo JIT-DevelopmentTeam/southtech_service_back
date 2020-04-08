@@ -39,12 +39,19 @@
 						text: '我的设备',
 						color: "#f28f79",
 						url: '/pages/wechat_service/mydevice/mydevice'
-					}
+					},
+					{
+						icon: 'icongongdan',
+						text: '服务评价',
+						color: "#79ddee",
+						url: '/pages/wechat_service/servicecommentery/servicecommentery'
+					},
 				]
 			}
 		},
 		created() {
-			alert(this.$store.dispatch("GET_WECHAT_OPENID", 'code'));
+			this.$store.dispatch("GET_WECHAT_OPENID", 'code');
+			// TODO 获取身份设置客户端缓存
 		},
 		methods: {
 			change(e) {
