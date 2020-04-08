@@ -136,6 +136,16 @@ public class SysUser implements Serializable {
     private String enterpriseId;
 
     /**
+     * 经度
+     */
+    private Double longitude;
+
+    /**
+     * 纬度
+     */
+    private Double latitude;
+
+    /**
      * 创建人
      */
     private String createBy;

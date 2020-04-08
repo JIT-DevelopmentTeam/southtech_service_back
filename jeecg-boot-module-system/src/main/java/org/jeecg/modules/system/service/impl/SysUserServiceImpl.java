@@ -366,7 +366,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         userMapper.updateByEnterpriseId(userParams);
     }
 
-    @Override
+	@Override
+	@Transactional
+	public void updateLocation(Double longitude, Double latitude, String enterpriseId) {
+		userMapper.updateLocation(longitude, latitude, enterpriseId);
+	}
+
+	@Override
     public List<SysUser> listByRoleCode(String roleCode) {
         return userMapper.listByRoleCode(roleCode);
     }

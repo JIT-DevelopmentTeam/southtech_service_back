@@ -147,6 +147,7 @@ public class MobileStageController {
                     signIn.setLatitude(Double.parseDouble(params.get("signOutLatitude").toString()));
                     break;
             }
+            sysUserService.updateLocation(signIn.getLongitude(), signIn.getLatitude(), user.getEnterpriseId());
         } catch (ParseException e) {
             e.printStackTrace();
         }

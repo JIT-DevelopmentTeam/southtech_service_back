@@ -212,6 +212,14 @@ public interface ISysUserService extends IService<SysUser> {
      */
     void updateByEnterpriseId(@Param("userParams") SysUser userParams);
 
+	/**
+	 * 根据企业应用id更新用户的位置信息
+	 * @param longitude
+	 * @param latitude
+	 * @param enterpriseId
+	 */
+	void updateLocation(Double longitude, Double latitude, String enterpriseId);
+
     /**
      * 根据角色编号获取该角色用户
      * @param roleCode

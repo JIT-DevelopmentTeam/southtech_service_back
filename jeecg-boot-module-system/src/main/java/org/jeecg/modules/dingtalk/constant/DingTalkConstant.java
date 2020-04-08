@@ -35,4 +35,7 @@ public class DingTalkConstant {
     // 获取用户userId
     public static final String GET_USER_INFO = "https://oapi.dingtalk.com/user/getuserinfo";
 
+    // 获取部门用户签到记录
+    public static final String GET_CHECKIN = "https://oapi.dingtalk.com/checkin/record";
+
 }
