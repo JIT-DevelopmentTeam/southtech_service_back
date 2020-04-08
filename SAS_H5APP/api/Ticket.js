@@ -117,3 +117,21 @@ export function listDeviceNumberByMainId(params) {
 		params:params
 	})
 }
+
+/* 获取待评价工单 */
+export function listWorkOrderByComment(params) {
+	return http({
+		url:'/mobile/workOrder/worderOrderListByComment?clientId='+params,
+		method:'get',
+		params:params
+	});
+}
+
+/* 批量评价 */
+export function batchSaveServiceCommentery(params) {
+	return http({
+		url:'/mobile/serviceCommentery/batchSave',
+		method:'post',
+		data:params
+	});
+}

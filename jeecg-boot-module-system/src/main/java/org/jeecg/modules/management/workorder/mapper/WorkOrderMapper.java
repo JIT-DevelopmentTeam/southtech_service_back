@@ -39,4 +39,12 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder> {
      */
     List<MobileWorkOrderDTO> queryWXworkOrderList(Page<MobileWorkOrderDTO> page, @Param("openId") String openId, @Param("status") String status);
 
+    /**
+     * 获取当前客户未评价工单
+     * @param clientId
+     * @param status
+     * @return
+     */
+    List<WorkOrder> queryWorkOrderByComment(@Param("clientId") String clientId,@Param("status") String status);
+
 }

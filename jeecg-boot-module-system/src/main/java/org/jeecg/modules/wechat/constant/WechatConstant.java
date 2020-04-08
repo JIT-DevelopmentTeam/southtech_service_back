@@ -16,4 +16,8 @@ public class WechatConstant {
 
     public static final long EXPIRE_ID = 7200;
 
+    // 获取公众号用户Token Url
+    public static final String GET_USER_TOKEN_URL = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code";
+
+
 }

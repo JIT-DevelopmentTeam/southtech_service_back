@@ -79,17 +79,12 @@
 						return;
 					}
 				});
-				await listDeviceNumberByMainId({pageSize:100,clientId:this.client.id}).then((res) => {
+				await listDeviceNumberByMainId({clientId:this.client.id}).then((res) => {
 					if (res.data.success) {
 						this.deviceNumberList = res.data.result;
 					}
 				});
 			}
-			listDeviceNumberByMainId({pageSize:100,clientId:this.client.id}).then((res) => {
-				if (res.data.success) {
-					this.deviceNumberList = res.data.result;
-				}
-			});
 		},
 		methods: {
 			

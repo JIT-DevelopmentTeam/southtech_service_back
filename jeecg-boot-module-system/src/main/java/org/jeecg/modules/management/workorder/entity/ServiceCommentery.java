@@ -1,4 +1,4 @@
-package org.jeecg.modules.management.client.entity;
+package org.jeecg.modules.management.workorder.entity;
 
 import java.io.Serializable;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -9,19 +9,17 @@ import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
-
-import java.sql.Timestamp;
 import java.util.Date;
 
 /**
- * @Description: 微信用户
+ * @Description: 服务评价
  * @Author: jeecg-boot
- * @Date:   2020-03-23
+ * @Date:   2020-04-07
  * @Version: V1.0
  */
 @Data
-@TableName("tb_wx_user")
-public class WxUser implements Serializable {
+@TableName("ic_service_commentery")
+public class ServiceCommentery implements Serializable {
     private static final long serialVersionUID = 1L;
     
 	/**主键*/
@@ -46,37 +44,12 @@ public class WxUser implements Serializable {
 	/**所属部门*/
 	@Excel(name = "所属部门", width = 15)
 	private String sysOrgCode;
-	/**标识*/
-	@Excel(name = "标识", width = 15)
-	private String openId;
-	/**昵称*/
-	@Excel(name = "昵称", width = 15)
-	private String nickname;
-	/**性别*/
-	@Dict(dicCode = "sex")
-	@Excel(name = "性别", width = 15)
-	private String sex;
-	/**城市*/
-	@Excel(name = "城市", width = 15)
-	private String city;
-	/**国家*/
-	@Excel(name = "国家", width = 15)
-	private String country;
-	/**省份*/
-	@Excel(name = "省份", width = 15)
-	private String province;
-	/**备注*/
-	@Excel(name = "备注", width = 15)
-	private String remark;
-	/**所属客户*/
-	private String clientId;
-	/**用户特定accessToken*/
-	private String accessToken;
-	/**accessToken过期时间*/
-	private Timestamp accessTokenExpireId;
-    /**刷新token*/
-	private String refreshToken;
-	/**刷新token过期时间*/
-	private Timestamp refreshTokenExpireId;
-
+	/**所属工单*/
+	private String workOrderId;
+	/**评分*/
+	@Excel(name = "评分", width = 15)
+	private Double score;
+	/**评价*/
+	@Excel(name = "评价", width = 15)
+	private String evaluation;
 }

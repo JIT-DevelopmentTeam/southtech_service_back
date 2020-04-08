@@ -66,6 +66,10 @@
             "path" : "pages/wechat_service/index",
             "style" : {}
         }
+        ,{
+            "path" : "pages/wechat_service/servicecommentery/servicecommentery",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

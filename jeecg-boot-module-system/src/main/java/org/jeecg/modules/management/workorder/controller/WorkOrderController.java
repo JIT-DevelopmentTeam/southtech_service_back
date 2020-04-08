@@ -20,9 +20,11 @@ import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.management.client.entity.Client;
 import org.jeecg.modules.management.client.service.IClientService;
+import org.jeecg.modules.management.workorder.entity.ServiceCommentery;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
 import org.jeecg.modules.management.workorder.entity.WorkOrderProgress;
+import org.jeecg.modules.management.workorder.service.IServiceCommenteryService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderProgressService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
@@ -67,6 +69,9 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 
      @Autowired
      private IWorkOrderProgressService workOrderProgressService;
+
+    @Autowired
+    private IServiceCommenteryService serviceCommenteryService;
 
 	@Autowired
     private IClientService clientService;
@@ -423,5 +428,67 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         result.setResult(pageList);
         return result;
     }
+
+    /*--------------------------------子表处理-服务评价-begin----------------------------------------------*/
+    /**
+     * 查询子表信息 会传入主表ID
+     * @return
+     */
+    @GetMapping(value = "/listServiceCommenteryByMainId")
+    public Result<?> listServiceCommenteryByMainId(ServiceCommentery serviceCommentery,
+                                                   @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+                                                   @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                                   HttpServletRequest req) {
+        QueryWrapper<ServiceCommentery> queryWrapper = QueryGenerator.initQueryWrapper(serviceCommentery, req.getParameterMap());
+        Page<ServiceCommentery> page = new Page<ServiceCommentery>(pageNo, pageSize);
+        IPage<ServiceCommentery> pageList = serviceCommenteryService.page(page, queryWrapper);
+        return Result.ok(pageList);
+    }
+
+    /**
+     * 添加
+     * @param serviceCommentery
+     * @return
+     */
+    @PostMapping(value = "/addServiceCommentery")
+    public Result<?> addServiceCommentery(@RequestBody ServiceCommentery serviceCommentery) {
+        serviceCommenteryService.save(serviceCommentery);
+        return Result.ok("添加成功！");
+    }
+
+    /**
+     * 编辑
+     * @param serviceCommentery
+     * @return
+     */
+    @PutMapping(value = "/editServiceCommentery")
+    public Result<?> editServiceCommentery(@RequestBody ServiceCommentery serviceCommentery) {
+        serviceCommenteryService.updateById(serviceCommentery);
+        return Result.ok("编辑成功!");
+    }
+
+    /**
+     * 通过id删除
+     * @param id
+     * @return
+     */
+    @DeleteMapping(value = "/deleteServiceCommentery")
+    public Result<?> deleteServiceCommentery(@RequestParam(name="id",required=true) String id) {
+        serviceCommenteryService.removeById(id);
+        return Result.ok("删除成功!");
+    }
+
+    /**
+     * 批量删除
+     * @param ids
+     * @return
+     */
+    @DeleteMapping(value = "/deleteBatchServiceCommentery")
+    public Result<?> deleteBatchServiceCommentery(@RequestParam(name="ids",required=true) String ids) {
+        this.serviceCommenteryService.removeByIds(Arrays.asList(ids.split(",")));
+        return Result.ok("批量删除成功!");
+    }
+
+    /*--------------------------------子表处理-服务评价-end----------------------------------------------*/
 
 }
