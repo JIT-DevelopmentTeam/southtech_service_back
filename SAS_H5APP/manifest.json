@@ -76,7 +76,7 @@
         "domain" : "",
         "router" : {
             "mode" : "history",
-            "base" : "/H5_WEB/"
+            "base" : ""
         }
     }
 }
