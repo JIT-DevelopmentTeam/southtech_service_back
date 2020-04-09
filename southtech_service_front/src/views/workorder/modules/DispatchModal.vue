@@ -17,7 +17,7 @@
           </a-col>
           <a-col :lg="12">
             <a-form-item label="计划完成时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-date placeholder="请选择计划完成时间" v-decorator="[ 'plannedCompletionTime', validatorRules.plannedCompletionTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
+              <j-date placeholder="请选择计划完成时间" v-decorator="[ 'plannedCompletionTime', validatorRules.plannedCompletionTime]" :trigger-change="true" date-format="YYYY-MM-DD" style="width: 100%"/>
             </a-form-item>
           </a-col>
           <a-col :lg="12">
@@ -86,6 +86,7 @@
         this.edit({});
       },
       edit (record) {
+        debugger;
         this.form.resetFields();
         this.model = Object.assign({}, record);
         this.workOrderDetailIds = this.model.ids;

@@ -1,3 +1,4 @@
+import { http } from '@/utils/request.js'
 let origin =  location.href;
 let urlNow =encodeURIComponent(origin);///netbar/api/wechat/v1/get_open_id
 let scope = 'snsapi_base';    //snsapi_userinfo   //静默授权 用户无感知
@@ -6,4 +7,18 @@ let url = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appid}&re
 
 export function GetUrlKey(name) {//获取url 参数
   return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null;
+}
+
+export function getWxUserInfo(params) {
+	return http({
+		url:'mobile/index/getWxUserInfo?code='+params,
+		method:'get',
+	});
+}
+
+export function getLocalWxUserInfoByOpenId(params) {
+	return http({
+		url:'mobile/index/getWxUserInfoByOpenId?openId='+params,
+		method:'get',
+	});
 }

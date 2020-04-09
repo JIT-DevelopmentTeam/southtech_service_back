@@ -169,6 +169,10 @@ public class IndexController {
         QueryWrapper<WxUser> wxUserQueryWrapper = new QueryWrapper<>();
         wxUserQueryWrapper.eq("open_id",openId);
         WxUser wxUser = wxUserService.getOne(wxUserQueryWrapper);
+        if (oConvertUtils.isEmpty(wxUser)) {
+            log.error("本地暂无该用户信息,确认是否已关注同步!");
+            return Result.error("暂无用户信息!");
+        }
         return Result.ok(wxUser);
     }
 

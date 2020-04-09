@@ -7,7 +7,7 @@ import contact from './modules/contact.js'
 import clientUser from './modules/clientUser.js'
 import * as dd from 'dingtalk-jsapi'
 import {GetUserInfo} from '@/api/ddjsapi.js'
-import {GetUrlKey} from '@/api/wechatapi.js'
+import {GetUrlKey,getWxUserInfo} from '@/api/wechatapi.js'
 
 Vue.use(Vuex)
 
@@ -78,7 +78,11 @@ const actions = {
 		})
 	},
 	GET_WECHAT_OPENID({commit, state}, payload) {
-		commit("SET_CODE", GetUrlKey(payload));
+		getWxUserInfo(payload).then(res => {
+			if (res.data.success) {
+				commit("SET_WECHAT_OPENID", res.data.result.openid);
+			}
+		});
 	},
 }
 

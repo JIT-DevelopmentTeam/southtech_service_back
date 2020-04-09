@@ -13,7 +13,7 @@
         <a-row class="form-row" :gutter="32">
           <a-col :lg="8">
             <a-form-item label="编号" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input v-decorator="[ 'number', validatorRules.number]" placeholder="请输入编号"></a-input>
+              <a-input :disabled="true" v-decorator="[ 'number', validatorRules.number]" placeholder="请输入编号"></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -154,6 +154,7 @@
   import JDictSelectTag from "@/components/dict/JDictSelectTag"
   import JSearchSelectTag from '@/components/dict/JSearchSelectTag'
   import JMultiSelectTag from '@/components/dict/JMultiSelectTag'
+  import {formatDate} from '@/utils/util.js'
 
   export default {
     name: "FailureDeclarationPage",
@@ -220,7 +221,9 @@
     },
     mounted () {
         this.form.resetFields();
+        this.model.number = 'W'+formatDate(Date.parse(new Date()),'yyyyMMddhhmmss');
         this.model.type = "1";
+        this.model.declarationTime = formatDate(Date.parse(new Date()),'yyyy-MM-dd hh:mm:ss');
         this.model.workOrderDetailList = [{}];
         this.visible = true;
         this.$nextTick(() => {

@@ -57,8 +57,8 @@
           </a-col>
         </a-row>
 
-        <a-row class="form-row" :gutter="16">
-          <a-col :lg="32">
+        <a-row class="form-row" :gutter="8">
+          <a-col :lg="8">
             <a-form-item label="详细地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-textarea @blur="getLocationByAddress" style="resize: none;" v-decorator="['address']" rows="4" placeholder="请输入详细地址"/>
             </a-form-item>

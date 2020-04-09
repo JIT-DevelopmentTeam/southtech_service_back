@@ -14,6 +14,8 @@
 </template>
 
 <script>
+	import { getLocalWxUserInfoByOpenId } from '@/api/wechatapi.js'
+	
 	export default {
 		components: {
 			uniGrid: () => import("@dcloudio/uni-ui/lib/uni-grid/uni-grid.vue"),
@@ -21,6 +23,9 @@
 		},
 		data() {
 			return {
+				url:{
+					getWechatUserInfo:'mobile/index/getWxUserInfoByOpenId'
+				},
 				list: [
 					{
 						icon: 'icongongdan',
@@ -49,10 +54,6 @@
 				]
 			}
 		},
-		created() {
-			this.$store.dispatch("GET_WECHAT_OPENID", 'code');
-			// TODO 获取身份设置客户端缓存
-		},
 		methods: {
 			change(e) {
 				let list = this.list;
@@ -63,7 +64,32 @@
 			}
 		},
 		onLoad(option) {
-			alert(JSON.stringify(option));
+			this.$store.dispatch('GET_WECHAT_OPENID',option.code).then((res) => {
+				let openId = this.$store.getters['getWeChatOpenId'];
+				getLocalWxUserInfoByOpenId(openId).then((res) => {
+					let check = true;
+					let content = null;
+					if (res.data.success) {
+						if (!res.data.result.clientId) {
+							check = false;
+							content = '您的账号暂未通过审核,请联系客服!'
+						}
+					} else {
+						check = false;
+						content = '请先关注公众号,并联系客服确认信息!'
+					}
+					if (!check) {
+						uni.showModal({
+							title:'提示',
+							content:content,
+							showCancel:false,
+							success() {
+								window.location.reload();
+							}
+						})
+					}
+				});
+			});
 		}
 	}
 </script>

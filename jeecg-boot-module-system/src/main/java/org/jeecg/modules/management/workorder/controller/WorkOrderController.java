@@ -20,14 +20,8 @@ import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.management.client.entity.Client;
 import org.jeecg.modules.management.client.service.IClientService;
-import org.jeecg.modules.management.workorder.entity.ServiceCommentery;
-import org.jeecg.modules.management.workorder.entity.WorkOrder;
-import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
-import org.jeecg.modules.management.workorder.entity.WorkOrderProgress;
-import org.jeecg.modules.management.workorder.service.IServiceCommenteryService;
-import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
-import org.jeecg.modules.management.workorder.service.IWorkOrderProgressService;
-import org.jeecg.modules.management.workorder.service.IWorkOrderService;
+import org.jeecg.modules.management.workorder.entity.*;
+import org.jeecg.modules.management.workorder.service.*;
 import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 import org.jeecg.modules.management.workorder.vo.WorkOrderPage;
 import org.jeecg.modules.message.entity.SysMessageTemplate;
@@ -63,6 +57,9 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 
 	@Autowired
 	private IWorkOrderService workOrderService;
+
+	@Autowired
+    private IWorkOrderPageService workOrderPageService;
 
 	@Autowired
 	private IWorkOrderDetailService workOrderDetailService;
@@ -120,22 +117,71 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         }
         if (StringUtils.isNotBlank(req.getParameter("customerServiceRealName"))) {
             QueryWrapper<SysUser> userQueryWrapper = new QueryWrapper<>();
-            userQueryWrapper.like("realname",req.getParameter("customerServiceRealName").trim());
+            userQueryWrapper.like("realname", req.getParameter("customerServiceRealName").trim());
             List<SysUser> userList = sysUserService.list(userQueryWrapper);
             List<String> userNamesList = new ArrayList<>();
             for (SysUser user : userList) {
                 userNamesList.add(user.getUsername());
             }
             if (!userNamesList.isEmpty()) {
-                queryWrapper.in("customer_service_name",userNamesList);
+                queryWrapper.in("customer_service_name", userNamesList);
             } else {
-                queryWrapper.eq("customer_service_name","0");
+                queryWrapper.eq("customer_service_name", "0");
             }
         }
-		Page<WorkOrder> page = new Page<WorkOrder>(pageNo, pageSize);
+        Page<WorkOrder> page = new Page<WorkOrder>(pageNo, pageSize);
 		IPage<WorkOrder> pageList = workOrderService.page(page, queryWrapper);
 		return Result.ok(pageList);
 	}
+
+    /**
+     * 分页列表查询
+     * @param workOrderPageDTO
+     * @param pageNo
+     * @param pageSize
+     * @param req
+     * @return
+     */
+    @GetMapping(value = "/listPage")
+	public Result<?> listPage(WorkOrderPageDTO workOrderPageDTO,
+                              @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+                              @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+                              HttpServletRequest req) {
+        QueryWrapper<WorkOrderPageDTO> queryWrapper = QueryGenerator.initQueryWrapper(workOrderPageDTO, req.getParameterMap());
+        queryWrapper.orderByAsc("status");
+        queryWrapper.orderByDesc("create_time");
+        if (StringUtils.isNotBlank(req.getParameter("clientName"))) {
+            QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<Client>();
+            clientQueryWrapper.like("name",req.getParameter("clientName").trim());
+            List<Client> clientList = clientService.list(clientQueryWrapper);
+            List<String> clientIdsList = new ArrayList<>();
+            for (Client client : clientList) {
+                clientIdsList.add(client.getId());
+            }
+            if (!clientIdsList.isEmpty()) {
+                queryWrapper.in("client_id",clientIdsList);
+            } else {
+                queryWrapper.eq("client_id","0");
+            }
+        }
+        if (StringUtils.isNotBlank(req.getParameter("customerServiceRealName"))) {
+            QueryWrapper<SysUser> userQueryWrapper = new QueryWrapper<>();
+            userQueryWrapper.like("realname", req.getParameter("customerServiceRealName").trim());
+            List<SysUser> userList = sysUserService.list(userQueryWrapper);
+            List<String> userNamesList = new ArrayList<>();
+            for (SysUser user : userList) {
+                userNamesList.add(user.getUsername());
+            }
+            if (!userNamesList.isEmpty()) {
+                queryWrapper.in("customer_service_name", userNamesList);
+            } else {
+                queryWrapper.eq("customer_service_name", "0");
+            }
+        }
+        Page<WorkOrderPageDTO> page = new Page<>(pageNo, pageSize);
+        IPage<WorkOrderPageDTO> pageList = workOrderPageService.page(page, queryWrapper);
+        return Result.ok(pageList);
+    }
 
 	/**
      *   添加
@@ -334,7 +380,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             WorkOrderDetail workOrderDetail = workOrderDetailService.getById(id);
             workOrderDetail.setServiceEngineerName(serviceEngineerName);
             try {
-                workOrderDetail.setPlannedCompletionTime(DateUtils.parseDate(plannedCompletionTime,"yyyy-MM-dd HH:mm:ss"));
+                workOrderDetail.setPlannedCompletionTime(DateUtils.parseDate(plannedCompletionTime,"yyyy-MM-dd"));
             } catch (ParseException e) {
                 e.printStackTrace();
             }

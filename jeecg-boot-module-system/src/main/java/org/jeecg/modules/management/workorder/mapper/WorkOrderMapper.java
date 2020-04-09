@@ -1,9 +1,14 @@
 package org.jeecg.modules.management.workorder.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.poi.ss.formula.functions.T;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
+import org.jeecg.modules.management.workorder.entity.WorkOrderPageDTO;
 import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDTO;
 import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 
@@ -46,5 +51,28 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder> {
      * @return
      */
     List<WorkOrder> queryWorkOrderByComment(@Param("clientId") String clientId,@Param("status") String status);
+
+    @Select("SELECT\n" +
+            "\tworkOrder.id,\n" +
+            "\tworkOrder.number,\n" +
+            "\tworkOrder.`status`,\n" +
+            "\tworkOrder.type,\n" +
+            "\tworkOrder.access_method,\n" +
+            "\tworkOrder.client_id,\n" +
+            "\tworkOrder.contact_id,\n" +
+            "\tworkOrder.emergency_level,\n" +
+            "\tworkOrder.customer_service_name,\n" +
+            "\tworkOrder.declaration_time,\n" +
+            "\tworkOrderDetail.device_number,\n" +
+            "\tworkOrderDetail.service_engineer_name,\n" +
+            "\tworkOrderDetail.fault_location,\n" +
+            "\tworkOrderDetail.peers,\n" +
+            "\tworkOrderDetail.appointment,\n" +
+            "\tworkOrderDetail.planned_completion_time,\n" +
+            "\tworkOrderDetail.id AS 'workOrderDetailId' \n" +
+            "FROM\n" +
+            "\tic_work_order_detail workOrderDetail\n" +
+            "\tINNER JOIN ic_work_order workOrder ON workOrderDetail.work_order_id = workOrder.id")
+    List<WorkOrderPageDTO> queryListPage(WorkOrderPageDTO workOrderPageDTO);
 
 }

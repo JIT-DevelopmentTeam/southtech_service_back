@@ -15,7 +15,7 @@
         <a-row class="form-row" :gutter="16">
           <a-col :lg="8">
             <a-form-item label="编号" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input v-decorator="[ 'number', validatorRules.number]" placeholder="请输入编号"></a-input>
+              <a-input :disabled="true" v-decorator="[ 'number', validatorRules.number]" placeholder="请输入编号"></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -152,6 +152,7 @@
   import JDictSelectTag from "@/components/dict/JDictSelectTag"
   import JSearchSelectTag from '@/components/dict/JSearchSelectTag'
   import JMultiSelectTag from '@/components/dict/JMultiSelectTag'
+  import {formatDate} from '@/utils/util.js'
 
   export default {
     name: "WorkOrderModal",
@@ -236,6 +237,10 @@
       },
       edit (record) {
         this.form.resetFields();
+        if (!record.id) {
+          record.number = 'W'+formatDate(Date.parse(new Date()),'yyyyMMddhhmmss');
+          record.declarationTime = formatDate(Date.parse(new Date()),'yyyy-MM-dd hh:mm:ss');
+        }
         this.model = Object.assign({}, record);
         this.model.workOrderDetailList = [{}];
         if(this.model.id){

@@ -72,24 +72,7 @@
         v-if="selectedRowKeys.length === 1"
         icon="message"
         @click="handleServiceVisits"
-      >回访意见</a-button>
-      <a-dropdown v-if="selectedRowKeys.length > 0">
-        <a-menu slot="overlay">
-          <a-menu-item key="1" @click="batchDel">
-            <a-icon type="delete" />删除
-          </a-menu-item>
-           <a-menu-item key="2" v-has="'workOrder:finish'" @click="setStatus(3)">
-            <a-icon type="check" />完成
-          </a-menu-item>
-           <a-menu-item key="3" v-has="'workOrder:close'" @click="setStatus(4)">
-            <a-icon type="close" />关闭
-          </a-menu-item>
-        </a-menu>
-        <a-button style="margin-left: 8px">
-          批量操作
-          <a-icon type="down" />
-        </a-button>
-      </a-dropdown>
+      >回访</a-button>
     </div>
 
     <!-- table区域-begin -->
@@ -112,6 +95,7 @@
         :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type:'checkbox'}"
         :customRow="clickThenSelect"
         @change="handleTableChange"
+        :scroll="tableScroll"
       >
         <template slot="htmlSlot" slot-scope="text">
           <div v-html="text"></div>
@@ -143,42 +127,28 @@
 
           <a-divider type="vertical" />
           <a-dropdown>
-            <a class="ant-dropdown-link">
-              更多
-              <a-icon type="down" />
+            <a v-if="!record.assignedTime" @click="dispatch(record)" class="ant-dropdown-link">
+              派工
             </a>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
-                  <a>删除</a>
-                </a-popconfirm>
-              </a-menu-item>
-            </a-menu>
           </a-dropdown>
         </span>
       </a-table>
     </div>
 
     <a-tabs defaultActiveKey="1">
-      <a-tab-pane tab="工单明细" key="1">
-        <work-order-detail-list
-          :mainId="selectedMainId"
-          :mainStatus="selectedMainStatus"
-          @ok="loadData"
-        />
-      </a-tab-pane>
-      <a-tab-pane tab="工单进度" key="2">
+      <a-tab-pane tab="工单进度" key="1">
         <work-order-progress-page :mainId="selectedMainId" />
       </a-tab-pane>
-      <a-tab-pane tab="回访记录" key="3">
+      <a-tab-pane tab="回访记录" key="2">
         <ServiceVisitsList ref="ServiceVisitsList" :workOrderNum="workOrder.number"/>
       </a-tab-pane>
-	  <a-tab-pane tab="服务评价" key="4" forceRender>
+	  <a-tab-pane tab="服务评价" key="3" forceRender>
         <service-commentery-list :mainId="selectedMainId" />
       </a-tab-pane>
     </a-tabs>
 
     <workOrder-modal ref="modalForm" @ok="modalFormOk"></workOrder-modal>
+    <DisPatchModal ref="dispatchModalForm" @ok="dispatchModalFormOk"></DisPatchModal>
     <ServiceVisits ref="ServiceVisits" :workOrder="workOrder" />
   </a-card>
 </template>
@@ -187,22 +157,23 @@
 import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 import WorkOrderModal from './modules/WorkOrderModal'
 import { getAction, postAction } from '@/api/manage'
-import WorkOrderDetailList from './WorkOrderDetailList'
+import DisPatchModal from './modules/DispatchModal'
 import WorkOrderProgressPage from './WorkOrderProgressPage'
 import ServiceCommenteryList from './ServiceCommenteryList'
 import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
 import { initDictOptions, filterMultiDictText } from '@/components/dict/JDictSelectUtil'
 import ServiceVisits from '@/views/servicevists/modules/ServiceVisitsModal'
 import ServiceVisitsList from '@/views/servicevists/ServiceVisitsList'
+import {formatDate} from '@/utils/util.js'
 
 export default {
   name: 'WorkOrderList',
   mixins: [JeecgListMixin],
   components: {
     JDictSelectTag,
-    WorkOrderDetailList,
+    DisPatchModal,
     WorkOrderProgressPage,
-	ServiceCommenteryList,
+  	ServiceCommenteryList,
     WorkOrderModal,
     ServiceVisits,
     ServiceVisitsList
@@ -210,6 +181,7 @@ export default {
   data() {
     return {
       description: '工单信息管理页面',
+      tableScroll: { x: 16 * 147 + 50 },
       // 表头
       columns: [
         {
@@ -307,6 +279,76 @@ export default {
           dataIndex: 'declarationTime'
         },
         {
+            title:'设备档案',
+            align:"center",
+            dataIndex:"deviceNumber",
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return filterMultiDictText(this.dictOptions['deviceNumber'], text+"")
+              }
+            }
+          },
+          {
+            title:'服务工程师',
+            align:"center",
+            dataIndex: 'serviceEngineerName',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return filterMultiDictText(this.dictOptions['serviceEngineerName'], text+"")
+              }
+            }
+          },
+          {
+            title:'故障部位',
+            align:"center",
+            dataIndex: 'faultLocation',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return filterMultiDictText(this.dictOptions['faultLocation'], text+"")
+              }
+            }
+          },
+          {
+            title:'派工时间',
+            align:"center",
+            dataIndex: 'assignedTime'
+          },
+          {
+            title:'同行人员',
+            align:"center",
+            dataIndex: 'peers',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return filterMultiDictText(this.dictOptions['peers'], text+"")
+              }
+            }
+          },
+          {
+            title:'预约服务时间',
+            align:"center",
+            dataIndex: 'appointment'
+          },
+          {
+            title:'计划完成时间',
+            align:"center",
+            dataIndex: 'plannedCompletionTime',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return formatDate(text,'yyyy-MM-dd');
+              }
+            }
+          },
+        {
           title: '操作',
           dataIndex: 'action',
           align: 'center',
@@ -314,7 +356,7 @@ export default {
         }
       ],
       url: {
-        list: '/workorder/workOrder/list',
+        list: '/workorder/workOrder/listPage',
         delete: '/workorder/workOrder/delete',
         deleteBatch: '/workorder/workOrder/deleteBatch',
         exportXlsUrl: '/workorder/workOrder/exportXls',
@@ -329,7 +371,10 @@ export default {
         contactId: [],
         emergencyLevel: [],
         customerServiceName: [],
-        mobilePhone: []
+        deviceNumber:[],
+        serviceEngineerName:[],
+        faultLocation:[],
+        peers:[]
       },
       /* 分页参数 */
       ipagination: {
@@ -395,6 +440,26 @@ export default {
           this.$set(this.dictOptions, 'customerServiceName', res.result)
         }
       })
+      initDictOptions('tb_device_number,name,id').then((res) => {
+        if (res.success) {
+          this.$set(this.dictOptions, 'deviceNumber', res.result)
+        }
+      })
+      initDictOptions('sys_user,realname,username').then((res) => {
+        if (res.success) {
+          this.$set(this.dictOptions, 'serviceEngineerName', res.result)
+        }
+      })
+      initDictOptions('work_order_detail_fault_location').then((res) => {
+        if (res.success) {
+          this.$set(this.dictOptions, 'faultLocation', res.result)
+        }
+      })
+      initDictOptions('sys_user,realname,username').then((res) => {
+        if (res.success) {
+          this.$set(this.dictOptions, 'peers', res.result)
+        }
+      })
     },
     clickThenSelect(record) {
       return {
@@ -426,6 +491,7 @@ export default {
       }
     },
     loadData(arg) {
+      debugger;
       if (!this.url.list) {
         this.$message.error('请设置url.list属性!')
         return
@@ -484,6 +550,16 @@ export default {
     },
     handleServiceVisits() {
       this.$refs.ServiceVisits.add()
+    },
+    dispatch(record){
+      record.ids = record.workOrderDetailId;
+      this.$refs.dispatchModalForm.edit(record);
+      this.$refs.dispatchModalForm.title = "派工";
+      this.$refs.dispatchModalForm.disableSubmit = false;
+    },
+    dispatchModalFormOk() {
+      this.loadData();
+      this.$emit('ok');
     }
   }
 }

@@ -2,7 +2,9 @@ package org.jeecg.modules.management.client.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -510,29 +512,18 @@ public class ClientController extends JeecgController<Client, IClientService> {
      public Result<?> synchronizeWxUser() {
          try {
              List<WxUserEntity> wxuserList = WxUserUtils.getAllWxuser(redisUtil.get(WechatConstant.ACCESS_TOKEN_KEY).toString(),null);
+             QueryWrapper<WxUser> wxUserQueryWrapper = new QueryWrapper<>();
+             wxUserService.remove(wxUserQueryWrapper);
              for (WxUserEntity wxUserEntity : wxuserList) {
-                 QueryWrapper<WxUser> wxUserQueryWrapper = new QueryWrapper<>();
-                 wxUserQueryWrapper.eq("open_id", wxUserEntity.getOpenid());
-                 WxUser editWxUser = wxUserService.getOne(wxUserQueryWrapper);
-                 if (oConvertUtils.isEmpty(editWxUser)) {
-                     WxUser addWxUser = new WxUser();
-                     addWxUser.setOpenId(wxUserEntity.getOpenid());
-                     addWxUser.setNickname(wxUserEntity.getNickname());
-                     addWxUser.setSex(wxUserEntity.getSex());
-                     addWxUser.setCity(wxUserEntity.getCity());
-                     addWxUser.setCountry(wxUserEntity.getCountry());
-                     addWxUser.setProvince(wxUserEntity.getProvince());
-                     addWxUser.setRemark(wxUserEntity.getRemark());
-                     wxUserService.save(addWxUser);
-                 } else {
-                     editWxUser.setNickname(wxUserEntity.getNickname());
-                     editWxUser.setSex(wxUserEntity.getSex());
-                     editWxUser.setCity(wxUserEntity.getCity());
-                     editWxUser.setCountry(wxUserEntity.getCountry());
-                     editWxUser.setProvince(wxUserEntity.getProvince());
-                     editWxUser.setRemark(wxUserEntity.getRemark());
-                     wxUserService.updateById(editWxUser);
-                 }
+                 WxUser addWxUser = new WxUser();
+                 addWxUser.setOpenId(wxUserEntity.getOpenid());
+                 addWxUser.setNickname(wxUserEntity.getNickname());
+                 addWxUser.setSex(wxUserEntity.getSex());
+                 addWxUser.setCity(wxUserEntity.getCity());
+                 addWxUser.setCountry(wxUserEntity.getCountry());
+                 addWxUser.setProvince(wxUserEntity.getProvince());
+                 addWxUser.setRemark(wxUserEntity.getRemark());
+                 wxUserService.save(addWxUser);
              }
          } catch (WexinReqException e) {
              e.printStackTrace();
