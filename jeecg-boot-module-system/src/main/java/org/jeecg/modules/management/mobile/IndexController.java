@@ -129,15 +129,23 @@ public class IndexController {
      */
     @GetMapping(value = "/getWxUserInfo")
     public Result<?> getWxUserInfo(@RequestParam("code") String code) {
-        JSONObject result = HttpHelper.httpGet(WechatConstant.GET_USER_TOKEN_URL.replace("APPID",WechatConstant.APP_ID).replace("SECRET",WechatConstant.SECRET).replace("CODE",code));
-        if (oConvertUtils.isEmpty(result)) {
+        JSONObject codeResult = HttpHelper.httpGet(WechatConstant.GET_USER_TOKEN_URL.replace("APPID",WechatConstant.APP_ID).replace("SECRET",WechatConstant.SECRET).replace("CODE",code));
+        if (oConvertUtils.isEmpty(codeResult)) {
             log.error("获取微信用户信息失败,请求出错!");
             return Result.error("获取微信用户信息失败");
         }
-        String accessToken = result.getString("access_token");
-        Long accessTokenExpireId = result.getLong("expires_in");
-        String refreshToken = result.getString("refresh_token");
-        String openId = result.getString("openid");
+        String accessToken = codeResult.getString("access_token");
+        Long accessTokenExpireId = codeResult.getLong("expires_in");
+        String refreshToken = codeResult.getString("refresh_token");
+        String openId = codeResult.getString("openid");
+        JSONObject verifyResult = HttpHelper.httpGet(WechatConstant.VERIFY_TOKEN_URL.replace("ACCESS_TOKEN",accessToken).replace("OPENID",openId));
+        if ("40003".equals(verifyResult.get("errcode").toString())) {
+            // token 失效
+            JSONObject refreshResult = HttpHelper.httpGet(WechatConstant.REFRESH_TOKEN_URL.replace("APPID",WechatConstant.APP_ID).replace("REFRESH_TOKEN",refreshToken));
+            accessToken = refreshResult.getString("access_token");
+            accessTokenExpireId = refreshResult.getLong("expires_in");
+            openId = refreshResult.getString("openid");
+        }
         QueryWrapper<WxUser> wxUserQueryWrapper = new QueryWrapper<>();
         wxUserQueryWrapper.eq("open_id",openId);
         WxUser wxUser = wxUserService.getOne(wxUserQueryWrapper);
@@ -148,15 +156,11 @@ public class IndexController {
         wxUser.setAccessToken(accessToken);
         wxUser.setAccessTokenExpireId(new Timestamp(System.currentTimeMillis() + accessTokenExpireId * 1000));
         wxUser.setRefreshToken(refreshToken);
-        wxUser.setAccessTokenExpireId(new Timestamp(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 30));
-        wxUserService.updateById(wxUser);
-        Wxuser wxuser = null;
-        try {
-            wxuser = JwUserAPI.getWxuser(accessToken,openId);
-        } catch (WexinReqException e) {
-            e.printStackTrace();
+        if (oConvertUtils.isEmpty(wxUser.getRefreshTokenExpireId())) {
+            wxUser.setRefreshTokenExpireId(new Timestamp(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 30));
         }
-        return Result.ok(wxuser);
+        wxUserService.updateById(wxUser);
+        return Result.ok(wxUser);
     }
 
     /**

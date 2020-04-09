@@ -148,7 +148,7 @@
 	     async mounted() {
 			 // 初始化
 			this.dingTalkUserId = this.$store.getters['getUserId'];
-			this.wechatOpenId = this.$store.getters['getWeChatUser'];
+			this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
 			if (this.dingTalkUserId) {
 				getUserByEnterpriseId(this.dingTalkUserId).then((res) => {
 					if (res.data.success) {
@@ -166,17 +166,7 @@
 					if (res.data.success) {
 						this.client = res.data.result;
 						this.model.clientId = res.data.result.id;
-					} else {
-						uni.showModal({
-							title:'提示',
-							content:'您的账户尚未通过审核,请联系工作人员!',
-							showCancel:false,
-							success:function() {
-								window.location.reload();
-							}
-						});
-						return;
-					}
+					} 
 				});
 				await getDicList("tb_contact,name,id,client_id="+this.client.id).then((res) => {
 					if (res.data.success) {

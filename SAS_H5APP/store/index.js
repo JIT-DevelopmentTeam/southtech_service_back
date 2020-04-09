@@ -78,11 +78,18 @@ const actions = {
 		})
 	},
 	GET_WECHAT_OPENID({commit, state}, payload) {
-		getWxUserInfo(payload).then(res => {
-			if (res.data.success) {
-				commit("SET_WECHAT_OPENID", res.data.result.openid);
-			}
+		return new Promise((resolve, reject) => {
+			getWxUserInfo(payload).then(res => {
+				if (res.data.success) {
+					commit("SET_WECHAT_OPENID", res.data.result.openId);
+					resolve(res.data.result);
+				} else {
+					// 本地无用户数据
+					resolve(null);
+				}
+			});
 		});
+		
 	},
 }
 

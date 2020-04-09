@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<view class="example-body">
+		<view v-if="checkUser" class="example-body">
 			<uni-grid :column="3" :highlight="true" @change="change">
 				<uni-grid-item v-for="(item, index) in list" :index="index" :key="index">
 					<view class="grid-item-box" style="background-color: #fff;">
@@ -23,6 +23,7 @@
 		},
 		data() {
 			return {
+				checkUser:false,
 				url:{
 					getWechatUserInfo:'mobile/index/getWxUserInfoByOpenId'
 				},
@@ -64,31 +65,26 @@
 			}
 		},
 		onLoad(option) {
+			let that = this;
 			this.$store.dispatch('GET_WECHAT_OPENID',option.code).then((res) => {
-				let openId = this.$store.getters['getWeChatOpenId'];
-				getLocalWxUserInfoByOpenId(openId).then((res) => {
-					let check = true;
-					let content = null;
-					if (res.data.success) {
-						if (!res.data.result.clientId) {
-							check = false;
-							content = '您的账号暂未通过审核,请联系客服!'
-						}
+				if (res) {
+					let clientId = res.clientId;
+					if (clientId) {
+						that.checkUser = true;
 					} else {
-						check = false;
-						content = '请先关注公众号,并联系客服确认信息!'
-					}
-					if (!check) {
 						uni.showModal({
 							title:'提示',
-							content:content,
-							showCancel:false,
-							success() {
-								window.location.reload();
-							}
+							content:'您的账号暂未通过审核,请联系客服!',
+							showCancel:false
 						})
 					}
-				});
+				} else {
+					uni.showModal({
+						title:'提示',
+						content:'请关注公众号后联系客服审核信息!',
+						showCancel:false
+					})
+				}
 			});
 		}
 	}
