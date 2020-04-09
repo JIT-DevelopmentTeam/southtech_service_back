@@ -61,6 +61,9 @@
 					url: list[index].url
 				})
 			}
+		},
+		onLoad(option) {
+			alert(JSON.stringify(option));
 		}
 	}
 </script>
