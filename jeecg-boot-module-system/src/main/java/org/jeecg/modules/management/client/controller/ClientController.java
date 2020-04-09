@@ -512,18 +512,29 @@ public class ClientController extends JeecgController<Client, IClientService> {
      public Result<?> synchronizeWxUser() {
          try {
              List<WxUserEntity> wxuserList = WxUserUtils.getAllWxuser(redisUtil.get(WechatConstant.ACCESS_TOKEN_KEY).toString(),null);
-             QueryWrapper<WxUser> wxUserQueryWrapper = new QueryWrapper<>();
-             wxUserService.remove(wxUserQueryWrapper);
              for (WxUserEntity wxUserEntity : wxuserList) {
-                 WxUser addWxUser = new WxUser();
-                 addWxUser.setOpenId(wxUserEntity.getOpenid());
-                 addWxUser.setNickname(wxUserEntity.getNickname());
-                 addWxUser.setSex(wxUserEntity.getSex());
-                 addWxUser.setCity(wxUserEntity.getCity());
-                 addWxUser.setCountry(wxUserEntity.getCountry());
-                 addWxUser.setProvince(wxUserEntity.getProvince());
-                 addWxUser.setRemark(wxUserEntity.getRemark());
-                 wxUserService.save(addWxUser);
+                 QueryWrapper<WxUser> wxUserQueryWrapper = new QueryWrapper<>();
+                 wxUserQueryWrapper.eq("open_id", wxUserEntity.getOpenid());
+                 WxUser editWxUser = wxUserService.getOne(wxUserQueryWrapper);
+                 if (oConvertUtils.isEmpty(editWxUser)) {
+                     WxUser addWxUser = new WxUser();
+                     addWxUser.setOpenId(wxUserEntity.getOpenid());
+                     addWxUser.setNickname(wxUserEntity.getNickname());
+                     addWxUser.setSex(wxUserEntity.getSex());
+                     addWxUser.setCity(wxUserEntity.getCity());
+                     addWxUser.setCountry(wxUserEntity.getCountry());
+                     addWxUser.setProvince(wxUserEntity.getProvince());
+                     addWxUser.setRemark(wxUserEntity.getRemark());
+                     wxUserService.save(addWxUser);
+                 } else {
+                     editWxUser.setNickname(wxUserEntity.getNickname());
+                     editWxUser.setSex(wxUserEntity.getSex());
+                     editWxUser.setCity(wxUserEntity.getCity());
+                     editWxUser.setCountry(wxUserEntity.getCountry());
+                     editWxUser.setProvince(wxUserEntity.getProvince());
+                     editWxUser.setRemark(wxUserEntity.getRemark());
+                     wxUserService.updateById(editWxUser);
+                 }
              }
          } catch (WexinReqException e) {
              e.printStackTrace();
