@@ -62,26 +62,17 @@
 			}
 		},
 	 	async mounted() {
-			this.wechatOpenId = this.$store.getters['getWeChatUser'];
-			if (this.wechatOpenId) {
-				await getClientByOpenId(this.wechatOpenId).then((res) => {
+			this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
+			let that = this;
+			if (that.wechatOpenId) {
+				await getClientByOpenId(that.wechatOpenId).then((res) => {
 					if (res.data.success) {
-						this.client = res.data.result;
-					} else {
-						uni.showModal({
-							title:'提示',
-							content:'您的账户尚未通过审核,请联系工作人员!',
-							showCancel:false,
-							success:function() {
-								window.location.reload();
-							}
-						});
-						return;
+						that.client = res.data.result;
 					}
 				});
-				await listDeviceNumberByMainId({clientId:this.client.id}).then((res) => {
+				await listDeviceNumberByMainId({clientId:that.client.id}).then((res) => {
 					if (res.data.success) {
-						this.deviceNumberList = res.data.result;
+						that.deviceNumberList = res.data.result;
 					}
 				});
 			}

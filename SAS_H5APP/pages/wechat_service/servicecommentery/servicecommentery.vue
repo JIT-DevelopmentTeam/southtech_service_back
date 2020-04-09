@@ -40,21 +40,11 @@
 			}
 		},
 		async mounted() {
-			this.wechatOpenId = this.$store.getters['getWeChatUser'];
+			this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
 			if (this.wechatOpenId) {
 				await getClientByOpenId(this.wechatOpenId).then((res) => {
 					if (res.data.success) {
 						this.client = res.data.result;
-					} else {
-						uni.showModal({
-							title:'提示',
-							content:'您的账户尚未通过审核,请联系工作人员!',
-							showCancel:false,
-							success:function() {
-								window.location.reload();
-							}
-						});
-						return;
 					}
 				});
 				await listWorkOrderByComment({clientId:client.id}).then((res) => {
