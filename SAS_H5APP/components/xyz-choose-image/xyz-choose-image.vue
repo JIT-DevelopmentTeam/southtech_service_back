@@ -63,7 +63,6 @@ export default {
 		return {
 			imgList: [],
 			base64: '',
-			commitList: []
 		};
 	},
 	methods: {
@@ -79,11 +78,9 @@ export default {
 				sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
 				sourceType: ['album', 'camera'], //从相册选择
 				success: function(res) {
-					_this.commitList = []
 					for (var i = 0; i < res.tempFilePaths.length; i++) {
 						var obj = {id: guid(), path: res.tempFilePaths[i]}
 						_this.imgList.push(obj)
-						_this.commitList.push(obj)
 					}
 					
 
@@ -91,7 +88,7 @@ export default {
 						uni.setStorageSync(_this.saveStr, _this.imgList.join(','));
 					}
 					
-					_this.$emit("uploadPhotoSuccess", _this.commitList)
+					_this.$emit("uploadPhotoSuccess", _this.imgList)
 				}
 			});
 		},

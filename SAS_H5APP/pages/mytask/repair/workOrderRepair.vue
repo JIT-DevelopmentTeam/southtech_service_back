@@ -534,9 +534,7 @@
 				}
 			},
 			uploadPhotoSuccess(entityList) {
-				for (var i = 0; i < entityList.length; i++) {
-					this.photoCommit.push(entityList[i]);
-				}
+				this.photoCommit = entityList;
 			},
 			deletePhotoSuccess(entityList, id) {
 				this.photoCommit = entityList;
