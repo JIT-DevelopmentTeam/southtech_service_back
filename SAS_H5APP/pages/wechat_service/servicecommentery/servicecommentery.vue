@@ -3,13 +3,16 @@
 		<view class="uni-title">
 			<text>服务评分</text>
 		</view>
-		<uni-list v-for="(workOrder,index) in workOrderList">
-			<uni-list-item title="工单编号:" :showArrow="true" :rightText="workOrder.number"></uni-list-item>
-			<uni-list-item title="满意度评分:" :showArrow="false"></uni-list-item>
-			<uni-rate max="5" @change="setScore($event.value,index)"></uni-rate>
-			<uni-list-item title="服务评价:" :showArrow="false"></uni-list-item>
-			<textarea @blur="setEvaluation($event.target.value,index)" auto-height placeholder="请输入服务评价"/>
+		<uni-list>
+			<uni-card v-for="(workOrder,index) in workOrderList">
+				<uni-list-item title="工单编号:" :showArrow="true" :rightText="workOrder.number"></uni-list-item>
+				<uni-list-item title="满意度评分:" :showArrow="false"></uni-list-item>
+				<uni-rate max="5" @change="setScore($event.value,index)"></uni-rate>
+				<uni-list-item title="服务评价:" :showArrow="false"></uni-list-item>
+				<textarea @blur="setEvaluation($event.target.value,index)" auto-height placeholder="请输入服务评价"/>
+			</uni-card>
 		</uni-list>
+		
 		<footer class="footer">
 			<button type="primary" @click="submit">提交</button>
 		</footer>
@@ -20,12 +23,14 @@
 	import uniList from "@dcloudio/uni-ui/lib/uni-list/uni-list"
 	import uniListItem from "@dcloudio/uni-ui/lib/uni-list-item/uni-list-item"
 	import uniRate from '@dcloudio/uni-ui/lib/uni-rate/uni-rate'
-	import {listWorkOrderByComment,batchSaveServiceCommentery} from '@/api/Ticket.js'
+	import uniCard from '@dcloudio/uni-ui/lib/uni-card/uni-card'
+	import {listWorkOrderByComment,batchSaveServiceCommentery,getClientByOpenId} from '@/api/Ticket.js'
 	
 	export default {
 		components:{
 			uniList,
 			uniListItem,
+			uniCard,
 			uniRate
 		},
 		name:'ServiceCommentery',
@@ -40,18 +45,22 @@
 			}
 		},
 		async mounted() {
-			this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
+			this.wechatOpenId = 'otL61wnZFm38s4_ulyQTjjiOMeZM';
+			// this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
+			let that = this;
 			if (this.wechatOpenId) {
 				await getClientByOpenId(this.wechatOpenId).then((res) => {
 					if (res.data.success) {
-						this.client = res.data.result;
+						that.client = res.data.result;
 					}
 				});
-				await listWorkOrderByComment({clientId:client.id}).then((res) => {
-					if (res.data.success) {
-						this.workOrderList = res.data.result;
-					}
-				})
+				if (that.client) {
+					await listWorkOrderByComment(that.client.id).then((res) => {
+						if (res.data.success) {
+							that.workOrderList = res.data.result;
+						}
+					})
+				}
 			}
 		},
 		methods: {

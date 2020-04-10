@@ -8,31 +8,13 @@
 				<view class="uni-list">
 					<uni-list>
 					    <uni-list-item title="编码" :rightText="deviceNumber.number"></uni-list-item>
+						<uni-list-item title="名称" :rightText="deviceNumber.name"></uni-list-item>
+						<uni-list-item title="类型" :rightText="deviceNumber.type"></uni-list-item>
+						<uni-list-item title="保质期" :rightText="deviceNumber.qgp"></uni-list-item>
+						<uni-list-item title="签约日期" :rightText="deviceNumber.signing"></uni-list-item>
+						<view class="uni-title uni-common-pl">描述</view>
+						<textarea :disabled="true" :value="deviceNumber.description ? deviceNumber.description : ''"/>
 					</uni-list>
-				</view>
-				<view class="uni-list">
-					<uni-list>
-					    <uni-list-item title="名称" :rightText="deviceNumber.name"></uni-list-item>
-					</uni-list>
-				</view>
-				<view class="uni-list">
-					<uni-list>
-					    <uni-list-item title="类型" :rightText="deviceNumber.type"></uni-list-item>
-					</uni-list>
-				</view>
-				<view class="uni-list">
-					<uni-list>
-					    <uni-list-item title="保质期" :rightText="deviceNumber.qgp"></uni-list-item>
-					</uni-list>
-				</view>
-				<view class="uni-list">
-					<uni-list>
-					    <uni-list-item title="签约日期" :rightText="deviceNumber.signing"></uni-list-item>
-					</uni-list>
-				</view>
-				<view class="uni-list">
-					<view class="uni-title uni-common-pl">描述</view>
-					<textarea :disabled="true" :value="deviceNumber.description ? deviceNumber.description : ''"/>
 				</view>
 			</uni-card>
 		</view>
@@ -62,7 +44,8 @@
 			}
 		},
 	 	async mounted() {
-			this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
+			this.wechatOpenId = 'otL61wnZFm38s4_ulyQTjjiOMeZM';
+			//this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
 			let that = this;
 			if (that.wechatOpenId) {
 				await getClientByOpenId(that.wechatOpenId).then((res) => {
