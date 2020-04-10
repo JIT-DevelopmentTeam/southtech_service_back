@@ -7,7 +7,7 @@
 			<view class="uni-flex uni-column">
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>编号:</view>
-					<input type="text" v-model="model.number" class="uni-input" placeholder="编号"/>
+					<input type="text" :disabled="true" v-model="model.number" class="uni-input" placeholder="编号"/>
 				</view>
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>客户</view>
@@ -133,6 +133,7 @@
 	import uniSearchBar from '@dcloudio/uni-ui/lib/uni-search-bar/uni-search-bar'
 	import validate from '@/components/form/validate'
 	import { getDicList,listUserByRoleCode,listClient,getClientById,addWorkOrder,getUserByEnterpriseId,getClientByOpenId } from '@/api/Ticket.js'
+	import { formatDateStr } from '@/utils/formatDate.js'
 	
 	export default {
 		name:'FailureDeclaration',
@@ -173,6 +174,11 @@
 				 		this.contactList = res.data.result;
 					}
 				});
+				await getDicList("tb_device_number,name,id,client_id="+this.client.id).then((res) => {
+					if (res.data.success) {
+				 		this.deviceNumberList = res.data.result;
+					}
+				});
 			}
 			getDicList("work_order_access_method").then((res) => {
 				if (res.data.success) {
@@ -194,6 +200,9 @@
 					this.faultLocationList = res.data.result;
 				}
 			});
+			this.model.number = 'W'+formatDateStr(Date.parse(new Date()),'yyyyMMddhhmmss');
+			this.model.declarationTime = formatDateStr(Date.parse(new Date()),'yyyy-MM-dd hh:mm:ss');
+			this.declarationTime = formatDateStr(Date.parse(new Date()),'yyyy-MM-dd hh:mm:ss');
 		},
 		data() {
 			return {
@@ -421,6 +430,10 @@
 			  			title: res.data.message,
 			  			icon: 'none'
 			  		});
+					setTimeout(function (){
+						uni.navigateBack({
+						})
+					},3000);
 			  	}
 			  });
 		  }
