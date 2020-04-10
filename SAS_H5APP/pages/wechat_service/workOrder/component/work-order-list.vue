@@ -18,12 +18,6 @@
 				<view class="btn">
 					<model-label :modelLabel="formatModel"></model-label>
 				</view>
-				<template v-slot:footer>
-					<view class="footer-box">
-						<view class="label">{{ formatDate(info.assignedTime) }}</view>
-						<view class="label right">{{ calTime(formatDate(info.assignedTime)) }}</view>
-					</view>
-				</template>
 			</uni-card>
 		</uni-swipe-action-item>
 	</view>
