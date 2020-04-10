@@ -1,5 +1,6 @@
 package org.jeecg.modules.management.mobile.stage;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.management.file.entity.File;
 import org.jeecg.modules.management.file.service.IFileService;
@@ -81,7 +82,7 @@ public class MobileStageController {
 
     public List<File> getByReportId(String reportId, String type) {
         List<File> fileList = fileService.getByReportId(reportId, type);
-        return  fileList;
+        return fileList;
     }
 
     @RequestMapping(value = "/progressReport", method = RequestMethod.POST)
@@ -124,6 +125,7 @@ public class MobileStageController {
 
     /**
      * 签到表（保存操作）
+     *
      * @param type
      * @param params
      * @param user
@@ -156,6 +158,7 @@ public class MobileStageController {
 
     /**
      * 进度汇报（保存操作）
+     *
      * @param params
      */
     private String reportSave(Map<String, Object> params) {
@@ -203,10 +206,23 @@ public class MobileStageController {
         // 根据工单id查出所有进度
         List<WorkOrderProgress> progressList = workOrderProgressService.selectByMainId(workOrderId);
         // 判断：如果当前进度id等于进度list的最后一个，并且isCompleted为1则执行更新工单状态为已完成
-        if (progressId.equals(progressList.get(progressList.size()-1).getId()) && "1".equals(isCompleted)) {
+        if (progressId.equals(progressList.get(progressList.size() - 1).getId()) && "1".equals(isCompleted)) {
             WorkOrder workOrder = new WorkOrder();
             workOrder.setId(workOrderId);
-            workOrder.setStatus("3");
+            QueryWrapper<WorkOrderDetail> queryWrapper = new QueryWrapper();
+            queryWrapper.eq("work_order_id", workOrderId);
+            List<WorkOrderDetail> workOrderDetailList = workOrderDetailService.list(queryWrapper);
+            boolean normal = true;
+            for (int i = 0; i < workOrderDetailList.size(); i++) {
+                if (workOrderDetailList.get(i).getPlannedCompletionTime().getTime() < System.currentTimeMillis()) {
+                    normal = false;
+                }
+            }
+            if (normal) {
+                workOrder.setStatus("3");
+            } else {
+                workOrder.setStatus("6");
+            }
             workOrderService.updateById(workOrder);
         }
     }
