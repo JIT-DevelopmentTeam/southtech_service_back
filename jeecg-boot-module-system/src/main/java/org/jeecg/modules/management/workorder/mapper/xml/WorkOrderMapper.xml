@@ -59,6 +59,7 @@
             <if test="status != null and status != ''">
                 AND workOrder.status = #{status}
             </if>
+        ORDER BY workOrder.declaration_time DESC
     </select>
 
     <select id="queryWXworkOrderList" resultType="org.jeecg.modules.management.workorder.vo.MobileWorkOrderDTO">
@@ -88,6 +89,7 @@
                 <if test="status != null and status != ''">
                     AND workOrder.`status` IN ${status}
                 </if>
+            ORDER BY workOrder.declaration_time DESC
     </select>
 
     <select id="queryWorkOrderByComment" resultType="org.jeecg.modules.management.workorder.entity.WorkOrder" parameterType="String">
