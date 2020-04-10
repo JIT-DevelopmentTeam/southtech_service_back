@@ -1,7 +1,7 @@
 <template>
 	<view @click="goDetail(info.id)">
 		<uni-swipe-action-item :options="options" @click="onClick" @change="change(info.id)" >
-			<uni-card class="uniCard" note="true">
+			<uni-card class="uniCard">
 				<view class="info">
 					<view class="line">
 						<view class="label">{{ info.clientName }}</view>
