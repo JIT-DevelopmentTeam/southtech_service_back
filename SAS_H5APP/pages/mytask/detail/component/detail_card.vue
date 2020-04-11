@@ -1,8 +1,7 @@
 <template>
 	<view>
 		<view v-for="(item, index) in showList" :key="index">
-			<view @click="item.enterpriseId === userId ? dClick(item.detailId, item.progressId, item.isCompleted, item.reportId) : ''">
-				<uni-card class="uniCard">
+				<uni-card class="uniCard" @click="item.enterpriseId === userId ? dClick(item.detailId, item.progressId, item.isCompleted, item.reportId) : ''">
 					<view>
 						<view class="inline">设备档案：</view>
 						<view class="inline">{{ item.deviceName }}</view>
@@ -26,7 +25,6 @@
 						<view class="inline">{{item.appointment}}</view>
 					</view>
 				</uni-card>
-			</view>
 		</view>
 	</view>
 </template>
