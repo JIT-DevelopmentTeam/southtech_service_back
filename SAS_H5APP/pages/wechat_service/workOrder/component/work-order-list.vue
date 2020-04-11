@@ -1,7 +1,7 @@
 <template>
-	<view @click="goDetail(info.id)">
-		<uni-swipe-action-item :options="options" @click="onClick" @change="change(info.id)" >
-			<uni-card class="uniCard">
+	<view>
+		<uni-swipe-action-item :disabled="current != 1 || serviceCommenteryList.length > 0" :options="options" @click="onClick" @change="change(info.id)" >
+			<uni-card class="uniCard" @click="goDetail(info.id)">
 				<view class="info">
 					<view class="line">
 						<view class="label">{{ info.clientName }}</view>
@@ -26,6 +26,7 @@
 <script>
 	import {calculationTime} from '@/utils/moment.js'
 	import {format} from '@/utils/formatDate.js'
+	import {getServiceCommentList} from '@/api/serviceNumber.js'
 
 	export default {
 		name: 'workOrderList',
@@ -43,9 +44,10 @@
 						style: {
 							backgroundColor: '#FFA500'
 						},
-						url:"../evaluate/evaluate"
+						url:"../servicecommentery/servicecommentery"
 					}
 				],
+				serviceCommenteryList: []
 			}
 		},
 		components: {
@@ -56,7 +58,8 @@
 			uniSwipeActionItem: () => import('@dcloudio/uni-ui/lib/uni-swipe-action-item/uni-swipe-action-item.vue')
 		},
 		props: {
-			'info': Object
+			'info': Object,
+			'current': Number
 		},
 		computed: {
 			formatDate(dateTime) {
@@ -90,13 +93,21 @@
 			onClick(e){
 				if (e.index == 0) {
 					uni.navigateTo({
-						url: e.content.url +'?workOrderId=' + this.workOrderId
+						url: e.content.url +'?workOrder=' + encodeURIComponent(JSON.stringify(this.info))
 					})
 				}
 			},
 			change(id){
 				this.workOrderId = id;
 			}
+		},
+		mounted() {
+			let params = {
+				workOrderId: this.info.id
+			}
+			getServiceCommentList(params).then(res => {
+				this.serviceCommenteryList = res.data.result;
+			})
 		}
 	}
 </script>

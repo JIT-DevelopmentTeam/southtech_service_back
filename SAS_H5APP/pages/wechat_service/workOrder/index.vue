@@ -3,7 +3,7 @@
 		<uni-segmented-control class="borderStyle" :current="current" :values="items" style-type="button" active-color="#09a0f7" @clickItem="onClickItem"></uni-segmented-control>
 		<scroll-view :scroll-top="scrollTop" scroll-y="true" class="scroll-Y" @scrolltoupper="upper" @scrolltolower="lower" @scroll="scroll">
 			<uni-swipe-action id="swipe">
-				<work-order-list v-for="(item,index) in dataSource" :info="item" :key="index"></work-order-list>
+				<work-order-list v-for="(item,index) in dataSource" :info="item" :key="index" :current="current"></work-order-list>
 			</uni-swipe-action>
 			<uni-load-more :status="'loading'" v-show="load"></uni-load-more>
 		</scroll-view>

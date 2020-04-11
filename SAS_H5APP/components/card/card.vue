@@ -1,6 +1,6 @@
 <template>
-	<view @click="goDetail(info.id)">
-		<uni-card class="uniCard" note="true">
+	<view>
+		<uni-card class="uniCard" note="true" @click="goDetail(info.id)">
 			<view class="info">
 				<view class="line">
 					<view class="label">{{ info.clientName }}</view>

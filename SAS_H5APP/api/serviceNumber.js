@@ -82,3 +82,10 @@ export function getServiceStageList(params) {
 		params: params
 	})
 }
+
+export function getServiceCommentList(params) {
+	return http({
+		url: '/mobile/serviceCommentery/getByWorkOrderId',
+		params: params
+	})
+}
