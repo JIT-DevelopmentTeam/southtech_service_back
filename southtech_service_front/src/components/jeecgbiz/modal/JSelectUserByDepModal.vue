@@ -174,8 +174,8 @@
         let params = this.getQueryParams();//查询条件
         await getUserList(params).then((res) => {
           if (res.success) {
-            this.dataSource = res.result.records;
-            this.ipagination.total = res.result.total;
+            this.dataSource = res.result;
+            //this.ipagination.total = res.result.total;
           }
         })
       },

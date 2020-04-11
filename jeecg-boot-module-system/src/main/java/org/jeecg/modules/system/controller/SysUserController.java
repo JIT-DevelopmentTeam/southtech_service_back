@@ -92,6 +92,12 @@ public class SysUserController {
         return result;
     }
 
+    @GetMapping(value = "/listData")
+    public Result<?> listData(SysUser user, HttpServletRequest req) {
+        QueryWrapper<SysUser> queryWrapper = QueryGenerator.initQueryWrapper(user, req.getParameterMap());
+        return Result.ok(sysUserService.list(queryWrapper));
+    }
+
     @RequestMapping(value = "/listUserByRoleCode", method = RequestMethod.GET)
     public Result<IPage<SysUser>> queryUserPageList(SysUser user, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, @RequestParam("roleCode") String roleCode, HttpServletRequest req) {

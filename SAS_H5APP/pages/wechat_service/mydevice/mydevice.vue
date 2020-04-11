@@ -44,8 +44,7 @@
 			}
 		},
 	 	async mounted() {
-			this.wechatOpenId = 'otL61wnZFm38s4_ulyQTjjiOMeZM';
-			//this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
+			this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
 			let that = this;
 			if (that.wechatOpenId) {
 				await getClientByOpenId(that.wechatOpenId).then((res) => {

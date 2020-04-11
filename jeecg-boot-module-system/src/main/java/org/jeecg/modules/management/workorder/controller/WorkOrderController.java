@@ -424,7 +424,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             req.setUserid(serviceEngineer.getEnterpriseId());
             req.setCreateTime(System.currentTimeMillis());
             req.setTitle("待办");
-            req.setUrl(domainName+"/H5_WEB");
+            req.setUrl(domainName);
             List<OapiWorkrecordAddRequest.FormItemVo> list2 = new ArrayList<>();
             OapiWorkrecordAddRequest.FormItemVo obj3 = new OapiWorkrecordAddRequest.FormItemVo();
             list2.add(obj3);

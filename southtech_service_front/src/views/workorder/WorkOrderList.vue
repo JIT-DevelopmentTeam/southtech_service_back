@@ -92,7 +92,7 @@
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
-        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type:'checkbox'}"
+        :rowSelection="{fixed:true,selectedRowKeys: selectedRowKeys, onChange: onSelectChange, type:'checkbox'}"
         :customRow="clickThenSelect"
         @change="handleTableChange"
         :scroll="tableScroll"
@@ -184,6 +184,16 @@ export default {
       tableScroll: { x: 16 * 147 + 50 },
       // 表头
       columns: [
+        {
+          title: '#',
+          dataIndex: '',
+          key: 'rowIndex',
+          width: 60,
+          align: 'center',
+          customRender: function(t, r, index) {
+            return parseInt(index) + 1
+          }
+        },
         {
           title: '编号',
           align: 'center',
@@ -352,6 +362,8 @@ export default {
           title: '操作',
           dataIndex: 'action',
           align: 'center',
+          fixed: 'right',
+          width: 135,
           scopedSlots: { customRender: 'action' }
         }
       ],

@@ -60,7 +60,7 @@
           </a-col>
           <a-col :lg="8">
             <a-form-item label="客服" :labelCol="labelCol" :wrapperCol="wrapperCol">
-                <j-select-user-by-dep v-decorator="['customerServiceName',validatorRules.customerServiceName]" :multi="false" :trigger-change="true"/>
+                <j-select-user-by-dep v-decorator="['customerServiceName',validatorRules.customerServiceName]" :multi="false"/>
               </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -287,8 +287,9 @@
         this.form.setFieldsValue(pick(row,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
       },
       contactCondition() {
+        console.log("clientId:"+this.client.id);
         let sql = "tb_contact,name,id,client_id=";
-        if (this.client) {
+        if (this.client.id) {
           sql += this.client.id;
         } else {
           sql += "0";
@@ -297,7 +298,7 @@
       },
       deviceNumberCondition(){
         let sql = "tb_device_number,name,id,client_id=";
-        if (this.client) {
+        if (this.client.id) {
           sql += this.client.id;
         } else {
           sql += "0";
