@@ -4,7 +4,7 @@
 			<text>服务评分</text>
 		</view>
 		<uni-list>
-			<uni-card v-for="(workOrder,index) in workOrderList">
+			<uni-card v-for="(workOrder,index) in workOrderList" :key="index">
 				<uni-list-item title="工单编号:" :showArrow="true" :rightText="workOrder.number"></uni-list-item>
 				<uni-list-item title="满意度评分:" :showArrow="false"></uni-list-item>
 				<uni-rate max="5" @change="setScore($event.value,index)"></uni-rate>
@@ -44,21 +44,27 @@
 				}
 			}
 		},
-		async mounted() {
-			this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
-			let that = this;
-			if (this.wechatOpenId) {
-				await getClientByOpenId(this.wechatOpenId).then((res) => {
-					if (res.data.success) {
-						that.client = res.data.result;
-					}
-				});
-				if (that.client) {
-					await listWorkOrderByComment(that.client.id).then((res) => {
+		async onLoad(option) {
+			if (option.workOrder) {
+				let workOrder = JSON.parse(decodeURIComponent(option.workOrder));
+				console.log(workOrder);
+				this.workOrderList.push(workOrder);
+			} else {
+				this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
+				let that = this;
+				if (this.wechatOpenId) {
+					await getClientByOpenId(this.wechatOpenId).then((res) => {
 						if (res.data.success) {
-							that.workOrderList = res.data.result;
+							that.client = res.data.result;
 						}
-					})
+					});
+					if (that.client) {
+						await listWorkOrderByComment(that.client.id).then((res) => {
+							if (res.data.success) {
+								that.workOrderList = res.data.result;
+							}
+						})
+					}
 				}
 			}
 		},
