@@ -503,7 +503,6 @@ export default {
       }
     },
     loadData(arg) {
-      debugger;
       if (!this.url.list) {
         this.$message.error('请设置url.list属性!')
         return

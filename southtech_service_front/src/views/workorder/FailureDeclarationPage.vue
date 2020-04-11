@@ -287,7 +287,6 @@
         this.form.setFieldsValue(pick(row,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
       },
       contactCondition() {
-        console.log("clientId:"+this.client.id);
         let sql = "tb_contact,name,id,client_id=";
         if (this.client.id) {
           sql += this.client.id;

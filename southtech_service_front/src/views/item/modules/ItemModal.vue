@@ -28,9 +28,9 @@
         <a-form-item label="保修期" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'ikfperiod', validatorRules.ikfperiod]" placeholder="请输入保修期"></a-input>
         </a-form-item>
-        <a-form-item label="modifyTime" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <!-- <a-form-item label="modifyTime" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'modifytime', validatorRules.modifytime]" placeholder="请输入modifyTime"></a-input>
-        </a-form-item>
+        </a-form-item> -->
 
       </a-form>
     </a-spin>

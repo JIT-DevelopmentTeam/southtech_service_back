@@ -334,7 +334,7 @@
 	    		<artifactId>jeecg-boot-base-common</artifactId>
 	    		<version>${jeecgboot.common.version}</version>
 	    	</dependency>
-	    	<!-- 七牛云SDK -->
+	    	<!-- SDK -->
 			<dependency>
 				<groupId>com.qiniu</groupId>
 				<artifactId>qiniu-java-sdk</artifactId>

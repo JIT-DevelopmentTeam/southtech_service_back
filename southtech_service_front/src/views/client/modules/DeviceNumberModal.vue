@@ -30,8 +30,8 @@
         <a-form-item label="描述" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-textarea rows="4" placeholder="请输入描述" v-decorator="[ 'description', validatorRules.description]" style="resize:none;"/>
         </a-form-item>
-        <a-form-item label="保质期" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-date placeholder="请选择保质期" v-decorator="[ 'qgp', validatorRules.qgp]" :trigger-change="true" style="width: 100%"/>
+        <a-form-item label="保质期至" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-date placeholder="请选择保质期至" v-decorator="[ 'qgp', validatorRules.qgp]" :trigger-change="true" style="width: 100%"/>
         </a-form-item>
         <a-form-item label="签约日期" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-date placeholder="请选择签约日期" v-decorator="[ 'signing', validatorRules.signing]" :trigger-change="true" style="width: 100%"/>
@@ -85,7 +85,7 @@
         type:{rules: [{ required: true, message: '请输入类型!' }]},
         clientId:{rules: [{ required: true, message: '请选择客户!' }]},
         description:{},
-        qgp:{rules: [{ required: true, message: '请选择保质期!' }]},
+        qgp:{rules: [{ required: true, message: '请选择保质期至!' }]},
         signing:{rules: [{ required: true, message: '请选择签约时间!' }]},
         },
         url: {

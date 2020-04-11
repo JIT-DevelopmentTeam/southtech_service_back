@@ -158,7 +158,7 @@
             }
           },
           {
-            title:'保质期',
+            title:'保质期至',
             align:"center",
             dataIndex: 'qgp'
           },
