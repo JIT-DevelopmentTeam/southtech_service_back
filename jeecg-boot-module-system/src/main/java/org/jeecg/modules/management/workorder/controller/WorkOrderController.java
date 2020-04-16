@@ -429,7 +429,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             OapiWorkrecordAddRequest.FormItemVo obj3 = new OapiWorkrecordAddRequest.FormItemVo();
             list2.add(obj3);
             obj3.setTitle(messageTemplateList.get(0).getTemplateName());
-            obj3.setContent(messageTemplateList.get(0).getTemplateContent().replace("${clientServiceName}",loginUser.getRealname()).replace("${clientName}",client.getName()));
+            obj3.setContent(messageTemplateList.get(0).getTemplateContent().replace("${clientServiceName}",loginUser.getRealname()).replace("${clientName}",client.getName()).replace("${sendingTime}",DateUtils.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss")));
             req.setFormItemList(list2);
             try {
                 OapiWorkrecordAddResponse rsp = dingTalkClient.execute(req, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());

@@ -121,12 +121,6 @@
             title:'评价',
             align:"center",
             dataIndex: 'evaluation'
-          },
-          {
-            title: '操作',
-            dataIndex: 'action',
-            align:"center",
-            scopedSlots: { customRender: 'action' },
           }
         ],
         url: {

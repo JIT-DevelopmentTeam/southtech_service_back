@@ -4,6 +4,7 @@
 
 <script>
 import {gantt} from 'dhtmlx-gantt';
+import "../../node_modules/dhtmlx-gantt/codebase/locale/locale_cn.js"
 export default {
   name: 'Gantt',
   components:{gantt},
@@ -17,6 +18,7 @@ export default {
   },
 
   mounted: function () {
+    console.log(gantt.config);
     gantt.config.xml_date = "%Y-%m-%d";
     gantt.config.drag_links = false;
     gantt.config.drag_resize = false;

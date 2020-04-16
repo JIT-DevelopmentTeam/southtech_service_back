@@ -73,6 +73,22 @@
         icon="message"
         @click="handleServiceVisits"
       >回访</a-button>
+
+      <a-dropdown v-if="selectedRowKeys.length > 0">
+        <a-menu slot="overlay">
+          <a-menu-item key="1" v-has="'workOrder:finish'" @click="setStatus(3)">
+            <a-icon type="check" />强制完成
+          </a-menu-item>
+          <a-menu-item key="2" v-has="'workOrder:close'" @click="setStatus(4)">
+            <a-icon type="close" />强制关闭
+          </a-menu-item>
+        </a-menu>
+        <a-button style="margin-left: 8px">
+          批量操作
+          <a-icon type="down" />
+        </a-button>
+      </a-dropdown>
+    </div>
     </div>
 
     <!-- table区域-begin -->
@@ -127,7 +143,7 @@
 
           <a-divider type="vertical" />
           <a-dropdown>
-            <a v-if="!record.assignedTime" @click="dispatch(record)" class="ant-dropdown-link">
+            <a v-if="!record.serviceEngineerName" @click="dispatch(record)" class="ant-dropdown-link">
               派工
             </a>
           </a-dropdown>
@@ -535,13 +551,13 @@ export default {
           ids += this.selectedRowKeys[a] + ','
         }
       }
-      let message = ''
+      let message = null;
       switch (status) {
         case 3:
-          message += '您确定要完成选中工单吗?'
+          message = '您确定要完成选中工单吗?'
           break
         case 4:
-          message += '您确定要关闭选中工单吗?'
+          message = '您确定要关闭选中工单吗?'
           break
       }
       this.$confirm({
