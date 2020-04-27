@@ -1,10 +1,8 @@
 package org.jeecg.modules.management.mobile.workOrder;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.jeecg.common.api.vo.Result;
-import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.modules.management.progressreport.service.IProgressReportService;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
@@ -18,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -33,6 +30,9 @@ public class MobileWorkOrderController {
 
     @Autowired
     private IWorkOrderDetailService workOrderDetailService;
+
+    @Autowired
+    protected IProgressReportService progressReportService;
 
 
     //-----------------------------------钉钉----------------------------------
@@ -65,6 +65,12 @@ public class MobileWorkOrderController {
     public Result<?> getAllDetail(HttpServletRequest req) {
         List<MobileWorkOrderDetailDTO> detailList = workOrderDetailService.getByWorkOrderId(req.getParameter("workOrderId"));
         return Result.ok(detailList);
+    }
+
+    @RequestMapping(value = "/getAllReport", method = RequestMethod.GET)
+    public Result<?> getAllReport(HttpServletRequest req) {
+        List<MobileWorkOrderDetailDTO> reportList = progressReportService.getByWorkOrderId(req.getParameter("workOrderId"));
+        return Result.ok(reportList);
     }
 
     @PostMapping(value = "/add")
