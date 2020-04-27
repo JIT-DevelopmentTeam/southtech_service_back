@@ -17,7 +17,7 @@
 
             <a-col :span="10">
               <a-form-item label="姓名">
-                <a-input placeholder="请输入姓名" v-model="queryParam.username"></a-input>
+                <a-input placeholder="请输入姓名" v-model="queryParam.realname"></a-input>
               </a-form-item>
             </a-col>
             <a-col :span="8">

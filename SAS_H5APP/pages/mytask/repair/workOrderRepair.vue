@@ -134,7 +134,7 @@
 				</view>
 			</view>
 		
-			<view v-if="stageStatus != 1">
+			<view v-if="stageStatus != 1 && jurisdiction !== 'view'">
 				<view class="bottom">
 					<uni-grid :column="3" :show-border="false"  :square="false">
 						<uni-grid-item>
@@ -177,6 +177,7 @@
 			return {
 				picRequestRUl: this.$IP + '/mobile/upload/uploadPicture',  // 请求地址
 				uploadFileUrl: this.$IP + '/mobile/upload/uploadFile',
+				jurisdiction: '',/* 可操作权限 */
 				reportId: '',
 				detailId: '',/* 工单明细id */
 				id: '',/* 阶段id */
@@ -261,6 +262,7 @@
 			this.ticketId = option.ticketId
 			this.stageStatus = option.stageStatus
 			this.ticketType = option.ticketType
+			this.jurisdiction = option.jurisdiction
 			/**-------阶段配置型显示-------*/
 			this.stageLists = this.$store.getters['stage/getStageList']
 			this.stage = this.stageLists.filter(e=>e.id === this.id)[0]
@@ -279,7 +281,7 @@
 				getReportById(params).then(res => {
 					console.log(res);
 					let result = res.data.result;
-					if (result.isCompleted === '1') {
+					if (result.isCompleted === '1' && result.time !== null) {
 						let timeArr = result.time.split(",");
 						this.signInTime = timeArr[0];
 						this.signOutTime = timeArr[1];

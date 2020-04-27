@@ -1,8 +1,11 @@
 package org.jeecg.modules.management.progressreport.service;
 
-import org.jeecg.modules.management.progressreport.entity.ProgressReport;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.management.progressreport.entity.ProgressReport;
 import org.jeecg.modules.management.progressreport.vo.MobileReportDTO;
+import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDetailDTO;
+
+import java.util.List;
 
 /**
  * @Description: 进度汇报
@@ -20,5 +23,12 @@ public interface IProgressReportService extends IService<ProgressReport> {
      * @return
      */
     MobileReportDTO getByReportId(String userName, String progressId, String reportId);
+
+    /**
+     * 根据workOrderId查询汇报记录列表
+     * @param workOrderId
+     * @return
+     */
+    List<MobileWorkOrderDetailDTO> getByWorkOrderId(String workOrderId);
 
 }

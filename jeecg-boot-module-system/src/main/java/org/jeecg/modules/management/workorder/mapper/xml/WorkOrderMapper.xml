@@ -49,7 +49,7 @@
         FROM
             `ic_work_order` workOrder
         LEFT JOIN tb_client client ON client.id = workOrder.client_id
-        LEFT JOIN tb_contact contact ON contact.client_id = client.id
+        LEFT JOIN tb_contact contact ON contact.id = workOrder.contact_id
         LEFT JOIN ic_work_order_detail detail ON workOrder.id = detail.work_order_id
         WHERE
             1=1

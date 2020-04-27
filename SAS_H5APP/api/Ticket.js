@@ -58,6 +58,14 @@ export function getAllDetail(params) {
 	})
 }
 
+export function getAllReport(params) {
+	return http({
+		url: '/mobile/workOrder/getAllReport',
+		params: params,
+		method: 'get'
+	})
+}
+
 /* 获取用户列表 */
 export function listClient(params) {
 	return http({
