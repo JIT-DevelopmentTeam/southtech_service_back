@@ -67,6 +67,8 @@ public class DeviceNumber extends BaseEntity implements Serializable {
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private java.util.Date signing;
+    /**验收日期*/
+    private java.util.Date acceptance;
 	/**所属客户*/
 	private java.lang.String clientId;
 }

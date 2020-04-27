@@ -168,6 +168,11 @@
             dataIndex: 'signing'
           },
           {
+            title:'验收日期',
+            align:"center",
+            dataIndex: 'acceptance'
+          },
+          {
             title: '操作',
             dataIndex: 'action',
             align:"center",

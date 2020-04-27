@@ -59,7 +59,7 @@ public class Contact implements Serializable {
 	private java.lang.String position;
 	/**手机*/
 	@Excel(name = "手机", width = 15)
-	private java.lang.String mobilePhone;
+    private java.lang.String mobilePhone;
 	/**电话*/
 	@Excel(name = "电话", width = 15)
 	private java.lang.String phone;

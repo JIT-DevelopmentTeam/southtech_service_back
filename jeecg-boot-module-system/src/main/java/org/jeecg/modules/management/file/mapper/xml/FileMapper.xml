@@ -3,7 +3,18 @@
 <mapper namespace="org.jeecg.modules.management.file.mapper.FileMapper">
 
     <select id="getByReportId" resultType="org.jeecg.modules.management.file.entity.File">
-        SELECT * FROM ic_file WHERE progress_report_id = #{reportId} and type = #{type}
+        SELECT
+          *
+        FROM
+          ic_file
+        WHERE
+          1=1
+        <if test="reportId != null and reportId != ''">
+            AND progress_report_id = #{reportId}
+        </if>
+        <if test="type != null and type != ''">
+            AND type = #{type}
+        </if>
     </select>
 
 </mapper>

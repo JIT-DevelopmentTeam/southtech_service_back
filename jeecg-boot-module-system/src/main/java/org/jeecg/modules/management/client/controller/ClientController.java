@@ -262,6 +262,17 @@ public class ClientController extends JeecgController<Client, IClientService> {
 	}
 
     /**
+     * 添加
+     * @param contact
+     * @return
+     */
+    @PostMapping(value = "/addContactReturn")
+    public Result<?> addContactReturn(@RequestBody Contact contact) {
+        contactService.save(contact);
+        return Result.ok(contact);
+    }
+
+    /**
 	 * 编辑
 	 * @param contact
 	 * @return
@@ -419,9 +430,16 @@ public class ClientController extends JeecgController<Client, IClientService> {
                     deviceNumber.setNumber(data.getString("number"));
                     deviceNumber.setName(data.getString("name"));
                     deviceNumber.setType(data.getString("type"));
-                    /*deviceNumber.setDescription(data.getString("describe"));
                     deviceNumber.setSigning(dataFormat.parse(data.getString("signing")));
-                    deviceNumber.setQgp(dataFormat.parse(data.getString("QGP")));*/
+                    if (oConvertUtils.isNotEmpty(data.get("describe"))) {
+                        deviceNumber.setDescription(data.getString("describe"));
+                    }
+                    if (oConvertUtils.isNotEmpty(data.get("QGP"))) {
+                        deviceNumber.setQgp(dataFormat.parse(data.getString("QGP")));
+                    }
+                    if (oConvertUtils.isNotEmpty(data.get("acceptance"))) {
+                        deviceNumber.setAcceptance(dataFormat.parse(data.getString("acceptance")));
+                    }
                     deviceNumber.setModifytime(data.getTimestamp("FModifyTime"));
                     deviceNumber.setClientId(client.getId());
                     addDeviceNumberList.add(deviceNumber);

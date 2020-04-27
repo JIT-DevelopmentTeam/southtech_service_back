@@ -89,7 +89,6 @@
         </a-button>
       </a-dropdown>
     </div>
-    </div>
 
     <!-- table区域-begin -->
     <div>
@@ -155,10 +154,13 @@
       <a-tab-pane tab="工单进度" key="1">
         <work-order-progress-page :mainId="selectedMainId" />
       </a-tab-pane>
-      <a-tab-pane tab="回访记录" key="2">
+      <a-tab-pane tab="汇报记录" key="2" forceRender>
+        <progress-report-list :mainId="selectedMainId" />
+      </a-tab-pane>
+      <a-tab-pane tab="回访记录" key="3">
         <ServiceVisitsList ref="ServiceVisitsList" :workOrderNum="workOrder.number"/>
       </a-tab-pane>
-	  <a-tab-pane tab="服务评价" key="3" forceRender>
+      <a-tab-pane tab="服务评价" key="4" forceRender>
         <service-commentery-list :mainId="selectedMainId" />
       </a-tab-pane>
     </a-tabs>
@@ -176,10 +178,12 @@ import { getAction, postAction } from '@/api/manage'
 import DisPatchModal from './modules/DispatchModal'
 import WorkOrderProgressPage from './WorkOrderProgressPage'
 import ServiceCommenteryList from './ServiceCommenteryList'
+import ProgressReportList from './ProgressReportList'
 import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
 import { initDictOptions, filterMultiDictText } from '@/components/dict/JDictSelectUtil'
 import ServiceVisits from '@/views/servicevists/modules/ServiceVisitsModal'
 import ServiceVisitsList from '@/views/servicevists/ServiceVisitsList'
+
 import {formatDate} from '@/utils/util.js'
 
 export default {
@@ -189,7 +193,8 @@ export default {
     JDictSelectTag,
     DisPatchModal,
     WorkOrderProgressPage,
-  	ServiceCommenteryList,
+    ServiceCommenteryList,
+    ProgressReportList,
     WorkOrderModal,
     ServiceVisits,
     ServiceVisitsList

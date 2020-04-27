@@ -1,9 +1,9 @@
 <template>
 	<view class="content">
-		<view v-for="(ditem,index) in dataList" :key="index">
+		<view v-for="(ditem,dindex) in dataList" :key="dindex">
 			<view v-if="ditem.show == undefined || ditem.show">
 				<nav-div :title="ditem.title">
-					<view v-for="(titem,index) in ditem.textList" :key="index">
+					<view v-for="(titem,tindex) in ditem.textList" :key="tindex">
 						<nav-icon :text="titem.text" :icon="titem.icon" :color-style="titem.color" @clickItem="clickItem(titem.pageType, titem.url)"></nav-icon>
 					</view>
 				</nav-div>

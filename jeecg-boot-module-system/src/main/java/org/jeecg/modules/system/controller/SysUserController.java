@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.constant.CommonConstant;
@@ -102,6 +103,9 @@ public class SysUserController {
     public Result<IPage<SysUser>> queryUserPageList(SysUser user, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, @RequestParam("roleCode") String roleCode, HttpServletRequest req) {
         Result<IPage<SysUser>> result = new Result<IPage<SysUser>>();
+        if (StringUtils.isNotBlank(user.getRealname())) {
+            user.setRealname("*"+user.getRealname().trim()+"*");
+        }
         QueryWrapper<SysUser> queryWrapper = QueryGenerator.initQueryWrapper(user, req.getParameterMap());
         QueryWrapper<SysRole> roleQueryWrapper = new QueryWrapper<>();
         roleQueryWrapper.eq("role_code",roleCode);

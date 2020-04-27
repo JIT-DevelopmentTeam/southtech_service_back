@@ -26,7 +26,11 @@ import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 import org.jeecg.modules.management.workorder.vo.WorkOrderPage;
 import org.jeecg.modules.message.entity.SysMessageTemplate;
 import org.jeecg.modules.message.service.ISysMessageTemplateService;
+import org.jeecg.modules.system.entity.SysAnnouncement;
+import org.jeecg.modules.system.entity.SysAnnouncementSend;
 import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysAnnouncementSendService;
+import org.jeecg.modules.system.service.ISysAnnouncementService;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +82,11 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 
      @Autowired
      private ISysMessageTemplateService sysMessageTemplateService;
+
+    @Autowired
+    private ISysAnnouncementService sysAnnouncementService;
+    @Autowired
+    private ISysAnnouncementSendService sysAnnouncementSendService;
 
      @Autowired
      private RedisUtil redisUtil;
@@ -193,6 +202,37 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         WorkOrder workOrder = new WorkOrder();
         BeanUtils.copyProperties(workOrderPage, workOrder);
         workOrderService.saveMain(workOrder, workOrderPage.getWorkOrderDetailList());
+        List<SysMessageTemplate> messageTemplateList = sysMessageTemplateService.selectByCode("sys_new_ticket_reminder");
+        if (!messageTemplateList.isEmpty()) {
+            List<SysUser> userList = sysUserService.listByRoleCode("customer_service");
+            if (!userList.isEmpty()) {
+                StringBuffer userIdsStr = new StringBuffer();
+                for (SysUser user : userList) {
+                    userIdsStr.append(user.getId()+",");
+                }
+                userIdsStr = userIdsStr.deleteCharAt(userIdsStr.length()-1);
+                SysAnnouncement announcement = new SysAnnouncement();
+                announcement.setTitile(messageTemplateList.get(0).getTemplateName());
+                announcement.setMsgContent(messageTemplateList.get(0).getTemplateContent());
+                announcement.setStartTime(new Date());
+                announcement.setSender("admin");
+                announcement.setPriority("H");
+                announcement.setMsgCategory("2");
+                announcement.setMsgType("USER");
+                announcement.setSendStatus("1");
+                announcement.setSendTime(new Date());
+                announcement.setUserIds(userIdsStr.toString());
+                announcement.setDelFlag("0");
+                sysAnnouncementService.saveAnnouncement(announcement);
+                for (SysUser user : userList) {
+                    SysAnnouncementSend announcementSend = new SysAnnouncementSend();
+                    announcementSend.setAnntId(announcement.getId());
+                    announcementSend.setUserId(user.getId());
+                    announcementSend.setReadFlag("0");
+                    sysAnnouncementSendService.save(announcementSend);
+                }
+            }
+        }
         return Result.ok("添加成功！");
     }
 

@@ -9,9 +9,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.management.file.entity.File;
+import org.jeecg.modules.management.file.service.IFileService;
 import org.jeecg.modules.management.progressreport.entity.ProgressReport;
 import org.jeecg.modules.management.progressreport.service.IProgressReportService;
 
@@ -45,6 +49,9 @@ import com.alibaba.fastjson.JSON;
 public class ProgressReportController extends JeecgController<ProgressReport, IProgressReportService> {
 	@Autowired
 	private IProgressReportService progressReportService;
+
+	@Autowired
+    private IFileService fileService;
 	
 	/**
 	 * 分页列表查询
