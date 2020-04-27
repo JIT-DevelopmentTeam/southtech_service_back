@@ -1,10 +1,11 @@
-import { getWorkOrderList, getAllDetail } from '@/api/Ticket.js'
+import { getWorkOrderList, getAllDetail, getAllReport } from '@/api/Ticket.js'
 import { getServiceWorkOrderList} from '@/api/serviceNumber.js'
 
 
 const state = {
 	ticketList: [],  // 钉钉工单列表
 	ticketDetailList: [], // 工单明细列表
+	reportList: [],	// 汇报记录列表
 	serviceTicketList:[]   /* 服务号工单列表 */
 }
 
@@ -14,6 +15,9 @@ const getters = {
 	},
 	getTicketDetailList() {
 		return state.ticketDetailList
+	},
+	getReportList() {
+		return state.reportList
 	},
 	getServiceTicketList(){
 		return state.serviceTicketList
@@ -26,6 +30,9 @@ const mutations = {
 	},
 	setTicketDetailList(state, payload) {
 		state.ticketDetailList = payload
+	},
+	setReportList(state, payload) {
+		state.reportList = payload
 	},
 	setServiceTicketList(state, payload){
 		state.serviceTicketList = payload
@@ -64,6 +71,17 @@ const actions = {
 				resolve(res.data.result)
 			}).catch(err => {
 				console.log(error);
+				reject()
+			})
+		})
+	},
+	GetReportList({commit, state}, payload) {
+		return new Promise((resolve, reject) => {
+			getAllReport(payload).then(res => {
+				commit('setReportList', res.data.result)
+				resolve(res.data.result)
+			}).catch(err => {
+				console.log(err);
 				reject()
 			})
 		})

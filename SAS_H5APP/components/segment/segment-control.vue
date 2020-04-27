@@ -11,8 +11,11 @@
 			<view v-if="current == 0">
 				<step-item :ticketId="ticketId" :ticketType="ticketType" :isNavigateTo="isNavigateTo"></step-item>
 			</view>
-			<view v-else>
+			<view v-else-if="current == 1">
 				<detail-card :ticketId="ticketId" :ticketType="ticketType"></detail-card>
+			</view>
+			<view v-else>
+				<report-card :ticketId="ticketId" :ticketType="ticketType"></report-card>
 			</view>
         </view>
     </view>
@@ -23,7 +26,8 @@
 		components: {
 			uniSegmentedControl: () => import('@dcloudio/uni-ui/lib/uni-segmented-control/uni-segmented-control.vue'),
 			stepItem: () => import('@/components/swiper-item/swiper-item.vue'),
-			detailCard: () => import('@/pages/mytask/detail/component/detail_card.vue')
+			detailCard: () => import('@/pages/mytask/detail/component/detail_card.vue'),
+			reportCard: () => import('@/pages/mytask/detail/component/report_card.vue')
 		},
 		props:{
 			ticketId:{
@@ -47,7 +51,7 @@
 		},
 	    data() {
 			return {
-				items: ['项目阶段','工单明细'],
+				items: ['项目阶段','工单明细','汇报明细'],
 				current: 0,
 			}
 	    },
