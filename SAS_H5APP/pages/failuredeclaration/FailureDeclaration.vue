@@ -20,7 +20,7 @@
 						<view class="uni-input">{{ contactList[dataIndex.contactIndex] != null ? contactList[dataIndex.contactIndex].text : '' }}</view>
 					</picker>
 				</view>
-				<view class="flex-item flex-item-V">
+				<view class="flex-item flex-item-V" v-if="dingTalkUserId">
 					<view class="title"><span style="color: red;">*</span>接入方式</view>
 					<picker v-model="model.accessMethod" mode ="selector" @change="pickerChange($event.target.value,'accessMethodIndex');" :value="dataIndex.accessMethodIndex" :range="accessMethodList" range-key="text">
 						<view class="uni-input">{{ accessMethodList[dataIndex.accessMethodIndex] != null ? accessMethodList[dataIndex.accessMethodIndex].text : '' }}</view>
@@ -149,7 +149,8 @@
 	     async mounted() {
 			 // 初始化
 			this.dingTalkUserId = this.$store.getters['getUserId'];
-			this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
+			this.wechatOpenId = 'otL61wnZFm38s4_ulyQTjjiOMeZM';
+			//this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
 			if (this.dingTalkUserId) {
 				getUserByEnterpriseId(this.dingTalkUserId).then((res) => {
 					if (res.data.success) {
@@ -179,6 +180,8 @@
 				 		this.deviceNumberList = res.data.result;
 					}
 				});
+				this.model.accessMethod = '4';
+				console.log(this.model);
 			}
 			getDicList("work_order_access_method").then((res) => {
 				if (res.data.success) {

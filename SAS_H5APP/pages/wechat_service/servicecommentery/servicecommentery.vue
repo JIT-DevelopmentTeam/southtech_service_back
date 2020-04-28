@@ -47,7 +47,6 @@
 		async onLoad(option) {
 			if (option.workOrder) {
 				let workOrder = JSON.parse(decodeURIComponent(option.workOrder));
-				console.log(workOrder);
 				this.workOrderList.push(workOrder);
 			} else {
 				this.wechatOpenId = this.$store.getters['getWeChatOpenId'];

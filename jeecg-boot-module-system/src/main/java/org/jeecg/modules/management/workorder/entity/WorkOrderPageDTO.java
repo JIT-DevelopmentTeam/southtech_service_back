@@ -31,6 +31,7 @@ public class WorkOrderPageDTO implements Serializable {
     private java.lang.String emergencyLevel;
     private java.lang.String customerServiceName;
     private java.util.Date declarationTime;
+    private java.lang.String annex;
     private java.lang.String deviceNumber;
     private java.lang.String serviceEngineerName;
     private java.lang.String faultLocation;

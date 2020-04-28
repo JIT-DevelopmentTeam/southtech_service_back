@@ -36,23 +36,13 @@
             </a-form-item>
           </a-col>
           <a-col :lg="8">
-           <a-form-item label="联系人(选)" :labelCol="labelCol" :wrapperCol="wrapperCol">
+           <a-form-item label="联系人" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-dict-select-tag v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" :trigger-change="true" :dictCode="contactCondition()" @change="selectContact($event)"/>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
-            <a-form-item label="联系人(填)" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input :disabled="disabledWrite" v-model="contactName" placeholder="请输入联系人"></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
            <a-form-item label="联系电话" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-input placeholder="请选择联系人" :value="contact != null ? contact.mobilePhone : ''" :disabled="true"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
-           <a-form-item label="联系电话(填)" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input :disabled="disabledWrite" v-model="contactMobile" placeholder="请填写联系电话"></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -82,7 +72,7 @@
           </a-col>
           <a-col :lg="8">
             <a-form-item label="附件" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-upload v-decorator="['annex']" name="workOrderDetail" :trigger-change="true"></j-upload>
+              <j-upload v-decorator="['annex']" name="workOrderDetail"></j-upload>
             </a-form-item>
           </a-col>
         </a-row>
@@ -197,8 +187,6 @@
         confirmLoading: false,
         disabledWrite:false,
         contactId:null,
-        contactName:null,
-        contactMobile:null,
         validatorRules:{
         number:{rules: [{ required: true, message: '请输入编号!' }]},
         status:{rules: [{ required: true, message: '请输入状态!' }]},
@@ -221,7 +209,6 @@
           getClientById:"/client/client/getClientById",
           getContactById:"/client/client/getContactById",
           getByUserName:"/sys/user/getByUserName",
-          addContactReturn:"/client/client/addContactReturn"
         },
         workOrderType:null,
         listSize:5,
@@ -290,58 +277,34 @@
         this.form.validateFields((err, values) => {
           if (!err) {
             that.confirmLoading = true;
-            that.addContact().then((res)=>{
-              let httpurl = '';
-              let method = '';
-              if(!this.model.id){
-                httpurl+=this.url.add;
-                method = 'post';
+            let httpurl = '';
+            let method = '';
+            if(!this.model.id){
+              httpurl+=this.url.add;
+              method = 'post';
+            }else{
+              httpurl+=this.url.edit;
+              method = 'put';
+            }
+            if (res && res.success) {
+              values.contactId = res.result.id;
+            }
+            let formData = Object.assign(this.model, values);
+            console.log("表单提交数据",formData)
+            httpAction(httpurl,formData,method).then((res)=>{
+              if(res.success){
+                that.$message.success(res.message);
+                that.$emit('ok');
               }else{
-                httpurl+=this.url.edit;
-                method = 'put';
+                that.$message.warning(res.message);
               }
-              if (res && res.success) {
-                values.contactId = res.result.id;
-              }
-              let formData = Object.assign(this.model, values);
-              console.log("表单提交数据",formData)
-              httpAction(httpurl,formData,method).then((res)=>{
-                if(res.success){
-                  that.$message.success(res.message);
-                  that.$emit('ok');
-                }else{
-                  that.$message.warning(res.message);
-                }
-              }).finally(() => {
-                that.confirmLoading = false;
-                that.close();
-              })
-            });
+            }).finally(() => {
+              that.confirmLoading = false;
+              that.close();
+            })
           }
          
         })
-      },
-      addContact(){
-        let that = this;
-        return new Promise(function (resolve,reject) {
-          if (!that.contactId) {
-            if (!that.contactName && !that.contactMobile) {
-              that.$message.error('请填写联系人和联系电话!');
-              return;
-            }
-            // 先插入联系人
-            let clientId = that.form.getFieldValue('clientId');
-            let addContact = {name:that.contactName,mobilePhone:that.contactMobile,clientId:clientId};
-            postAction(that.url.addContactReturn,addContact).then((res) => {
-              if (res.success) {
-                resolve(res);
-              }
-            }).catch(err => {
-              reject()
-            });
-          }
-          resolve();
-        });
       },
       handleCancel () {
         this.close()
@@ -398,12 +361,6 @@
         });
       },
       selectContact(value) {
-        console.log("value:"+value)
-        if (value) {
-          this.disabledWrite = true;
-        } else {
-          this.disabledWrite = false;
-        }
         this.contactId = value;
         getAction(this.url.getContactById+"?id="+value,null).then((res) => {
           if (res.success) {
