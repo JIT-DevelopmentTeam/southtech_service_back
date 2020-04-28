@@ -53,12 +53,29 @@
         
         @change="handleTableChange">
 
-        <template slot="htmlSlot" slot-scope="text">
-          <div v-html="text"></div>
+         <template slot="htmlSlot" slot-scope="text">
+            <span v-if="text.indexOf('jpg') > 0 || text.indexOf('png') > 0 && !text" style="font-size: 12px;font-style: italic;">无此图片</span>
+            <div v-else-if="text.indexOf('jpg') > 0 || text.indexOf('png') > 0" style="float: left;width:104px;height:104px;margin-right: 10px;margin: 0 8px 8px 0;">
+              <div
+                style="width: 100%;height: 100%;position: relative;padding: 8px;border: 1px solid #d9d9d9;border-radius: 4px;">
+                <img style="width: 100%;" :src="getImgView(text)" alt="图片不存在"/>
+              </div>
+            </div>
+            <!-- <img  height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/> -->
+            <span v-if="text.indexOf('jpg') < 0 || text.indexOf('png') < 0 && !text" style="font-size: 12px;font-style: italic;">无此文件</span>
+              <a-button
+                v-else-if="text.indexOf('jpg') < 0 && text.indexOf('png') < 0"
+                :ghost="true"
+                type="primary"
+                icon="download"
+                size="small"
+                @click="uploadFile(text)">
+                下载
+              </a-button>
         </template>
         <template slot="imgSlot" slot-scope="text">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
-          <img v-else :src="getImgView(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
+          <img v-else :src="getImgView(text)" height="100px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
         </template>
         <template slot="fileSlot" slot-scope="text">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
@@ -124,22 +141,34 @@
             }
           },
           {
-            title:'文件名',
+            title:'类型',
             align:"center",
-            dataIndex: 'filename'
+            dataIndex: 'type',
+            customRender:function(text) {
+              let typeText;
+              switch (text) {
+                case 'Photo':
+                  typeText = '图片';
+                  break;
+                case 'File':
+                  typeText = '文件';
+                  break;
+              }
+              return typeText;
+            }
           },
           {
-            title:'文件路径',
+            title:'附件',
             align:"center",
             dataIndex: 'url',
-            scopedSlots: {customRender: 'imgSlot'}
+            scopedSlots: {customRender: 'htmlSlot'}
           },
-          {
-            title: '操作',
-            dataIndex: 'action',
-            align:"center",
-            scopedSlots: { customRender: 'action' }
-          }
+          // {
+          //   title: '操作',
+          //   dataIndex: 'action',
+          //   align:"center",
+          //   scopedSlots: { customRender: 'action' }
+          // }
         ],
         url: {
           list: "/file/file/list",
@@ -161,7 +190,11 @@
       initDictConfig(){
       },
       showModal(record) {
+        this.queryParam['progressReportId'] = record.id;
+        this.initDictConfig();
+        this.loadData(1);
         this.visible = true;
+
       },
       ok(e) {
         this.visible = false;

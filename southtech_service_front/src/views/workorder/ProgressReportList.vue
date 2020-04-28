@@ -200,7 +200,7 @@
         })
       },
       annexList(record) {
-        this.$refs.fileList.showModal()
+        this.$refs.fileList.showModal(record);
       },
       clearList(){
         this.dataSource=[]
