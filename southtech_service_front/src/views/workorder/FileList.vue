@@ -54,15 +54,15 @@
         @change="handleTableChange">
 
          <template slot="htmlSlot" slot-scope="text">
-            <span v-if="text.indexOf('jpg') > 0 || text.indexOf('png') > 0 && !text" style="font-size: 12px;font-style: italic;">无此图片</span>
-            <div v-else-if="text.indexOf('jpg') > 0 || text.indexOf('png') > 0" style="float: left;width:104px;height:104px;margin-right: 10px;margin: 0 8px 8px 0;">
+            <span v-if="(text.indexOf('jpg') >= 0 || text.indexOf('png') >= 0) && !text" style="font-size: 12px;font-style: italic;">无此图片</span>
+            <div v-else-if="text.indexOf('jpg') >= 0 || text.indexOf('png') >= 0" style="width:300px;display: inline-block;">
               <div
-                style="width: 100%;height: 100%;position: relative;padding: 8px;border: 1px solid #d9d9d9;border-radius: 4px;">
-                <img style="width: 100%;" :src="getImgView(text)" alt="图片不存在"/>
+                style="width: 100%;height: 100%;padding: 8px;border: 1px solid #d9d9d9;border-radius: 4px;">
+                <img style="width: 100%;height: 100%;" :src="getImgView(text)" alt="图片不存在"/>
               </div>
             </div>
             <!-- <img  height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/> -->
-            <span v-if="text.indexOf('jpg') < 0 || text.indexOf('png') < 0 && !text" style="font-size: 12px;font-style: italic;">无此文件</span>
+            <span v-if="(text.indexOf('jpg') <= 0 || text.indexOf('png') <= 0) && !text" style="font-size: 12px;font-style: italic;">无此文件</span>
               <a-button
                 v-else-if="text.indexOf('jpg') < 0 && text.indexOf('png') < 0"
                 :ghost="true"
