@@ -74,14 +74,19 @@
 					} else {
 						uni.showModal({
 							title:'提示',
-							content:'您的账号暂未通过审核,请联系客服!',
-							showCancel:false
+							content:'您的账号尚未注册,请先进行注册!',
+							showCancel:false,
+							success: () => {
+								uni.redirectTo({
+									url:'/pages/wechat_service/login/index?wxUser='+encodeURIComponent(JSON.stringify(res))
+								})
+							}
 						})
 					}
 				} else {
 					uni.showModal({
 						title:'提示',
-						content:'请关注公众号后联系客服审核信息!',
+						content:'请关注公众号!',
 						showCancel:false
 					})
 				}

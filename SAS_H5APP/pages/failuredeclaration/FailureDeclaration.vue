@@ -149,8 +149,7 @@
 	     async mounted() {
 			 // 初始化
 			this.dingTalkUserId = this.$store.getters['getUserId'];
-			this.wechatOpenId = 'otL61wnZFm38s4_ulyQTjjiOMeZM';
-			//this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
+			this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
 			if (this.dingTalkUserId) {
 				getUserByEnterpriseId(this.dingTalkUserId).then((res) => {
 					if (res.data.success) {

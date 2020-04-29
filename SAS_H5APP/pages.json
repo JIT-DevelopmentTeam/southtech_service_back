@@ -70,6 +70,10 @@
             "path" : "pages/wechat_service/servicecommentery/servicecommentery",
             "style" : {}
         }
+		,{
+		    "path" : "pages/wechat_service/login/index",
+		    "style" : {}
+		}
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
