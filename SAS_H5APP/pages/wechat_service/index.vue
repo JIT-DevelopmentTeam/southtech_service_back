@@ -83,12 +83,6 @@
 							}
 						})
 					}
-				} else {
-					uni.showModal({
-						title:'提示',
-						content:'请关注公众号!',
-						showCancel:false
-					})
 				}
 			});
 		}

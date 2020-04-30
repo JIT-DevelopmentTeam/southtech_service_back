@@ -2,20 +2,20 @@
 	<view class="login">
 		<view class="content">
 			<!-- 头部logo -->
-			<view class="header">
+			<!-- <view class="header">
 				<image :src="logoImage"></image>
-			</view>
+			</view> -->
 			<!-- 主体表单 -->
 			<view class="main">
 				<wInput
-					v-model="companyName"
+					v-model="model.companyName"
 					type="text"
 					maxlength="30"
 					placeholder="企业全称"
 				></wInput>	
 				<label class="label-text">{{labelText}}</label>
 				<wInput
-					v-model="mobile"
+					v-model="model.mobile"
 					type="text"
 					maxlength="11"
 					placeholder="手机号码"
@@ -44,7 +44,8 @@
 					companyName:null,
 					nickname:null,
 					mobile:null,
-					status:'0'
+					status:'0',
+					openId:null
 				},
 				isRotate: false, //是否加载旋转
 				errorCode:"",
@@ -52,7 +53,7 @@
 				wechatOpenId:null,
 				wxUser:{},
 				url:{
-					addWxUserRegister:'mobile/wxUserRegister'
+					addWxUserRegister:'mobile/wxUserRegister/save'
 				}
 			};
 		},
@@ -63,6 +64,7 @@
 		onLoad(option) {
 			this.wxUser = JSON.parse(decodeURIComponent(option.wxUser));
 			this.model.nickname = this.wxUser.nickname;
+			this.model.openId = this.wxUser.openId;
 		},
 		mounted() {
 			_this= this;
@@ -74,7 +76,7 @@
 					//判断是否加载中，避免重复点击请求
 					return false;
 				}
-				if (this.companyName.length == "") {
+				if (this.model.companyName == null || this.model.companyName === '') {
 				     uni.showToast({
 				        icon: 'none',
 						position: 'bottom',
@@ -82,14 +84,14 @@
 				    });
 				    return;
 				}
-		        if (this.mobile.length == "") {
+		        if (this.model.mobile == null || this.model.mobile === '') {
 		            uni.showToast({
 		                icon: 'none',
 						position: 'bottom',
-		                title: '手机号码不正确'
+		                title: '手机号码不能为空'
 		            });
 		            return;
-		        }else if (!(/^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/.test(this.mobile))) {
+		        }else if (!(/^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/.test(this.model.mobile))) {
 					uni.showToast({
 					    icon: 'none',
 						position: 'bottom',
@@ -101,23 +103,19 @@
 				setTimeout(function(){
 					_this.isRotate=false
 				},3000)
-				uni.showLoading({
-					title: '注册中'
-				});
-				let formData = Object.assign({},this.model);
+				let formData = Object.assign({},_this.model);
+				
 				uni.request({
-					url::this.$IP+this.url.addWxUserRegister,
+					url:_this.$IP+_this.url.addWxUserRegister,
 					method:'POST',
 					dataType:'json',
 					data:formData,
 					success:function(res){
-						if (res.data.success) {
-							uni.showModal({
-								title:'提示',
-								content:res.data.message,
-								showCancel:false
-							})
-						}
+						uni.showModal({
+							title:'提示',
+							content:res.data.message,
+							showCancel:false
+						})
 					}
 				})
 		    },

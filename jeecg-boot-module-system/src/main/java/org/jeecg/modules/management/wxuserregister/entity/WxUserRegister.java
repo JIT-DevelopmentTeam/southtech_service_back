@@ -58,4 +58,6 @@ public class WxUserRegister implements Serializable {
 	/**状态*/
 	@Excel(name = "状态", width = 15)
     private java.lang.String status;
+    /**openId*/
+    private java.lang.String openId;
 }

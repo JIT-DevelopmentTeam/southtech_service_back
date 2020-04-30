@@ -67,7 +67,7 @@ Vue.component('Gantt', Gantt)
 // 初始化vue-amap
 VueAMap.initAMapApiLoader({
   // 高德key
-  key: '3ea24bb0feca9045c72c7683af2c9360',
+  key: '7647e7075ef1bd47ef7c3cdfc0c8feae',
   // 插件集合 （插件按需引入）
   plugin: ['Geolocation', 'Scale'],
   v: '1.4.4'

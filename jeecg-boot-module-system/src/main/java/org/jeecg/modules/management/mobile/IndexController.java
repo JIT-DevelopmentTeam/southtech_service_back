@@ -1,4 +1,5 @@
 package org.jeecg.modules.management.mobile;
+import java.util.Date;
 
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.JWTCreator;
@@ -131,8 +132,8 @@ public class IndexController {
     public Result<?> getWxUserInfo(@RequestParam("code") String code) {
         JSONObject codeResult = HttpHelper.httpGet(WechatConstant.GET_USER_TOKEN_URL.replace("APPID",WechatConstant.APP_ID).replace("SECRET",WechatConstant.SECRET).replace("CODE",code));
         if (oConvertUtils.isEmpty(codeResult)) {
-            log.error("获取微信用户信息失败,请求出错!");
-            return Result.error("获取微信用户信息失败");
+            log.error("获取微信用户Token失败,请求出错!");
+            return Result.error("获取用户信息失败");
         }
         String accessToken = codeResult.getString("access_token");
         Long accessTokenExpireId = codeResult.getLong("expires_in");
@@ -150,8 +151,24 @@ public class IndexController {
         wxUserQueryWrapper.eq("open_id",openId);
         WxUser wxUser = wxUserService.getOne(wxUserQueryWrapper);
         if (oConvertUtils.isEmpty(wxUser)) {
-            log.error("本地暂无同步该用户信息!");
-            return Result.error("本地暂无同步该用户信息!");
+            JSONObject userResult = HttpHelper.httpGet(WechatConstant.GET_USER_INFO_URL.replace("ACCESS_TOKEN",accessToken).replace("OPENID",openId));
+            if (oConvertUtils.isEmpty(userResult)) {
+                log.error("获取微信用户信息失败,请求出错!");
+                return Result.error("获取用户信息失败");
+            }
+            WxUser addUser = new WxUser();
+            addUser.setOpenId(openId);
+            addUser.setNickname(userResult.getString("nickname"));
+            addUser.setSex(userResult.getString("sex"));
+            addUser.setCity(userResult.getString("city"));
+            addUser.setCountry(userResult.getString("country"));
+            addUser.setProvince(userResult.getString("province"));
+            addUser.setAccessToken(accessToken);
+            addUser.setAccessTokenExpireId(new Timestamp(System.currentTimeMillis() + accessTokenExpireId * 1000));
+            addUser.setRefreshToken(refreshToken);
+            addUser.setRefreshTokenExpireId(new Timestamp(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 30));
+            wxUserService.save(addUser);
+            return Result.ok(addUser);
         }
         wxUser.setAccessToken(accessToken);
         wxUser.setAccessTokenExpireId(new Timestamp(System.currentTimeMillis() + accessTokenExpireId * 1000));

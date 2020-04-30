@@ -9,6 +9,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
@@ -60,6 +62,12 @@ public class WxUserRegisterController extends JeecgController<WxUserRegister, IW
 								   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 								   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 								   HttpServletRequest req) {
+	    if (StringUtils.isNotBlank(wxUserRegister.getCompanyName())) {
+	        wxUserRegister.setCompanyName("*"+wxUserRegister.getCompanyName().trim()+"*");
+        }
+        if (StringUtils.isNotBlank(wxUserRegister.getNickname())) {
+            wxUserRegister.setNickname("*"+wxUserRegister.getNickname().trim()+"*");
+        }
 		QueryWrapper<WxUserRegister> queryWrapper = QueryGenerator.initQueryWrapper(wxUserRegister, req.getParameterMap());
 		Page<WxUserRegister> page = new Page<WxUserRegister>(pageNo, pageSize);
 		IPage<WxUserRegister> pageList = wxUserRegisterService.page(page, queryWrapper);

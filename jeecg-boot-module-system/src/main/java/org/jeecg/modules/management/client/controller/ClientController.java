@@ -332,7 +332,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
 	        deviceNumber.setNumber(deviceNumber.getNumber().trim());
         }
         if (StringUtils.isNotBlank(deviceNumber.getName())) {
-            deviceNumber.setName(deviceNumber.getName().trim());
+            deviceNumber.setName("*"+deviceNumber.getName().trim()+"*");
         }
         if (StringUtils.isNotBlank(deviceNumber.getType())) {
             deviceNumber.setType(deviceNumber.getType().trim());

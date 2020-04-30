@@ -12,6 +12,7 @@
 						<uni-list-item title="类型" :rightText="deviceNumber.type"></uni-list-item>
 						<uni-list-item title="保质期" :rightText="deviceNumber.qgp"></uni-list-item>
 						<uni-list-item title="签约日期" :rightText="deviceNumber.signing"></uni-list-item>
+						<uni-list-item title="验收日期" :rightText="deviceNumber.acceptance"></uni-list-item>
 						<view class="uni-title uni-common-pl">描述</view>
 						<textarea :disabled="true" :value="deviceNumber.description ? deviceNumber.description : ''"/>
 					</uni-list>

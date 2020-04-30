@@ -157,7 +157,7 @@
           {
             title:'昵称',
             align:"center",
-            dataIndex: 'nickName'
+            dataIndex: 'nickname'
           },
           {
             title:'手机号',
