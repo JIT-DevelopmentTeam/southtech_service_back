@@ -181,6 +181,8 @@ public class ClientController extends JeecgController<Client, IClientService> {
             }
             JSONArray dataArray = jsonObject.getJSONArray("data");
             DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            List<Client> addClientList = new ArrayList<>();
+            List<Client> editClientList = new ArrayList<>();
             for (int i = 0; i < dataArray.size(); i++) {
                 JSONObject data = dataArray.getJSONObject(i);
                 QueryWrapper<Client> checkQueryWrapper = new QueryWrapper<>();
@@ -193,13 +195,19 @@ public class ClientController extends JeecgController<Client, IClientService> {
                     addClient.setType("1");
                     addClient.setCreateTime(dataFormat.parse(data.getString("FRegDate")));
                     addClient.setModifytime(data.getTimestamp("FModifyTime"));
-                    clientService.save(addClient);
+                    addClientList.add(addClient);
                 } else {
                     editClient.setName(data.getString("FName"));
                     editClient.setCreateTime(dataFormat.parse(data.getString("FRegDate")));
                     editClient.setModifytime(data.getTimestamp("FModifyTime"));
-                    clientService.updateById(editClient);
+                    editClientList.add(editClient);
                 }
+            }
+            if (!addClientList.isEmpty()) {
+                clientService.saveBatch(addClientList);
+            }
+            if (!editClientList.isEmpty()) {
+                clientService.updateBatchById(editClientList);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -440,27 +448,31 @@ public class ClientController extends JeecgController<Client, IClientService> {
                     checkQueryWrapper.eq("number",data.getString("number"));
                     DeviceNumber editDeviceNumber = deviceNumberService.getOne(checkQueryWrapper);
                     if (oConvertUtils.isEmpty(editDeviceNumber)) {
-                        DeviceNumber deviceNumber = new DeviceNumber();
-                        deviceNumber.setNumber(data.getString("number"));
-                        deviceNumber.setName(data.getString("name"));
-                        deviceNumber.setType(data.getString("type"));
-                        deviceNumber.setSigning(dataFormat.parse(data.getString("signing")));
+                        DeviceNumber addDeviceNumber = new DeviceNumber();
+                        addDeviceNumber.setNumber(data.getString("number"));
+                        addDeviceNumber.setName(data.getString("name"));
+                        addDeviceNumber.setType(data.getString("type"));
+                        if (oConvertUtils.isNotEmpty(data.get("signing"))) {
+                            addDeviceNumber.setSigning(dataFormat.parse(data.getString("signing")));
+                        }
                         if (oConvertUtils.isNotEmpty(data.get("describe"))) {
-                            deviceNumber.setDescription(data.getString("describe"));
+                            addDeviceNumber.setDescription(data.getString("describe"));
                         }
                         if (oConvertUtils.isNotEmpty(data.get("QGP"))) {
-                            deviceNumber.setQgp(dataFormat.parse(data.getString("QGP")));
+                            addDeviceNumber.setQgp(dataFormat.parse(data.getString("QGP")));
                         }
                         if (oConvertUtils.isNotEmpty(data.get("acceptance"))) {
-                            deviceNumber.setAcceptance(dataFormat.parse(data.getString("acceptance")));
+                            addDeviceNumber.setAcceptance(dataFormat.parse(data.getString("acceptance")));
                         }
-                        deviceNumber.setModifytime(data.getTimestamp("FModifyTime"));
-                        deviceNumber.setClientId(client.getId());
-                        addDeviceNumberList.add(deviceNumber);
+                        addDeviceNumber.setModifytime(data.getTimestamp("FModifyTime"));
+                        addDeviceNumber.setClientId(client.getId());
+                        addDeviceNumberList.add(addDeviceNumber);
                     } else {
                         editDeviceNumber.setName(data.getString("name"));
                         editDeviceNumber.setType(data.getString("type"));
-                        editDeviceNumber.setSigning(dataFormat.parse(data.getString("signing")));
+                        if (oConvertUtils.isNotEmpty(data.get("signing"))) {
+                            editDeviceNumber.setSigning(dataFormat.parse(data.getString("signing")));
+                        }
                         if (oConvertUtils.isNotEmpty(data.get("describe"))) {
                             editDeviceNumber.setDescription(data.getString("describe"));
                         }
