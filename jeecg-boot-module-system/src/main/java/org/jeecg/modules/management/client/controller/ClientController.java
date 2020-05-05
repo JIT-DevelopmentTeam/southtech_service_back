@@ -164,7 +164,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
     }
 
      /**
-      * 同步
+      * 同步客户
       * @return
       */
     @RequestMapping(value = "/synchronizeClient", method = RequestMethod.GET)
@@ -183,14 +183,23 @@ public class ClientController extends JeecgController<Client, IClientService> {
             DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             for (int i = 0; i < dataArray.size(); i++) {
                 JSONObject data = dataArray.getJSONObject(i);
-                Client client = new Client();
-                client.setNumber(data.getString("FNumber"));
-                client.setName(data.getString("FName"));
-                client.setType("1");
-                client.setCreateTime(dataFormat.parse(data.getString("FRegDate")));
-                client.setModifytime(data.getTimestamp("FModifyTime"));
-                clientService.save(client);
-                // TODO ERP联系人
+                QueryWrapper<Client> checkQueryWrapper = new QueryWrapper<>();
+                checkQueryWrapper.eq("number",data.getString("FNumber"));
+                Client editClient = clientService.getOne(checkQueryWrapper);
+                if (oConvertUtils.isEmpty(editClient)) {
+                    Client addClient = new Client();
+                    addClient.setNumber(data.getString("FNumber"));
+                    addClient.setName(data.getString("FName"));
+                    addClient.setType("1");
+                    addClient.setCreateTime(dataFormat.parse(data.getString("FRegDate")));
+                    addClient.setModifytime(data.getTimestamp("FModifyTime"));
+                    clientService.save(addClient);
+                } else {
+                    editClient.setName(data.getString("FName"));
+                    editClient.setCreateTime(dataFormat.parse(data.getString("FRegDate")));
+                    editClient.setModifytime(data.getTimestamp("FModifyTime"));
+                    clientService.updateById(editClient);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -420,32 +429,58 @@ public class ClientController extends JeecgController<Client, IClientService> {
             JSONArray dataArray = jsonObject.getJSONArray("data");
             DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             List<DeviceNumber> addDeviceNumberList = new ArrayList<>();
+            List<DeviceNumber> editDeviceNumberList = new ArrayList<>();
             for (int i = 0; i < dataArray.size(); i++) {
                 JSONObject data = dataArray.getJSONObject(i);
                 QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<>();
                 clientQueryWrapper.eq("number",data.getString("custNo"));
                 Client client = clientService.getOne(clientQueryWrapper);
                 if (oConvertUtils.isNotEmpty(client)) {
-                    DeviceNumber deviceNumber = new DeviceNumber();
-                    deviceNumber.setNumber(data.getString("number"));
-                    deviceNumber.setName(data.getString("name"));
-                    deviceNumber.setType(data.getString("type"));
-                    deviceNumber.setSigning(dataFormat.parse(data.getString("signing")));
-                    if (oConvertUtils.isNotEmpty(data.get("describe"))) {
-                        deviceNumber.setDescription(data.getString("describe"));
+                    QueryWrapper<DeviceNumber> checkQueryWrapper = new QueryWrapper<>();
+                    checkQueryWrapper.eq("number",data.getString("number"));
+                    DeviceNumber editDeviceNumber = deviceNumberService.getOne(checkQueryWrapper);
+                    if (oConvertUtils.isEmpty(editDeviceNumber)) {
+                        DeviceNumber deviceNumber = new DeviceNumber();
+                        deviceNumber.setNumber(data.getString("number"));
+                        deviceNumber.setName(data.getString("name"));
+                        deviceNumber.setType(data.getString("type"));
+                        deviceNumber.setSigning(dataFormat.parse(data.getString("signing")));
+                        if (oConvertUtils.isNotEmpty(data.get("describe"))) {
+                            deviceNumber.setDescription(data.getString("describe"));
+                        }
+                        if (oConvertUtils.isNotEmpty(data.get("QGP"))) {
+                            deviceNumber.setQgp(dataFormat.parse(data.getString("QGP")));
+                        }
+                        if (oConvertUtils.isNotEmpty(data.get("acceptance"))) {
+                            deviceNumber.setAcceptance(dataFormat.parse(data.getString("acceptance")));
+                        }
+                        deviceNumber.setModifytime(data.getTimestamp("FModifyTime"));
+                        deviceNumber.setClientId(client.getId());
+                        addDeviceNumberList.add(deviceNumber);
+                    } else {
+                        editDeviceNumber.setName(data.getString("name"));
+                        editDeviceNumber.setType(data.getString("type"));
+                        editDeviceNumber.setSigning(dataFormat.parse(data.getString("signing")));
+                        if (oConvertUtils.isNotEmpty(data.get("describe"))) {
+                            editDeviceNumber.setDescription(data.getString("describe"));
+                        }
+                        if (oConvertUtils.isNotEmpty(data.get("QGP"))) {
+                            editDeviceNumber.setQgp(dataFormat.parse(data.getString("QGP")));
+                        }
+                        if (oConvertUtils.isNotEmpty(data.get("acceptance"))) {
+                            editDeviceNumber.setAcceptance(dataFormat.parse(data.getString("acceptance")));
+                        }
+                        editDeviceNumber.setModifytime(data.getTimestamp("FModifyTime"));
+                        editDeviceNumberList.add(editDeviceNumber);
                     }
-                    if (oConvertUtils.isNotEmpty(data.get("QGP"))) {
-                        deviceNumber.setQgp(dataFormat.parse(data.getString("QGP")));
-                    }
-                    if (oConvertUtils.isNotEmpty(data.get("acceptance"))) {
-                        deviceNumber.setAcceptance(dataFormat.parse(data.getString("acceptance")));
-                    }
-                    deviceNumber.setModifytime(data.getTimestamp("FModifyTime"));
-                    deviceNumber.setClientId(client.getId());
-                    addDeviceNumberList.add(deviceNumber);
                 }
             }
-            deviceNumberService.saveBatch(addDeviceNumberList);
+            if (!addDeviceNumberList.isEmpty()) {
+                deviceNumberService.saveBatch(addDeviceNumberList);
+            }
+            if (!editDeviceNumberList.isEmpty()) {
+                deviceNumberService.updateBatchById(editDeviceNumberList);
+            }
         } catch (Exception e) {
 	        e.printStackTrace();
 	        log.error("同步设备编号出错!");
