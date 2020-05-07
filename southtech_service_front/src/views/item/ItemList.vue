@@ -268,6 +268,7 @@
               .then(res => {
                 if (res.success) {
                   this.$message.success(res.message);
+                  this.loadTree();
                   this.loadData();
                 } else {
                   this.$message.error(res.message);
