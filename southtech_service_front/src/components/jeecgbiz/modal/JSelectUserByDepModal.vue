@@ -25,11 +25,11 @@
       </a-col>
       <a-col :md="18" :sm="24">
         <a-card :bordered="false">
-          用户账号:
+          姓名:
           <a-input-search
             :style="{width:'150px',marginBottom:'15px'}"
-            placeholder="请输入用户账号"
-            v-model="queryParam.username"
+            placeholder="请输入姓名"
+            v-model="queryParam.realname"
             @search="onSearch"
           ></a-input-search>
           <a-button @click="searchReset(1)" style="margin-left: 20px" icon="redo">重置</a-button>

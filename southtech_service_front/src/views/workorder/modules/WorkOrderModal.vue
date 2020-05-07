@@ -62,7 +62,7 @@
           </a-col>
           <a-col :lg="8">
             <a-form-item label="客服" :labelCol="labelCol" :wrapperCol="wrapperCol">
-                <j-select-user-by-dep v-decorator="['customerServiceName',validatorRules.customerServiceName]" :multi="false" :trigger-change="true"/>
+                <j-select-user-by-dep v-decorator="['customerServiceName',validatorRules.customerServiceName]" :multi="false" :trigger-change="true" :disabled="true"/>
               </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -190,14 +190,14 @@
         validatorRules:{
         number:{rules: [{ required: true, message: '请输入编号!' }]},
         status:{rules: [{ required: true, message: '请输入状态!' }]},
-        type:{rules: [{ required: true, message: '请输入类型!' }]},
-        clientId:{rules: [{ required: true, message: '请输入客户!' }]},
-        contactId:{},
-        accessMethod:{rules: [{ required: true, message: '请输入接入方式!' }]},
+        type:{rules: [{ required: true, message: '请选择类型!' }]},
+        clientId:{rules: [{ required: true, message: '请选择客户!' }]},
+        contactId:{rules: [{ required: true, message: '请选择联系人!' }]},
+        accessMethod:{rules: [{ required: true, message: '请选择接入方式!' }]},
         correspondentName:{},
-        emergencyLevel:{rules: [{ required: true, message: '请输入紧急程度!' }]},
-        customerServiceName:{rules: [{ required: true, message: '请输入客服!' }]},
-        declarationTime:{rules: [{ required: true, message: '请输入申报时间!' }]},
+        emergencyLevel:{rules: [{ required: true, message: '请选择紧急程度!' }]},
+        customerServiceName:{rules: [{ required: true, message: '请选择客服!' }]},
+        declarationTime:{rules: [{ required: true, message: '请选择申报时间!' }]},
         annex:{}
         },
         url: {
@@ -286,9 +286,6 @@
               httpurl+=this.url.edit;
               method = 'put';
             }
-            if (res && res.success) {
-              values.contactId = res.result.id;
-            }
             let formData = Object.assign(this.model, values);
             console.log("表单提交数据",formData)
             httpAction(httpurl,formData,method).then((res)=>{
@@ -313,10 +310,10 @@
         this.form.setFieldsValue(pick(row,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
       },
       contactCondition() {
-        return "tb_contact,name,id,client_id="+this.client.id;
+        return "tb_contact,name,id,client_id='"+this.client.id+"'";
       },
       deviceNumberCondition(){
-        return "tb_device_number,name,id,client_id="+this.client.id;
+        return "tb_device_number,name,id,client_id='"+this.client.id+"'";
       },
       addRowDetail () {
         this.model.workOrderDetailList.push({});
@@ -354,7 +351,7 @@
         }
       },
       searchCustomerService(val) {
-         getAction(this.url.listCustomerService,{pageSize:this.listSize,username:val}).then((res) => {
+        getAction(this.url.listCustomerService+"?roleCode=customer_service",{pageSize:this.listSize,realname:val}).then((res) => {
           if (res.success) {
             this.customerServiceList = res.result.records;
           }

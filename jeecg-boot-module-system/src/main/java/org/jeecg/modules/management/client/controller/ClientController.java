@@ -15,6 +15,7 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.HttpHelper;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.management.amap.constant.AMapConstant;
 import org.jeecg.modules.management.client.entity.Client;
 import org.jeecg.modules.management.client.entity.Contact;
 import org.jeecg.modules.management.client.entity.DeviceNumber;
@@ -24,6 +25,7 @@ import org.jeecg.modules.management.client.service.IContactService;
 import org.jeecg.modules.management.client.service.IDeviceNumberService;
 import org.jeecg.modules.management.client.service.IWxUserService;
 import org.jeecg.modules.management.erp.erpinterface.ERPInterfaceConstant;
+import org.jeecg.modules.management.erp.erptoken.util.ERPTokenUtils;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
 import org.jeecg.modules.wechat.constant.WechatConstant;
@@ -181,8 +183,6 @@ public class ClientController extends JeecgController<Client, IClientService> {
             }
             JSONArray dataArray = jsonObject.getJSONArray("data");
             DateFormat dataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            List<Client> addClientList = new ArrayList<>();
-            List<Client> editClientList = new ArrayList<>();
             for (int i = 0; i < dataArray.size(); i++) {
                 JSONObject data = dataArray.getJSONObject(i);
                 QueryWrapper<Client> checkQueryWrapper = new QueryWrapper<>();
@@ -192,22 +192,49 @@ public class ClientController extends JeecgController<Client, IClientService> {
                     Client addClient = new Client();
                     addClient.setNumber(data.getString("FNumber"));
                     addClient.setName(data.getString("FName"));
+                    // 设置经纬度
+                    setLocation(data, addClient);
                     addClient.setType("1");
                     addClient.setCreateTime(dataFormat.parse(data.getString("FRegDate")));
                     addClient.setModifytime(data.getTimestamp("FModifyTime"));
-                    addClientList.add(addClient);
+                    clientService.save(addClient);
+                    if (oConvertUtils.isNotEmpty(data.get("FContact"))) {
+                        Contact contact = new Contact();
+                        contact.setName(data.getString("FContact").trim());
+                        if (oConvertUtils.isNotEmpty(data.get("FMobilePhone"))) {
+                            contact.setMobilePhone(data.getString("FMobilePhone"));
+                        }
+                        contact.setClientId(addClient.getId());
+                        contactService.save(contact);
+                    }
                 } else {
                     editClient.setName(data.getString("FName"));
+                    // 设置经纬度
+                    setLocation(data, editClient);
+                    if (oConvertUtils.isNotEmpty(data.get("FContact"))) {
+                        QueryWrapper<Contact> contactQueryWrapper = new QueryWrapper<>();
+                        contactQueryWrapper.eq("client_id",editClient.getId());
+                        contactQueryWrapper.eq("name",data.getString("FContact").trim());
+                        Contact editContact = contactService.getOne(contactQueryWrapper);
+                        if (oConvertUtils.isEmpty(editContact)) {
+                            Contact addContact = new Contact();
+                            addContact.setName(data.getString("FContact").trim());
+                            if (oConvertUtils.isNotEmpty(data.get("FMobilePhone"))) {
+                                addContact.setMobilePhone(data.getString("FMobilePhone"));
+                            }
+                            addContact.setClientId(editClient.getId());
+                            contactService.save(addContact);
+                        } else {
+                            if (oConvertUtils.isNotEmpty(data.get("FMobilePhone")) && !editContact.getMobilePhone().equals(data.getString("FMobilePhone"))) {
+                                editContact.setMobilePhone(data.getString("FMobilePhone"));
+                                contactService.updateById(editContact);
+                            }
+                        }
+                    }
                     editClient.setCreateTime(dataFormat.parse(data.getString("FRegDate")));
                     editClient.setModifytime(data.getTimestamp("FModifyTime"));
-                    editClientList.add(editClient);
+                    clientService.updateById(editClient);
                 }
-            }
-            if (!addClientList.isEmpty()) {
-                clientService.saveBatch(addClientList);
-            }
-            if (!editClientList.isEmpty()) {
-                clientService.updateBatchById(editClientList);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -217,7 +244,24 @@ public class ClientController extends JeecgController<Client, IClientService> {
         return Result.ok("同步成功!");
     }
 
-     /**
+    /**
+     * 设置经纬度
+     * @param data
+     * @param client
+     */
+    private void setLocation(JSONObject data, Client client) {
+        if (oConvertUtils.isNotEmpty(data.get("FAddress"))) {
+            client.setAddress(data.getString("FAddress"));
+            JSONObject amapResult = HttpHelper.httpGet(AMapConstant.GET_LOCATION_BY_ADDRESS_URL.replace("ADDRESS",data.getString("FAddress")));
+            if (Integer.parseInt(amapResult.getString("count")) > 0) {
+                JSONArray geocodeArray = amapResult.getJSONArray("geocodes");
+                client.setLongitude(Double.parseDouble(geocodeArray.getJSONObject(0).getString("location").split(",")[0]));
+                client.setLatitude(Double.parseDouble(geocodeArray.getJSONObject(0).getString("location").split(",")[1]));
+            }
+        }
+    }
+
+    /**
       * 获取工单客户
       * @return
       */

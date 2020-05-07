@@ -70,7 +70,7 @@
           </a-col>
           <a-col :lg="8">
             <a-form-item label="客服" :labelCol="labelCol" :wrapperCol="wrapperCol">
-                <j-select-user-by-dep v-decorator="['customerServiceName',validatorRules.customerServiceName]" :multi="false"/>
+                <j-select-user-by-dep v-decorator="['customerServiceName',validatorRules.customerServiceName]" :multi="false" :disabled="true"/>
               </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -128,7 +128,7 @@
           <a-row class="form-row" :gutter="32">
             <a-col :lg="32">
               <strong>快捷搜索</strong>
-              <a-input placeholder="客户" @change="searchClient($event.target.value)"></a-input>
+              <a-input placeholder="客户" @click="searchClient($event.target.value)"></a-input>
                 <a-radio-group v-model="model.clientId" @change="selectClient">
                   <a-radio v-for="(client,index) in clientList" :style="radioStyle" v-bind:key="index" :value="client.id" :title="client.name">{{client.name}}</a-radio>
               </a-radio-group>
@@ -137,7 +137,7 @@
           <a-row class="form-row" :gutter="32" style="margin-top:50%;">
             <a-col :lg="32">
               <strong>快捷搜索</strong>
-              <a-input placeholder="客服" @change="searchCustomerService($event.target.value)"></a-input>
+              <a-input placeholder="客服" @click="searchCustomerService($event.target.value)"></a-input>
                 <a-radio-group v-model="model.customerServiceName" @change="selectCustomerService">
                   <a-radio v-for="(customerService,index) in customerServiceList" :style="radioStyle" v-bind:key="index" :value="customerService.username" :title="customerService.realname">{{customerService.realname}}</a-radio>
               </a-radio-group>
@@ -261,8 +261,8 @@
         // 触发表单验证
         this.form.validateFields((err, values) => {
           if (!err) {
-            that.confirmLoading = true;
             that.addContact().then((res)=>{
+            that.confirmLoading = true;
             let httpurl = '';
             let method = '';
             if(!this.model.id){
@@ -287,14 +287,16 @@
             }).finally(() => {
               that.confirmLoading = false;
               this.form.resetFields();
+              this.model.number = 'W'+formatDate(Date.parse(new Date()),'yyyyMMddhhmmss');
+              this.model.type = "1";
+              this.model.declarationTime = formatDate(Date.parse(new Date()),'yyyy-MM-dd hh:mm:ss');
+              this.model.workOrderDetailList = [{}];
               this.contact = {};
               this.contactName = null;
               this.contactMobile = null;
-              this.model.type = "1";
-              this.model.workOrderDetailList = [{}];
               this.visible = true;
               this.$nextTick(() => {
-                this.form.setFieldsValue(pick(this.model,'type'))
+                this.form.setFieldsValue(pick(this.model,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
               })
             })
             });
@@ -321,6 +323,7 @@
             });
           }
           resolve();
+          that.confirmLoading = false;
         });
       },
       handleCancel () {
@@ -330,29 +333,16 @@
         this.form.setFieldsValue(pick(row,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
       },
       contactCondition() {
-        let sql = "tb_contact,name,id,client_id=";
-        if (this.client.id) {
-          sql += this.client.id;
-        } else {
-          sql += "0";
-        }
-        return sql;
+        return "tb_contact,name,id,client_id='"+this.client.id+"'";
       },
       deviceNumberCondition(){
-        let sql = "tb_device_number,name,id,client_id=";
-        if (this.client.id) {
-          sql += this.client.id;
-        } else {
-          sql += "0";
-        }
-        return sql;
+       return "tb_device_number,name,id,client_id='"+this.client.id+"'";
       },
       addRowDetail () {
         this.model.workOrderDetailList.push({});
         this.$forceUpdate();
       },
       delRowDetail (index) {
-        //console.log(index)
         this.model.workOrderDetailList.splice(index,1);
         this.$forceUpdate();
       },
@@ -384,7 +374,6 @@
         });
       },
       selectContact(value) {
-        debugger;
         if (value) {
           this.disabledWrite = true;
         } else {

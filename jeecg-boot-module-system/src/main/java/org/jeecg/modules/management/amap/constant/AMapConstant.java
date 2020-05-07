@@ -6,7 +6,7 @@ package org.jeecg.modules.management.amap.constant;
  */
 public class AMapConstant {
 
-    // 捷特高德地图Web服务Key
+    // 高德地图Web服务Key
     public static String AMAP_KEY = "e109135f32e210caa9205a3ae323b09d";
 
     // 根据地址获取经纬度
