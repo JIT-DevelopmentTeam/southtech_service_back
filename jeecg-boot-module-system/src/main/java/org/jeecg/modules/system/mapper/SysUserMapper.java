@@ -40,7 +40,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	 * @param
 	 * @return
 	 */
-	IPage<SysUser> getUserByRoleId(Page page, @Param("roleId") String roleId, @Param("username") String username);
+	IPage<SysUser> getUserByRoleId(Page page, @Param("roleId") String roleId, @Param("realname") String realname);
 
 	/**
 	 * 根据角色code查询用户

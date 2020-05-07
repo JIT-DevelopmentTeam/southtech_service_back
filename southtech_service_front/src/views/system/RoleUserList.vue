@@ -99,8 +99,8 @@
             <a-row :gutter="24">
 
               <a-col :md="12" :sm="12">
-                <a-form-item label="用户账号">
-                  <a-input placeholder="" v-model="queryParam2.username"></a-input>
+                <a-form-item label="用户名称">
+                  <a-input placeholder="" v-model="queryParam2.realname"></a-input>
                 </a-form-item>
               </a-col>
               <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">

@@ -121,7 +121,7 @@ public interface ISysUserService extends IService<SysUser> {
 	 * @param
 	 * @return
 	 */
-	public IPage<SysUser> getUserByRoleId(Page<SysUser> page,String roleId, String username);
+	public IPage<SysUser> getUserByRoleId(Page<SysUser> page,String roleId, String realname);
 
 	/**
 	 * 查询所有用户
