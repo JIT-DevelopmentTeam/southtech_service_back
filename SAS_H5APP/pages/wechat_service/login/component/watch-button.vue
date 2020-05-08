@@ -4,7 +4,7 @@
 		<button :class="['buttonBorder',!_rotate?'dlbutton':'dlbutton_loading']" :style="{'background':bgColor, 'color': fontColor}">
 			<view :class="_rotate?'rotate_loop':''">
 				<text v-if="_rotate" class="cuIcon cuIcon-loading1 "></text>
-				<text v-if="!_rotate">{{ text }}</text>
+				<text v-if="!_rotate" id="txt">{{ text }}</text>
 			</view>
 		</button>
 	</view>
@@ -41,6 +41,10 @@
 
 <style>
 	@import url("./css/icon.css");
+	
+	#txt {
+		line-height: 3.5;
+	}
 	
 	.dlbutton {
 		color: #FFFFFF;
