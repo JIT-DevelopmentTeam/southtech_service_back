@@ -2,6 +2,7 @@ package org.jeecg.modules.management.mobile.stage;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.management.file.entity.File;
 import org.jeecg.modules.management.file.service.IFileService;
 import org.jeecg.modules.management.progressreport.entity.ProgressReport;
@@ -117,6 +118,11 @@ public class MobileStageController {
                 workOrderDetail.setId(params.get("detailId").toString());
                 workOrderDetail.setAppointment(new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(params.get("appointment").toString()));
                 workOrderDetailService.updateById(workOrderDetail);
+                if ("1".equals(params.get("completeStatus"))) {
+                    WorkOrder workOrder = workOrderService.getById(params.get("ticketId").toString());
+                    workOrder.setStatus("2");
+                    workOrderService.updateById(workOrder);
+                }
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -214,7 +220,7 @@ public class MobileStageController {
             List<WorkOrderDetail> workOrderDetailList = workOrderDetailService.list(queryWrapper);
             boolean normal = true;
             for (int i = 0; i < workOrderDetailList.size(); i++) {
-                if (workOrderDetailList.get(i).getPlannedCompletionTime().getTime() < System.currentTimeMillis()) {
+                if (Integer.parseInt(DateUtils.getBetweenDays(workOrderDetailList.get(i).getPlannedCompletionTime(), DateUtils.getDate())) > 1) {
                     normal = false;
                 }
             }
