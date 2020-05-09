@@ -66,6 +66,7 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
+      <a-button @click="exportReport" v-has="'workOrder:exportReport'" type="primary" icon="download">导出报表</a-button>
       <a-button
         type="primary"
         v-has="'workOrder:returnVisits'"
@@ -394,7 +395,8 @@ export default {
         deleteBatch: '/workorder/workOrder/deleteBatch',
         exportXlsUrl: '/workorder/workOrder/exportXls',
         importExcelUrl: 'workorder/workOrder/importExcel',
-        setStatusBatch: '/workorder/workOrder/setStatusBatch'
+        setStatusBatch: '/workorder/workOrder/setStatusBatch',
+        exportReport:'workorder/workOrder/exportReport'
       },
       dictOptions: {
         status: [],
@@ -592,6 +594,10 @@ export default {
     dispatchModalFormOk() {
       this.loadData();
       this.$emit('ok');
+    },
+    exportReport() {
+      let url = `${window._CONFIG['domianURL']}/${this.url.exportReport}`;
+      window.location.href = url;
     }
   }
 }

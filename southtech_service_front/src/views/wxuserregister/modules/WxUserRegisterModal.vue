@@ -20,7 +20,7 @@
           <a-input v-decorator="[ 'mobile', validatorRules.mobile]" placeholder="请输入手机号"></a-input>
         </a-form-item>
         <a-form-item label="状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="radio" v-decorator="['status', validatorRules.status]" :trigger-change="true" dictCode="wx_user_register_status" placeholder="请选择状态"/>
+          <j-dict-select-tag type="radio" v-decorator="['status', validatorRules.status]" :trigger-change="true" dictCode="wx_user_register_status" :disabled="true"/>
         </a-form-item>
 
       </a-form>
