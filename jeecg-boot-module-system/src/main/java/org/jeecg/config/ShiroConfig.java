@@ -90,6 +90,7 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/sys/common/download/**", "anon");//文件下载不限制token
 		filterChainDefinitionMap.put("/sys/common/pdf/**", "anon");//pdf预览
 		filterChainDefinitionMap.put("/generic/**", "anon");//pdf预览需要文件
+        filterChainDefinitionMap.put("/workorder/workOrder/exportReport","anon"); //导出报表
 		filterChainDefinitionMap.put("/", "anon");
 		filterChainDefinitionMap.put("/doc.html", "anon");
 		filterChainDefinitionMap.put("/**/*.js", "anon");

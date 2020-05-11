@@ -14,24 +14,29 @@ import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.RedisUtil;
+import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.management.client.entity.Client;
+import org.jeecg.modules.management.client.entity.DeviceNumber;
 import org.jeecg.modules.management.client.service.IClientService;
+import org.jeecg.modules.management.client.service.IDeviceNumberService;
+import org.jeecg.modules.management.stage.entity.Stage;
+import org.jeecg.modules.management.stage.service.IStageService;
 import org.jeecg.modules.management.workorder.entity.*;
 import org.jeecg.modules.management.workorder.service.*;
 import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 import org.jeecg.modules.management.workorder.vo.WorkOrderPage;
 import org.jeecg.modules.message.entity.SysMessageTemplate;
 import org.jeecg.modules.message.service.ISysMessageTemplateService;
-import org.jeecg.modules.system.entity.SysAnnouncement;
-import org.jeecg.modules.system.entity.SysAnnouncementSend;
-import org.jeecg.modules.system.entity.SysUser;
-import org.jeecg.modules.system.service.ISysAnnouncementSendService;
-import org.jeecg.modules.system.service.ISysAnnouncementService;
-import org.jeecg.modules.system.service.ISysUserService;
+import org.jeecg.modules.system.entity.*;
+import org.jeecg.modules.system.service.*;
+import org.jeecgframework.poi.excel.def.NormalExcelConstants;
+import org.jeecgframework.poi.excel.entity.ExportParams;
+import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -85,8 +90,18 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 
     @Autowired
     private ISysAnnouncementService sysAnnouncementService;
+
     @Autowired
     private ISysAnnouncementSendService sysAnnouncementSendService;
+
+    @Autowired
+    private ISysDictService sysDictService;
+
+    @Autowired
+    private IDeviceNumberService deviceNumberService;
+
+    @Autowired
+    private IStageService stageService;
 
      @Autowired
      private RedisUtil redisUtil;
@@ -439,7 +454,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             }
         }
         if (isFinish) {
-            workOrder.setStatus("2");
+            workOrder.setStatus("7");
             QueryWrapper<WorkOrderProgress> workOrderProgressQueryWrapper = new QueryWrapper<>();
             workOrderProgressQueryWrapper.eq("work_order_id",workOrder.getId());
             List<WorkOrderProgress> workOrderProgressesList = workOrderProgressService.list(workOrderProgressQueryWrapper);
@@ -483,6 +498,89 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             }
         }
 	    return Result.ok("派工成功!");
+    }
+
+    /**
+     * 导出报表
+     * @return
+     */
+    @RequestMapping(value = "/exportReport")
+    public ModelAndView exportReport() {
+        ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+        String title = "维修记录报表";
+        List<ServiceReport> exportList = new ArrayList<>();
+        List<WorkOrderDetail> workOrderDetailList = workOrderDetailService.list();
+        // 故障部位
+        List<DictModel> faultLocationDictItemList = sysDictService.queryDictItemsByCode("work_order_detail_fault_location");
+        // 工单状态
+        List<DictModel> stageDictItemList = sysDictService.queryDictItemsByCode("work_order_status");
+        for (int i = 0; i < workOrderDetailList.size(); i++) {
+            WorkOrderDetail workOrderDetail = workOrderDetailList.get(i);
+            WorkOrder workOrder = workOrderService.getById(workOrderDetail.getWorkOrderId());
+            SysUser serviceEngineer = sysUserService.getUserByName(workOrderDetail.getServiceEngineerName());
+            Client client = clientService.getById(workOrder.getClientId());
+            DeviceNumber deviceNumber = deviceNumberService.getById(workOrderDetail.getDeviceNumber());
+            String[] faultLocationValues = workOrderDetail.getFaultLocation().split(",");
+            StringBuffer faultLocationText = new StringBuffer();
+            for (String faultLocationValue : faultLocationValues) {
+                for (DictModel faultLocationDictItem : faultLocationDictItemList) {
+                    if (faultLocationValue.equals(faultLocationDictItem.getValue())) {
+                        faultLocationText.append(faultLocationDictItem.getText()+",");
+                    }
+                }
+            }
+            ServiceReport serviceReport = new ServiceReport();
+            serviceReport.setNumber(i+1);
+            serviceReport.setProvince(client.getProvince());
+            serviceReport.setCity(client.getCity());
+            serviceReport.setClientName(client.getName());
+            // 炉型 ?
+            serviceReport.setFurnace("");
+            serviceReport.setFeedbackQuestion("");
+            // 问题类型 ?
+            serviceReport.setQuestionType("");
+            if (faultLocationText.length() > 0) {
+                faultLocationText = faultLocationText.deleteCharAt(faultLocationText.length()-1);
+                serviceReport.setFaultLocation(faultLocationText.toString());
+            }
+            if (oConvertUtils.isNotEmpty(deviceNumber.getQgp())) {
+                serviceReport.setIsQgp(System.currentTimeMillis() <= deviceNumber.getQgp().getTime() ? "是" : "否");
+            }
+            // 是否收费 ?
+            serviceReport.setIsCharge("");
+            serviceReport.setServiceEngineerName(serviceEngineer.getRealname());
+            serviceReport.setAppointment(workOrderDetail.getAppointment());
+            if ("3".equals(workOrder.getStatus())) {
+                QueryWrapper<Stage> stageQueryWrapper = new QueryWrapper<>();
+                stageQueryWrapper.eq("work_order_type",workOrder.getType());
+                stageQueryWrapper.orderByDesc("order_index");
+                stageQueryWrapper.last("LIMIT 0,1");
+                Stage stage = stageService.getOne(stageQueryWrapper);
+                QueryWrapper<WorkOrderProgress> workOrderProgressQueryWrapper = new QueryWrapper<>();
+                workOrderProgressQueryWrapper.eq("work_order_id",workOrder.getId());
+                workOrderProgressQueryWrapper.eq("stage_id",stage.getId());
+                WorkOrderProgress finishProgress = workOrderProgressService.getOne(workOrderProgressQueryWrapper);
+                if (oConvertUtils.isNotEmpty(finishProgress.getFinishTime())) {
+                    serviceReport.setCompleteTime(finishProgress.getFinishTime());
+                }
+            }
+            serviceReport.setProcessResult("");
+            for (DictModel stageDictItem : stageDictItemList) {
+                if (workOrder.getStatus().equals(stageDictItem.getValue())) {
+                    serviceReport.setStatus(stageDictItem.getText());
+                }
+            }
+            serviceReport.setReasonForIncomplete("");
+            serviceReport.setResultsEvaluation("");
+            serviceReport.setStaffEvaluation("");
+            exportList.add(serviceReport);
+        }
+
+        mv.addObject(NormalExcelConstants.FILE_NAME, title); //此处设置的filename无效 ,前端会重更新设置一下
+        mv.addObject(NormalExcelConstants.CLASS, ServiceReport.class);
+        mv.addObject(NormalExcelConstants.PARAMS, new ExportParams(title, "", title));
+        mv.addObject(NormalExcelConstants.DATA_LIST, exportList);
+        return mv;
     }
 
     /*--------------------------------子表处理-工单明细-end----------------------------------------------*/

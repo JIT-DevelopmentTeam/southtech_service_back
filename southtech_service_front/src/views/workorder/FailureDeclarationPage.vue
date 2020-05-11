@@ -296,7 +296,7 @@
               this.contactMobile = null;
               this.visible = true;
               this.$nextTick(() => {
-                this.form.setFieldsValue(pick(this.model,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
+                this.form.setFieldsValue(pick(this.model,'number','type','declarationTime'))
               })
             })
             });
@@ -315,15 +315,13 @@
             let clientId = that.form.getFieldValue('clientId');
             let addContact = {name:that.contactName,mobilePhone:that.contactMobile,clientId:clientId};
             postAction(that.url.addContactReturn,addContact).then((res) => {
-              if (res.success) {
-                resolve(res);
-              }
+              resolve(res);
             }).catch(err => {
               reject()
             });
+          } else {
+            resolve();
           }
-          resolve();
-          that.confirmLoading = false;
         });
       },
       handleCancel () {

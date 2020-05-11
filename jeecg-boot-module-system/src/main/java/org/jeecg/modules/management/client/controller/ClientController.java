@@ -28,6 +28,8 @@ import org.jeecg.modules.management.erp.erpinterface.ERPInterfaceConstant;
 import org.jeecg.modules.management.erp.erptoken.util.ERPTokenUtils;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
+import org.jeecg.modules.management.wxuserregister.entity.WxUserRegister;
+import org.jeecg.modules.management.wxuserregister.service.IWxUserRegisterService;
 import org.jeecg.modules.wechat.constant.WechatConstant;
 import org.jeecg.modules.wechat.entity.WxUserEntity;
 import org.jeecg.modules.wechat.util.WxUserUtils;
@@ -74,6 +76,9 @@ public class ClientController extends JeecgController<Client, IClientService> {
 
      @Autowired
      private IWorkOrderService workOrderService;
+
+    @Autowired
+    private IWxUserRegisterService wxUserRegisterService;
 
 
 	/*---------------------------------主表处理-begin-------------------------------------*/
@@ -175,6 +180,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
         clientQueryWrapper.orderByDesc("modifytime");
         List<Client> clientList = clientService.list(clientQueryWrapper);
         try {
+            ERPTokenUtils.setToken();
             JSONObject jsonObject;
             if (clientList.isEmpty()) {
                 jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.LIST_CLIENT_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",""));
@@ -251,8 +257,8 @@ public class ClientController extends JeecgController<Client, IClientService> {
      */
     private void setLocation(JSONObject data, Client client) {
         if (oConvertUtils.isNotEmpty(data.get("FAddress"))) {
-            client.setAddress(data.getString("FAddress"));
-            JSONObject amapResult = HttpHelper.httpGet(AMapConstant.GET_LOCATION_BY_ADDRESS_URL.replace("ADDRESS",data.getString("FAddress")));
+            client.setAddress(data.getString("FAddress").replaceAll(" ",""));
+            JSONObject amapResult = HttpHelper.httpGet(AMapConstant.GET_LOCATION_BY_ADDRESS_URL.replace("ADDRESS",data.getString("FAddress").replaceAll(" ","")));
             if (Integer.parseInt(amapResult.getString("count")) > 0) {
                 JSONArray geocodeArray = amapResult.getJSONArray("geocodes");
                 client.setLongitude(Double.parseDouble(geocodeArray.getJSONObject(0).getString("location").split(",")[0]));
@@ -473,6 +479,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
 	    List<DeviceNumber> deviceNumberList = deviceNumberService.list(deviceNumberQueryWrapper);
 	    try {
             JSONObject jsonObject;
+            ERPTokenUtils.setToken();
             if (deviceNumberList.isEmpty()) {
                 jsonObject = HttpHelper.httpGet(ERPInterfaceConstant.API_DOMAIN_NAME+ERPInterfaceConstant.LIST_DEVICENUMBER_URL.replace("TOKEN",redisUtil.get(ERPInterfaceConstant.TOKEN_KEY).toString()).replace("MAX",""));
             } else {
@@ -588,6 +595,16 @@ public class ClientController extends JeecgController<Client, IClientService> {
      @PutMapping(value = "/editWxUser")
      public Result<?> editWxUser(@RequestBody WxUser wxUser) {
          wxUserService.updateById(wxUser);
+         // 若注册表有用户信息则改为绑定状态
+         if (StringUtils.isNotBlank(wxUser.getClientId())) {
+             QueryWrapper<WxUserRegister> wxUserRegisterQueryWrapper = new QueryWrapper<>();
+             wxUserRegisterQueryWrapper.eq("open_id",wxUser.getOpenId());
+             WxUserRegister wxUserRegister = wxUserRegisterService.getOne(wxUserRegisterQueryWrapper);
+             if (oConvertUtils.isNotEmpty(wxUserRegister)) {
+                 wxUserRegister.setStatus("1");
+                 wxUserRegisterService.updateById(wxUserRegister);
+             }
+         }
          return Result.ok("编辑成功!");
      }
 

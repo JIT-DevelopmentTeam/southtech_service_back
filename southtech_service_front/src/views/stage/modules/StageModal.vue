@@ -147,11 +147,7 @@ export default {
         },
         stageName: {
           rules: [
-            { required: true, message: '请输入阶段名称!' },
-            {
-              validator: (rule, value, callback) =>
-                validateDuplicateValue('tb_stage', 'stage_name', value, this.model.id, callback)
-            }
+            { required: true, message: '请输入阶段名称!' }
           ]
         },
         cumulativePercentage: {
