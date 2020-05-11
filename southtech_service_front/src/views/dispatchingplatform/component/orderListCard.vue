@@ -46,7 +46,7 @@
               <a-row>
                 <a-col :span="24">
                   <a-icon type="environment" theme="filled"/>
-                  <span>{{ item.province + item.city + item.area + item.community + item.address }}</span>
+                  <span>{{ item.address }}</span>
                 </a-col>
               </a-row>
             </a-card>

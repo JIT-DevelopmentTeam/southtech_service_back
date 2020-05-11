@@ -16,11 +16,13 @@
             stage.trigger_message AS "triggerMessage",
             stage.trigger_receivable AS "triggerReceivable",
             stage.attachment AS "attachment",
-            stage.job_description AS "jobDescription"
+            stage.job_description AS "jobDescription",
+            report.description AS "description"
         FROM
             ic_work_order_progress progress
             LEFT JOIN ic_work_order wo ON wo.id = progress.work_order_id
             LEFT JOIN tb_stage stage ON stage.id = progress.stage_id
+            LEFT JOIN ic_progress_report report ON report.progress_id = progress.id
             WHERE
             1=1
             <if test="workOrderId != null and workOrderId != ''">

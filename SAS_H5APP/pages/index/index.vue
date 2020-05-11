@@ -19,13 +19,13 @@
 			return {
 				dataList: [{
 						title: "服务管理",
-						textList: [{
+						textList: [/* {
 								text: "客户管理",
 								icon: "icontongxunlu",
 								color: "#97f079",
 								pageType: 'page',
 								url: ''
-							},
+							}, */
 							{
 								text: "工单管理",
 								icon: "icongongdan",
@@ -33,13 +33,13 @@
 								pageType: 'tab',
 								url: '/pages/mytask/index'
 							},
-							{
+							/* {
 								text: "客户应收",
 								icon: "iconweibaogongdan",
 								color: "#d679ef",
 								pageType: 'page',
 								url: ''
-							},
+							}, */
 							{
 								text: "故障代报",
 								icon: "iconrizhiyichang",
@@ -49,7 +49,7 @@
 							}
 						]
 					},
-					{
+					/* {
 						title: "日常管理",
 						textList: [{
 								text: "新增签到",
@@ -156,7 +156,7 @@
 								url: ''
 							}
 						]
-					}
+					} */
 				]
 			}
 		},

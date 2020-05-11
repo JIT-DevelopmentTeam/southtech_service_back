@@ -37,5 +37,7 @@ public class MobileStageDTO {
     private String attachment;
     // 工作要求
     private String jobDescription;
+    // 汇报描述
+    private String description;
 
 }
