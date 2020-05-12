@@ -35,12 +35,24 @@
           </a-col>
           <a-col :lg="8">
            <a-form-item label="接入方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-dict-select-tag type="list" v-decorator="['accessMethod',validatorRules.accessMethod]" :trigger-change="true" dictCode="work_order_access_method" placeholder="请选择接入方式"/>
+             <a-radio-group v-decorator="['accessMethod',validatorRules.accessMethod]" :options="options.accessMethodOptions"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="8">
+            <a-form-item label="紧急程度" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-radio-group v-decorator="['emergencyLevel',validatorRules.emergencyLevel]" :options="options.emergencyLevelOptions"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="8">
+            <a-form-item label="申报时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <j-date placeholder="请选择申报时间" v-decorator="[ 'declarationTime', validatorRules.declarationTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
            <a-form-item label="联系人(选)" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-dict-select-tag v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" :trigger-change="true" :dictCode="contactCondition()" @change="selectContact($event)"/>
+              <a-select v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" @change="selectContact">
+                <a-select-option v-for="(item, index) in options.contactOptions" :key="index" :value="item.value">{{item.label}}</a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -63,19 +75,14 @@
               <j-select-user-by-dep v-decorator="['correspondentName',validatorRules.correspondentName]" :multi="false" :trigger-change="true"/>
             </a-form-item>
           </a-col>
-           <a-col :lg="8">
-            <a-form-item label="紧急程度" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-dict-select-tag type="list" v-decorator="['emergencyLevel',validatorRules.emergencyLevel]" :trigger-change="true" dictCode="work_order_emergency_level" placeholder="请选择紧急程度"/>
-            </a-form-item>
-          </a-col>
           <a-col :lg="8">
             <a-form-item label="客服" :labelCol="labelCol" :wrapperCol="wrapperCol">
                 <j-select-user-by-dep v-decorator="['customerServiceName',validatorRules.customerServiceName]" :multi="false" :disabled="true"/>
               </a-form-item>
           </a-col>
           <a-col :lg="8">
-            <a-form-item label="申报时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-date placeholder="请选择申报时间" v-decorator="[ 'declarationTime', validatorRules.declarationTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
+           <a-form-item label="需要派工" :labelCol="labelCol" :wrapperCol="wrapperCol">
+             <a-radio-group v-decorator="['needDispatch',validatorRules.needDispatch]" :options="options.needDispatchOptions"/>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -92,32 +99,37 @@
               <a-row type="flex" style="margin-bottom:10px" :gutter="16">
                 <a-col :span="5">设备档案</a-col>
                 <a-col :span="7">故障部位</a-col>
-                <a-col :span="9">描述</a-col>
-                <a-col :span="2">操作</a-col>
+                <a-col :span="11">描述</a-col>
+                <!-- <a-col :span="2">操作</a-col> -->
               </a-row>
 
               <a-row type="flex" style="margin-bottom:10px" :gutter="16" v-for="(item, index) in model.workOrderDetailList" :key="index">
                 <a-col :span="5">
                   <a-form-item>
-                    <j-dict-select-tag v-decorator="['workOrderDetailList['+index+'].deviceNumber', {'initialValue':item.deviceNumber,rules: [{ required: true, message: '请选择设备档案!' }]}]" placeholder="设备档案" :trigger-change="true" :dictCode="deviceNumberCondition()"/>
+                    <a-select v-decorator="['workOrderDetailList['+index+'].deviceNumber', {'initialValue':item.deviceNumber,rules: [{ required: true, message: '请选择设备档案!' }]}]" placeholder="设备档案">
+                      <a-select-option v-for="(item, index) in options.deviceNumberOptions" :key="index" :value="item.value">{{item.label}}</a-select-option>
+                    </a-select>
                   </a-form-item>
                 </a-col>
                 <a-col :span="7">
                   <a-form-item>
-                    <j-multi-select-tag placeholder="故障部位" v-decorator="['workOrderDetailList['+index+'].faultLocation', {'initialValue':item.faultLocation,rules: [{ required: true, message: '请选择故障部位!' }]}]" dictCode="work_order_detail_fault_location"/>
+                    <j-checkbox
+                      v-decorator="['workOrderDetailList['+index+'].faultLocation', {'initialValue':item.faultLocation,rules: [{ required: true, message: '请选择故障部位!' }]}]"
+                      :options="options.faultLocationOptions"
+                    />
                   </a-form-item>
                 </a-col>
-                <a-col :span="9">
+                <a-col :span="11">
                   <a-form-item>
                     <a-textarea rows="4" v-decorator="['workOrderDetailList['+index+'].description', {'initialValue':item.description}]" placeholder="描述"></a-textarea>
                   </a-form-item>
                 </a-col>
-                <a-col :span="2">
+                <!-- <a-col :span="2">
                   <a-form-item>
                     <a-button @click="addRowDetail" icon="plus"></a-button>&nbsp;
                     <a-button @click="delRowDetail(index)" icon="minus"></a-button>
                   </a-form-item>
-                </a-col>
+                </a-col> -->
               </a-row>
             </div>
           </a-tab-pane>
@@ -128,7 +140,7 @@
           <a-row class="form-row" :gutter="32">
             <a-col :lg="32">
               <strong>快捷搜索</strong>
-              <a-input placeholder="客户" @click="searchClient($event.target.value)"></a-input>
+              <a-input placeholder="客户" @change="searchClient($event.target.value)"></a-input>
                 <a-radio-group v-model="model.clientId" @change="selectClient">
                   <a-radio v-for="(client,index) in clientList" :style="radioStyle" v-bind:key="index" :value="client.id" :title="client.name">{{client.name}}</a-radio>
               </a-radio-group>
@@ -137,7 +149,7 @@
           <a-row class="form-row" :gutter="32" style="margin-top:50%;">
             <a-col :lg="32">
               <strong>快捷搜索</strong>
-              <a-input placeholder="客服" @click="searchCustomerService($event.target.value)"></a-input>
+              <a-input placeholder="客服" @change="searchCustomerService($event.target.value)"></a-input>
                 <a-radio-group v-model="model.customerServiceName" @change="selectCustomerService">
                   <a-radio v-for="(customerService,index) in customerServiceList" :style="radioStyle" v-bind:key="index" :value="customerService.username" :title="customerService.realname">{{customerService.realname}}</a-radio>
               </a-radio-group>
@@ -164,7 +176,9 @@
   import JDictSelectTag from "@/components/dict/JDictSelectTag"
   import JSearchSelectTag from '@/components/dict/JSearchSelectTag'
   import JMultiSelectTag from '@/components/dict/JMultiSelectTag'
+  import JCheckbox from '@/components/jeecg/JCheckbox'
   import {formatDate} from '@/utils/util.js'
+  import {ajaxGetDictItems} from '@/api/api'
 
   export default {
     name: "FailureDeclarationPage",
@@ -174,7 +188,8 @@
       JSelectUserByDep,
       JDictSelectTag,
       JSearchSelectTag,
-      JMultiSelectTag
+      JMultiSelectTag,
+      JCheckbox
     },
     data () {
       return {
@@ -198,7 +213,6 @@
         },
         confirmLoading: false,
         disabledWrite:false,
-        contactId:null,
         contactName:null,
         contactMobile:null,
         validatorRules:{
@@ -210,7 +224,8 @@
         accessMethod:{rules: [{ required: true, message: '请输入接入方式!' }]},
         correspondentName:{},
         emergencyLevel:{rules: [{ required: true, message: '请输入紧急程度!' }]},
-        customerServiceName:{rules: [{ required: true, message: '请输入客服!' }]},
+        customerServiceName:{},
+        needDispatch:{},
         declarationTime:{rules: [{ required: true, message: '请输入申报时间!' }]},
         },
         url: {
@@ -229,20 +244,34 @@
         client:{},
         contact:{},
         customerService:{},
-        customerServiceList:[]
+        customerServiceList:[],
+        options:{
+          accessMethodOptions:[],
+          emergencyLevelOptions:[],
+          faultLocationOptions:[],
+          deviceNumberOptions:[],
+          needDispatchOptions:[],
+          contactOptions:[]
+        },
       }
     },
     created () {
+      this.initAccessMethodOptions();
+      this.initEmergencyLevelOptions();
+      this.initFaultLocationOptions();
+      this.initNeedDispatchOptions();
     },
     mounted () {
         this.form.resetFields();
         this.model.number = 'W'+formatDate(Date.parse(new Date()),'yyyyMMddhhmmss');
         this.model.type = "1";
+        this.model.accessMethod = "1";
+        this.model.emergencyLevel = "3";
         this.model.declarationTime = formatDate(Date.parse(new Date()),'yyyy-MM-dd hh:mm:ss');
         this.model.workOrderDetailList = [{}];
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
+          this.form.setFieldsValue(pick(this.model,'number','status','type','clientId','contactId','accessMethod','needDispatch','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
         })
         getAction(this.url.listClient,null).then((res) => {
           if (res.success) {
@@ -289,15 +318,18 @@
               this.form.resetFields();
               this.model.number = 'W'+formatDate(Date.parse(new Date()),'yyyyMMddhhmmss');
               this.model.type = "1";
+              this.model.accessMethod = "1";
+              this.model.emergencyLevel = "3";
               this.model.declarationTime = formatDate(Date.parse(new Date()),'yyyy-MM-dd hh:mm:ss');
               this.model.workOrderDetailList = [{}];
+              this.options.deviceNumberOptions = [];
               this.contact = {};
               this.contactName = null;
               this.contactMobile = null;
               this.visible = true;
               this.$nextTick(() => {
-                this.form.setFieldsValue(pick(this.model,'number','type','declarationTime'))
-              })
+                this.form.setFieldsValue(pick(this.model,'number','type','accessMethod','needDispatch','emergencyLevel','declarationTime'))
+              });
             })
             });
           }
@@ -306,7 +338,7 @@
       addContact(){
         let that = this;
         return new Promise(function (resolve,reject) {
-          if (!that.contactId) {
+          if (!that.model.contactId) {
             if (!that.contactName && !that.contactMobile) {
               that.$message.error('请填写联系人和电话!');
               return;
@@ -357,6 +389,8 @@
              if (res.success) {
               this.client = res.result;
               this.contact = {};
+              this.initContactOptions();
+              this.initDeviceNumberOptions();
               this.form.setFieldsValue({
                 clientId: this.client.id
               });
@@ -377,7 +411,6 @@
         } else {
           this.disabledWrite = false;
         }
-        this.contactId = value;
         getAction(this.url.getContactById+"?id="+value,null).then((res) => {
           if (res.success) {
             this.contact = res.result;
@@ -401,7 +434,93 @@
       },
       selectClientInSelect(id) {
         this.client.id = id;
-      }
+        this.initContactOptions();
+        this.initDeviceNumberOptions();
+      },
+      async initContactOptions(){
+        this.options.contactOptions = [];
+        this.model.contactId = null;
+        let _this = this;
+        if (this.client.id) {
+          await ajaxGetDictItems("tb_contact,name,id,client_id='"+this.client.id+"'", null).then((res) => {
+            if (res.success) {
+              for (let index = 0; index < res.result.length; index++) {
+                  _this.options.contactOptions.push({label:res.result[index].text,value:res.result[index].value});
+                 if (index === 0) {
+                    _this.disabledWrite = true;
+                    _this.model.contactId = res.result[index].value;
+                  }
+              }
+              if (res.result.length === 0) {
+                _this.disabledWrite = false;
+                _this.contactMobile = null;
+              }
+            }
+          });
+          if (_this.model.contactId) {
+            await getAction(_this.url.getContactById+'?id='+_this.model.contactId,null).then((res) => {
+             if (res.success) {
+               _this.contactMobile = res.result.mobilePhone;
+             }
+          });
+          }
+        }
+        this.form.setFieldsValue({
+          contactId:_this.model.contactId,
+        });
+      },
+      initDeviceNumberOptions(){
+        this.options.deviceNumberOptions = [];
+        this.model.workOrderDetailList[0].deviceNumber = null;
+        ajaxGetDictItems("tb_device_number,name,id,client_id='"+this.client.id+"'", null).then((res) => {
+          if (res.success) {
+            for (let index = 0; index < res.result.length; index++) {
+                this.options.deviceNumberOptions.push({label:res.result[index].text,value:res.result[index].value});
+                if (index === 0) {
+                   this.model.workOrderDetailList[0].deviceNumber = res.result[index].value;
+                }
+            }
+           
+          }
+        });
+        this.$forceUpdate();
+      },
+      initAccessMethodOptions(){
+        ajaxGetDictItems("work_order_access_method", null).then((res) => {
+          if (res.success) {
+            for (let index = 0; index < res.result.length; index++) {
+                this.options.accessMethodOptions.push({label:res.result[index].text,value:res.result[index].value});
+            }
+          }
+        })
+      },
+      initEmergencyLevelOptions(){
+        ajaxGetDictItems("work_order_emergency_level", null).then((res) => {
+          if (res.success) {
+            for (let index = 0; index < res.result.length; index++) {
+                this.options.emergencyLevelOptions.push({label:res.result[index].text,value:res.result[index].value});
+            }
+          }
+        })
+      },
+      initFaultLocationOptions(){
+        ajaxGetDictItems("work_order_detail_fault_location", null).then((res) => {
+          if (res.success) {
+            for (let index = 0; index < res.result.length; index++) {
+                this.options.faultLocationOptions.push({label:res.result[index].text,value:res.result[index].value});
+            }
+          }
+        })
+      },
+      initNeedDispatchOptions(){
+        ajaxGetDictItems("DIC_YES_OR_NOT", null).then((res) => {
+          if (res.success) {
+            for (let index = 0; index < res.result.length; index++) {
+                this.options.needDispatchOptions.push({label:res.result[index].text,value:res.result[index].value});
+            }
+          }
+        })
+      },
     }
   }
 </script>

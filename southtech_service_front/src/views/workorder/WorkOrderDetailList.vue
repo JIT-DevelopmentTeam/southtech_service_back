@@ -261,6 +261,7 @@
         this.$refs.dispatchModalForm.edit(record);
         this.$refs.dispatchModalForm.title = "派工";
         this.$refs.dispatchModalForm.disableSubmit = false;
+        
       },
       dispatchModalFormOk() {
         this.loadData();

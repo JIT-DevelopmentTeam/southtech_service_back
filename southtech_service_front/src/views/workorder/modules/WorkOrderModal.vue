@@ -24,6 +24,21 @@
             </a-form-item>
           </a-col>
           <a-col :lg="8">
+           <a-form-item label="接入方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
+             <a-radio-group v-decorator="['accessMethod',validatorRules.accessMethod]" :options="options.accessMethodOptions"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="8">
+           <a-form-item label="需要派工" :labelCol="labelCol" :wrapperCol="wrapperCol">
+             <a-radio-group v-decorator="['needDispatch',validatorRules.needDispatch]" :options="options.needDispatchOptions"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="8">
+            <a-form-item label="紧急程度" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-radio-group v-decorator="['emergencyLevel',validatorRules.emergencyLevel]" :options="options.emergencyLevelOptions"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="8">
             <a-form-item label="客户" :labelCol="labelCol" :wrapperCol="wrapperCol">
                <j-search-select-tag
                 placeholder="请选择客户"
@@ -46,28 +61,18 @@
             </a-form-item>
           </a-col>
           <a-col :lg="8">
-           <a-form-item label="接入方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-dict-select-tag type="list" v-decorator="['accessMethod',validatorRules.accessMethod]" :trigger-change="true" dictCode="work_order_access_method" placeholder="请选择接入方式"/>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
-           <a-form-item label="代报人" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-select-user-by-dep v-decorator="['correspondentName',validatorRules.correspondentName]" :multi="false" :trigger-change="true"/>
+            <a-form-item label="申报时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <j-date placeholder="请选择申报时间" v-decorator="[ 'declarationTime', validatorRules.declarationTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
             </a-form-item>
           </a-col>
            <a-col :lg="8">
-            <a-form-item label="紧急程度" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-dict-select-tag type="list" v-decorator="['emergencyLevel',validatorRules.emergencyLevel]" :trigger-change="true" dictCode="work_order_emergency_level" placeholder="请选择紧急程度"/>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
             <a-form-item label="客服" :labelCol="labelCol" :wrapperCol="wrapperCol">
                 <j-select-user-by-dep v-decorator="['customerServiceName',validatorRules.customerServiceName]" :multi="false" :trigger-change="true" :disabled="true"/>
               </a-form-item>
           </a-col>
           <a-col :lg="8">
-            <a-form-item label="申报时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-date placeholder="请选择申报时间" v-decorator="[ 'declarationTime', validatorRules.declarationTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
+           <a-form-item label="代报人" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <j-select-user-by-dep v-decorator="['correspondentName',validatorRules.correspondentName]" :multi="false" :trigger-change="true"/>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -83,33 +88,38 @@
             <div>
               <a-row type="flex" style="margin-bottom:10px" :gutter="16">
                 <a-col :span="5">设备档案</a-col>
-                <a-col v-if="workOrderType == '1'" :span="7">故障部位</a-col>
-                <a-col :span="9">描述</a-col>
-                <a-col :span="2">操作</a-col>
+                <a-col v-if="workOrderType === '1'" :span="7">故障部位</a-col>
+                <a-col :span="11">描述</a-col>
+                <!-- <a-col :span="2">操作</a-col> -->
               </a-row>
 
               <a-row type="flex" style="margin-bottom:10px" :gutter="16" v-for="(item, index) in model.workOrderDetailList" :key="index">
                 <a-col :span="5">
                   <a-form-item>
-                    <j-dict-select-tag v-decorator="['workOrderDetailList['+index+'].deviceNumber', {'initialValue':item.deviceNumber,rules: [{ required: true, message: '请选择设备档案!' }]}]" placeholder="设备档案" :trigger-change="true" :dictCode="deviceNumberCondition()"/>
+                    <a-select v-decorator="['workOrderDetailList['+index+'].deviceNumber', {'initialValue':item.deviceNumber,rules: [{ required: true, message: '请选择设备档案!' }]}]" placeholder="设备档案">
+                      <a-select-option selected v-for="(item, index) in options.deviceNumberOptions" :key="index" :value="item.value">{{item.label}}</a-select-option>
+                    </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col v-if="workOrderType == '1'" :span="7">
+                <a-col v-if="workOrderType === '1'" :span="7">
                   <a-form-item>
-                    <j-multi-select-tag placeholder="故障部位" v-decorator="['workOrderDetailList['+index+'].faultLocation', {'initialValue':item.faultLocation,rules: [{ required: true, message: '请选择故障部位!' }]}]" dictCode="work_order_detail_fault_location"/>
+                    <j-checkbox
+                      v-decorator="['workOrderDetailList['+index+'].faultLocation', {'initialValue':item.faultLocation,rules: [{ required: true, message: '请选择故障部位!' }]}]"
+                      :options="options.faultLocationOptions"
+                    />
                   </a-form-item>
                 </a-col>
-                <a-col :span="9">
+                <a-col :span="11">
                   <a-form-item>
                     <a-textarea rows="4" v-decorator="['workOrderDetailList['+index+'].description', {'initialValue':item.description}]" placeholder="描述"></a-textarea>
                   </a-form-item>
                 </a-col>
-                <a-col :span="2">
+                <!-- <a-col :span="2">
                   <a-form-item>
                     <a-button @click="addRowDetail" icon="plus"></a-button>&nbsp;
                     <a-button @click="delRowDetail(index)" icon="minus"></a-button>
                   </a-form-item>
-                </a-col>
+                </a-col> -->
               </a-row>
             </div>
           </a-tab-pane>
@@ -152,7 +162,9 @@
   import JDictSelectTag from "@/components/dict/JDictSelectTag"
   import JSearchSelectTag from '@/components/dict/JSearchSelectTag'
   import JMultiSelectTag from '@/components/dict/JMultiSelectTag'
+  import JCheckbox from '@/components/jeecg/JCheckbox'
   import {formatDate} from '@/utils/util.js'
+  import {ajaxGetDictItems} from '@/api/api'
 
   export default {
     name: "WorkOrderModal",
@@ -162,7 +174,8 @@
       JSelectUserByDep,
       JDictSelectTag,
       JSearchSelectTag,
-      JMultiSelectTag
+      JMultiSelectTag,
+      JCheckbox
     },
     data () {
       return {
@@ -196,7 +209,8 @@
         accessMethod:{rules: [{ required: true, message: '请选择接入方式!' }]},
         correspondentName:{},
         emergencyLevel:{rules: [{ required: true, message: '请选择紧急程度!' }]},
-        customerServiceName:{rules: [{ required: true, message: '请选择客服!' }]},
+        customerServiceName:{},
+        needDispatch:{rules: [{ required: true, message: '请选择是否需要派工!' }]},
         declarationTime:{rules: [{ required: true, message: '请选择申报时间!' }]},
         annex:{}
         },
@@ -216,10 +230,21 @@
         client:{},
         contact:{},
         customerService:{},
-        customerServiceList:[]
+        customerServiceList:[],
+        options:{
+          accessMethodOptions:[],
+          emergencyLevelOptions:[],
+          faultLocationOptions:[],
+          deviceNumberOptions:[],
+          needDispatchOptions:[]
+        },
       }
     },
     created () {
+      this.initAccessMethodOptions();
+      this.initEmergencyLevelOptions();
+      this.initFaultLocationOptions();
+      this.initNeedDispatchOptions();
     },
     mounted () {
       getAction(this.url.listClient,null).then((res) => {
@@ -241,6 +266,9 @@
         this.form.resetFields();
         if (!record.id) {
           record.number = 'W'+formatDate(Date.parse(new Date()),'yyyyMMddhhmmss');
+          record.accessMethod = "1";
+          record.emergencyLevel = "3";
+          record.needDispatch = "0";
           record.declarationTime = formatDate(Date.parse(new Date()),'yyyy-MM-dd hh:mm:ss');
         }
         this.model = Object.assign({}, record);
@@ -264,7 +292,7 @@
         }
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
+          this.form.setFieldsValue(pick(this.model,'number','status','type','clientId','contactId','accessMethod','needDispatch','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
         })
       },
       close () {
@@ -307,7 +335,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'number','status','type','clientId','contactId','accessMethod','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
+        this.form.setFieldsValue(pick(row,'number','status','type','clientId','contactId','accessMethod','needDispatch','correspondentName','emergencyLevel','customerServiceName','declarationTime','annex'))
       },
       contactCondition() {
         return "tb_contact,name,id,client_id='"+this.client.id+"'";
@@ -326,6 +354,7 @@
       },
       selectClient(id) {
         this.client.id = id;
+        this.initDeviceNumberOptions();
       },
       setWorkOrderType(value) {
         this.workOrderType = value;
@@ -382,6 +411,7 @@
       },
       selectClientInSelect(id) {
         this.client.id = id;
+        this.initDeviceNumberOptions();
       },
       selectContact(value) {
         getAction(this.url.getContactById+"?id="+value,null).then((res) => {
@@ -392,6 +422,58 @@
             });
           }
         });
+      },
+      initAccessMethodOptions(){
+        ajaxGetDictItems("work_order_access_method", null).then((res) => {
+          if (res.success) {
+            for (let index = 0; index < res.result.length; index++) {
+                this.options.accessMethodOptions.push({label:res.result[index].text,value:res.result[index].value});
+            }
+          }
+        })
+      },
+      initEmergencyLevelOptions(){
+        ajaxGetDictItems("work_order_emergency_level", null).then((res) => {
+          if (res.success) {
+            for (let index = 0; index < res.result.length; index++) {
+                this.options.emergencyLevelOptions.push({label:res.result[index].text,value:res.result[index].value});
+            }
+          }
+        })
+      },
+      initFaultLocationOptions(){
+        ajaxGetDictItems("work_order_detail_fault_location", null).then((res) => {
+          if (res.success) {
+            for (let index = 0; index < res.result.length; index++) {
+                this.options.faultLocationOptions.push({label:res.result[index].text,value:res.result[index].value});
+            }
+          }
+        })
+      },
+      initDeviceNumberOptions(){
+        this.options.deviceNumberOptions = [];
+        this.model.workOrderDetailList[0].deviceNumber = null;
+        ajaxGetDictItems("tb_device_number,name,id,client_id='"+this.client.id+"'", null).then((res) => {
+          if (res.success) {
+            for (let index = 0; index < res.result.length; index++) {
+                this.options.deviceNumberOptions.push({label:res.result[index].text,value:res.result[index].value});
+                if (index === 0) {
+                   this.model.workOrderDetailList[0].deviceNumber = res.result[index].value;
+                }
+            }
+           
+          }
+        });
+        this.$forceUpdate();
+      },
+      initNeedDispatchOptions(){
+        ajaxGetDictItems("DIC_YES_OR_NOT", null).then((res) => {
+          if (res.success) {
+            for (let index = 0; index < res.result.length; index++) {
+                this.options.needDispatchOptions.push({label:res.result[index].text,value:res.result[index].value});
+            }
+          }
+        })
       },
     }
   }
