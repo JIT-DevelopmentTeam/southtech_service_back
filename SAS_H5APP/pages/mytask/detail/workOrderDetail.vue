@@ -33,7 +33,7 @@
 						<view class="label sameLine fontsmall bold">
 							客户地址：
 						</view>
-						<location :labelStyle="labelStyle" :label="getTicket.province+getTicket.city+getTicket.area+getTicket.community+getTicket.address" :left_right="left_right"></location>
+						<location :labelStyle="labelStyle" :label="getTicket.address" :left_right="left_right"></location>
 					</view>
 				</view>
 				<view class="line">

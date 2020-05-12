@@ -29,7 +29,7 @@
 							<view class="label sameLine fontsmall bold">
 								客户地址：
 							</view>
-							<location :labelStyle="labelStyle" :label="getTicket.province+getTicket.city+getTicket.area+getTicket.community+getTicket.address"
+							<location :labelStyle="labelStyle" :label="getTicket.address"
 							 :left_right="left_right"></location>
 						</view>
 					</view>
@@ -136,19 +136,19 @@
 		
 			<view v-if="stageStatus != 1 && jurisdiction !== 'view'">
 				<view class="bottom">
-					<uni-grid :column="3" :show-border="false"  :square="false">
+					<uni-grid :column="2" :show-border="false"  :square="false">
 						<uni-grid-item>
 							<button class="bottomIcon" @click="" form-type="submit">
 								<span class="iconfont icontijiao bottomIcon" style="color: #09a0f7;"></span>
 								<text class="text">提交</text>
 							</button>
 						</uni-grid-item>
-						<uni-grid-item>
+						<!-- <uni-grid-item>
 							<button class="bottomIcon" @click="">
 								<span class="iconfont iconzancun bottomIcon" style="color: #999999;"></span>
 								<text class="text">暂存</text>
 							</button>
-						</uni-grid-item>
+						</uni-grid-item> -->
 						<uni-grid-item>
 							<button class="bottomIcon" @click="" form-type="reset">
 								<span class="iconfont iconfangqi bottomIcon" style="color: #d81e06;"></span>
@@ -284,7 +284,7 @@
 					if (result.isCompleted === '1' && result.time !== null) {
 						let timeArr = result.time.split(",");
 						this.signInTime = timeArr[0];
-						this.signOutTime = timeArr[1];
+						this.signOutTime = timeArr[timeArr.length === 1 ? 0 : 1];
 					}
 					this.completion.forEach(item => {
 						item.checked = false;

@@ -96,7 +96,7 @@
 				"text":"工作台",
 				"iconPath":"static/workbranch.png",
 				"selectedIconPath":"static/workbranch1.png"
-			},
+			}/* ,
 			{
 				"text":"日程",
 				"iconPath":"static/schedule.png",
@@ -109,7 +109,7 @@
 				"iconPath":"static/porfile1.png",
 				"selectedIconPath":"static/porfile.png",
 				"pagePath":"pages/porfile/index"
-			}
+			} */
 		]
 	},
 	"condition" : { //模式配置，仅开发期间生效
