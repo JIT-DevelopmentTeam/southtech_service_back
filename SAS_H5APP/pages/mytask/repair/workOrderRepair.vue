@@ -42,9 +42,9 @@
 
 		<form @submit="formSubmit" @reset="formReset">
 			<view class="context">
-				<conf-div title="工作要求:">
+				<!-- <conf-div title="工作要求:">
 					<span class="label">{{stage.jobDescription}}</span>
-				</conf-div>
+				</conf-div> -->
 				<!-- <conf-div title="当前所在位置:">
 					<location :labelStyle="labelStyle" :label="getTicket.address" :left_right="left_right"></location>
 				</conf-div> -->
@@ -281,7 +281,7 @@
 				getReportById(params).then(res => {
 					console.log(res);
 					let result = res.data.result;
-					if (result.isCompleted === '1' && result.time !== null) {
+					if (this.jurisdiction === 'view' && result.time !== null) {
 						let timeArr = result.time.split(",");
 						this.signInTime = timeArr[0];
 						this.signOutTime = timeArr[timeArr.length === 1 ? 0 : 1];
@@ -310,6 +310,12 @@
 						this.fileCommit.push(obj);
 					}
 				})
+			}
+			
+			if (this.jurisdiction === 'edit') {
+				this.signInTime = this.formatDate(new Date());
+				this.clickTime('signIn')
+				this.signOutTime = '';
 			}
 			
 			this.completion.forEach((i) => {
@@ -411,20 +417,13 @@
 			},
 			bindInTimeConfirm(e) {
 				this.signInTime = e.key;
-				let params = {
-					url: this.$url
-				}
-				GetJsapiTicket(params).then(res => {
-					this.timeStamp = res.data.result.timeStamp;
-					this.nonceStr = res.data.result.nonceStr;
-					this.signature = res.data.result.signature;
-					this.getLocation('signIn')
-				}).catch(err => {
-					
-				})
+				this.clickTime('signIn')
 			},
 			bindOutTimeConfirm(e) {
 				this.signOutTime = e.key;
+				this.clickTime('signOut')
+			},
+			clickTime(type) {
 				let params = {
 					url: this.$url
 				}
@@ -432,9 +431,7 @@
 					this.timeStamp = res.data.result.timeStamp;
 					this.nonceStr = res.data.result.nonceStr;
 					this.signature = res.data.result.signature;
-					this.getLocation('signOut')
-				}).catch(err => {
-					
+					this.getLocation(type)
 				})
 			},
 			getLocation(type) {

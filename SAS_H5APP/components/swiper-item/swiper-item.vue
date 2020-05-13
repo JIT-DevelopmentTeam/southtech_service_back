@@ -3,8 +3,8 @@
 		<view class="example-body">
 			<step-device :options="stageList" active-color="#007AFF" :active="active" direction="column">
 				<template v-slot:todo="{todo,index}">
-					<!-- <view @click="toRepair(todo.id,ticketId, todo.finishTime, index)"> -->
-					<view>
+					<view @click="todo.finishTime === null ? toRepair(todo.detailId, todo.id, todo.finishTime, todo.reportId, index) : ''">
+					<!-- <view> -->
 						<view class="sameLine">
 							<view class="uni-steps__column-title" :style="{color:index <=active ? index == active ?activeColor : goColor :deactiveColor}">
 								{{todo.name}}
@@ -69,7 +69,7 @@
 			}
 		},
 		methods: {
-			toRepair(progressId,ticketId,finishTime, index) {
+			toRepair(detailId, progressId, finishTime, reportId, index) {
 				let stageStatus = 0;
 				if(finishTime !== null) {stageStatus = 1}
 				if(!this.isNavigateTo){return;}
@@ -85,7 +85,7 @@
 					}
 				}
 				uni.navigateTo({
-					url: '../../mytask/repair/workOrderRepair?id=' + progressId + "&ticketId=" + ticketId + "&stageStatus=" + stageStatus + "&ticketType=" + this.ticketType
+					url: '../../mytask/repair/workOrderRepair?id=' + progressId + "&ticketId=" + this.ticketId + "&stageStatus=" + stageStatus + "&ticketType=" + this.ticketType + "&detailId=" + detailId + "&reportId=" + reportId + "&jurisdiction=edit"
 				})
 			}
 		},
@@ -114,6 +114,7 @@
 			let ticketId = this.ticketId
 			var payload = {'workOrderId': ticketId}
 			this.$store.dispatch('stage/GetDataList', payload)
+			this.$store.dispatch('workOrder/GetWorkOrderDetail', payload)
 		}
 	}
 </script>

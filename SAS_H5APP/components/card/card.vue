@@ -118,7 +118,7 @@
 	}
 
 	.phone {
-		top: 120upx;
+		top: 100upx;
 	}
 
 	.right {

@@ -8,29 +8,6 @@
 				<view class="line">
 					<view class="sameLine">
 						<view class="label sameLine fontsmall bold">
-							工单编号：
-						</view>
-						<view class="label sameLine fontsmall">
-							{{getTicket.number}}
-						</view>
-					</view>
-					<view class="sameLine">
-						<view class="label sameLine fontsmall bold">
-							分配时间：
-						</view>
-						<view class="label sameLine fontsmall">
-							{{formatDate(getTicket.assignedTime)}}
-						</view>
-					</view>
-				</view>
-			</view>
-			<view class="btn">
-				<model-label :modelLabel="formatModel"></model-label>
-			</view>
-			<template v-slot:footer>
-				<view class="line">
-					<view class="sameLine">
-						<view class="label sameLine fontsmall bold">
 							客户地址：
 						</view>
 						<location :labelStyle="labelStyle" :label="getTicket.address" :left_right="left_right"></location>
@@ -39,23 +16,48 @@
 				<view class="line">
 					<view class="sameLine">
 						<view class="label sameLine fontsmall bold">
-							主联系人：
+							联系人：
 						</view>
 						<view class="label sameLine fontsmall">
 							{{getTicket.contactName}}
-						</view>
-					</view>
-				</view>
-				<view class="line">
-					<view class="sameLine">
-						<view class="label sameLine fontsmall bold">
-							联系方式：
 						</view>
 						<view class="label sameLine fontsmall">
 							{{getTicket.contactPhone}}
 						</view>
 					</view>
 					<phone :phoneNum="getTicket.contactPhone"></phone>
+				</view>
+				<view class="line">
+					
+				</view>
+			</view>
+			<view class="btn">
+				<model-label :modelLabel="formatModel"></model-label>
+			</view>
+			<template v-slot:footer>
+				<view class="line">
+					<view class="label sameLine fontsmall bold">
+						工单编号：
+					</view>
+					<view class="label sameLine fontsmall">
+						{{getTicket.number}}
+					</view>
+				</view>
+				<view class="line">
+					<view class="label sameLine fontsmall bold">
+						设备名称：
+					</view>
+					<view class="label sameLine fontsmall">
+						{{getTicket.deviceName}}
+					</view>
+				</view>
+				<view class="line">
+					<view class="label sameLine fontsmall bold">
+						描述：
+					</view>
+					<view class="label sameLine fontsmall">
+						{{getTicket.description}}
+					</view>
 				</view>
 			</template>
 		</uni-card>
@@ -150,7 +152,7 @@
 	}
 
 	.phone {
-		top: 270upx;
+		top: 100upx;
 	}
 
 	.right {

@@ -87,7 +87,10 @@
 				item.forEach((list) => {
 					items.push(list.text) 
 				})
-				return items.splice(1)
+				items.shift();
+				items.pop();
+				// result = result.splice(items.length-1, 1);
+				return items
 			}
 		},
 		created() {
