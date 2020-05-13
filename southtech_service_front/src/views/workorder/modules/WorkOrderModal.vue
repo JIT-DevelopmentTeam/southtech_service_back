@@ -28,11 +28,7 @@
              <a-radio-group v-decorator="['accessMethod',validatorRules.accessMethod]" :options="options.accessMethodOptions"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="8">
-           <a-form-item label="需要派工" :labelCol="labelCol" :wrapperCol="wrapperCol">
-             <a-radio-group v-decorator="['needDispatch',validatorRules.needDispatch]" :options="options.needDispatchOptions"/>
-            </a-form-item>
-          </a-col>
+         
           <a-col :lg="8">
             <a-form-item label="紧急程度" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-radio-group v-decorator="['emergencyLevel',validatorRules.emergencyLevel]" :options="options.emergencyLevelOptions"/>
@@ -52,7 +48,10 @@
           </a-col>
           <a-col :lg="8">
            <a-form-item label="联系人" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-dict-select-tag v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" :trigger-change="true" :dictCode="contactCondition()" @change="selectContact($event)"/>
+             <a-select v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" @change="selectContact">
+                <a-select-option v-for="(item, index) in options.contactOptions" :key="index" :value="item.value">{{item.label}}</a-select-option>
+              </a-select>
+              <!-- <j-dict-select-tag v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" :trigger-change="true" :dictCode="contactCondition()" @change="selectContact($event)"/> -->
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -73,6 +72,11 @@
           <a-col :lg="8">
            <a-form-item label="代报人" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-select-user-by-dep v-decorator="['correspondentName',validatorRules.correspondentName]" :multi="false" :trigger-change="true"/>
+            </a-form-item>
+          </a-col>
+           <a-col :lg="8">
+           <a-form-item label="需要派工" :labelCol="labelCol" :wrapperCol="wrapperCol">
+             <a-radio-group v-decorator="['needDispatch',validatorRules.needDispatch]" :options="options.needDispatchOptions"/>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -210,7 +214,7 @@
         correspondentName:{},
         emergencyLevel:{rules: [{ required: true, message: '请选择紧急程度!' }]},
         customerServiceName:{},
-        needDispatch:{rules: [{ required: true, message: '请选择是否需要派工!' }]},
+        needDispatch:{},
         declarationTime:{rules: [{ required: true, message: '请选择申报时间!' }]},
         annex:{}
         },
@@ -236,7 +240,8 @@
           emergencyLevelOptions:[],
           faultLocationOptions:[],
           deviceNumberOptions:[],
-          needDispatchOptions:[]
+          needDispatchOptions:[],
+          contactOptions:[]
         },
       }
     },
@@ -268,7 +273,6 @@
           record.number = 'W'+formatDate(Date.parse(new Date()),'yyyyMMddhhmmss');
           record.accessMethod = "1";
           record.emergencyLevel = "3";
-          record.needDispatch = "0";
           record.declarationTime = formatDate(Date.parse(new Date()),'yyyy-MM-dd hh:mm:ss');
         }
         this.model = Object.assign({}, record);
@@ -352,9 +356,21 @@
         this.model.workOrderDetailList.splice(index,1);
         this.$forceUpdate();
       },
-      selectClient(id) {
-        this.client.id = id;
-        this.initDeviceNumberOptions();
+      selectClient() {
+        
+        if (this.model.clientId) {
+          getAction(this.url.getClientById+"?id="+this.model.clientId,null).then((res) => {
+             if (res.success) {
+              this.client = res.result;
+              this.contact = {};
+              this.initContactOptions();
+              this.initDeviceNumberOptions();
+              this.form.setFieldsValue({
+                clientId: this.client.id
+              });
+            }
+          });
+        }
       },
       setWorkOrderType(value) {
         this.workOrderType = value;
@@ -365,19 +381,6 @@
             this.clientList = res.result.records;
           }
         });
-      },
-      selectClient() {
-        if (this.model.clientId) {
-          getAction(this.url.getClientById+"?id="+this.model.clientId,null).then((res) => {
-             if (res.success) {
-              this.client = res.result;
-              this.contact = {};
-              this.form.setFieldsValue({
-                clientId: this.client.id
-              });
-            }
-          });
-        }
       },
       searchCustomerService(val) {
         getAction(this.url.listCustomerService+"?roleCode=customer_service",{pageSize:this.listSize,realname:val}).then((res) => {
@@ -411,6 +414,7 @@
       },
       selectClientInSelect(id) {
         this.client.id = id;
+        this.initContactOptions();
         this.initDeviceNumberOptions();
       },
       selectContact(value) {
@@ -465,6 +469,38 @@
           }
         });
         this.$forceUpdate();
+      },
+      async initContactOptions(){
+        this.options.contactOptions = [];
+        this.model.contactId = null;
+        let _this = this;
+        if (this.client.id) {
+          await ajaxGetDictItems("tb_contact,name,id,client_id='"+this.client.id+"'", null).then((res) => {
+            if (res.success) {
+              for (let index = 0; index < res.result.length; index++) {
+                  _this.options.contactOptions.push({label:res.result[index].text,value:res.result[index].value});
+                 if (index === 0) {
+                    _this.disabledWrite = true;
+                    _this.model.contactId = res.result[index].value;
+                  }
+              }
+              if (res.result.length === 0) {
+                _this.disabledWrite = false;
+                _this.contactMobile = null;
+              }
+            }
+          });
+          if (_this.model.contactId) {
+            await getAction(_this.url.getContactById+'?id='+_this.model.contactId,null).then((res) => {
+             if (res.success) {
+               _this.contactMobile = res.result.mobilePhone;
+             }
+          });
+          }
+        }
+        this.form.setFieldsValue({
+          contactId:_this.model.contactId,
+        });
       },
       initNeedDispatchOptions(){
         ajaxGetDictItems("DIC_YES_OR_NOT", null).then((res) => {
