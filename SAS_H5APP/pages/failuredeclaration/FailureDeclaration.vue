@@ -199,6 +199,8 @@
 			getDicList("work_order_emergency_level").then((res) => {
 				if (res.data.success) {
 					this.emergencyLevelList = res.data.result;
+					this.dataIndex.emergencyLevelIndex = 2;
+					this.model.emergencyLevel = '3';
 				}
 			});
 			listUserByRoleCode("customer_service").then((res) => {
