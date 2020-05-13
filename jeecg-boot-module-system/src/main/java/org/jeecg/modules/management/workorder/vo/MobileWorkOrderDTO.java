@@ -32,4 +32,8 @@ public class MobileWorkOrderDTO {
     private String address;
     // 分配时间
     private String assignedTime;
+    // 设备名称
+    private String deviceName;
+    // 描述
+    private String description;
 }

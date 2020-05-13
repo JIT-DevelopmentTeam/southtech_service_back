@@ -104,7 +104,7 @@ public class MobileStageController {
         // 检查当前工单下面的所以工单明细是否已经完成
         checkAllCompleted(params.get("ticketId").toString(), params.get("progressId").toString());
         // 检查当前进度是否是最后一个，如果是并且进度状态为完成则修改工单状态为完成
-        checkWorkOrderIsCompleted(params.get("ticketId").toString(), params.get("progressId").toString(), params.get("completeStatus").toString());
+//        checkWorkOrderIsCompleted(params.get("ticketId").toString(), params.get("progressId").toString(), params.get("completeStatus").toString());
         result.setSuccess(true);
         result.setResult(progressReportId);
         result.setMessage("保存成功");
@@ -118,11 +118,6 @@ public class MobileStageController {
                 workOrderDetail.setId(params.get("detailId").toString());
                 workOrderDetail.setAppointment(new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(params.get("appointment").toString()));
                 workOrderDetailService.updateById(workOrderDetail);
-                if ("1".equals(params.get("completeStatus"))) {
-                    WorkOrder workOrder = workOrderService.getById(params.get("ticketId").toString());
-                    workOrder.setStatus("2");
-                    workOrderService.updateById(workOrder);
-                }
             } catch (ParseException e) {
                 e.printStackTrace();
             }

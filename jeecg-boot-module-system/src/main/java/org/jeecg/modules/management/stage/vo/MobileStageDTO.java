@@ -39,5 +39,9 @@ public class MobileStageDTO {
     private String jobDescription;
     // 汇报描述
     private String description;
+    // 汇报id
+    private String reportId;
+    // 工单明细id
+    private String detailId;
 
 }
