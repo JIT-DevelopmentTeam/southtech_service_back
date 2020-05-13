@@ -44,6 +44,11 @@
             </a-form-item>
           </a-col>
           <a-col :lg="8">
+           <a-form-item label="需要派工" :labelCol="labelCol" :wrapperCol="wrapperCol">
+             <a-radio-group v-decorator="['needDispatch',validatorRules.needDispatch]" :options="options.needDispatchOptions"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="8">
             <a-form-item label="申报时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-date placeholder="请选择申报时间" v-decorator="[ 'declarationTime', validatorRules.declarationTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
             </a-form-item>
@@ -79,11 +84,6 @@
             <a-form-item label="客服" :labelCol="labelCol" :wrapperCol="wrapperCol">
                 <j-select-user-by-dep v-decorator="['customerServiceName',validatorRules.customerServiceName]" :multi="false" :disabled="true"/>
               </a-form-item>
-          </a-col>
-          <a-col :lg="8">
-           <a-form-item label="需要派工" :labelCol="labelCol" :wrapperCol="wrapperCol">
-             <a-radio-group v-decorator="['needDispatch',validatorRules.needDispatch]" :options="options.needDispatchOptions"/>
-            </a-form-item>
           </a-col>
           <a-col :lg="8">
             <a-form-item label="附件" :labelCol="labelCol" :wrapperCol="wrapperCol">
@@ -217,16 +217,16 @@
         contactMobile:null,
         validatorRules:{
         number:{rules: [{ required: true, message: '请输入编号!' }]},
-        status:{rules: [{ required: true, message: '请输入状态!' }]},
-        type:{rules: [{ required: true, message: '请输入类型!' }]},
-        clientId:{rules: [{ required: true, message: '请输入客户!' }]},
+        status:{rules: [{ required: true, message: '请选择状态!' }]},
+        type:{rules: [{ required: true, message: '请选择类型!' }]},
+        clientId:{rules: [{ required: true, message: '请选择客户!' }]},
         contactId:{},
-        accessMethod:{rules: [{ required: true, message: '请输入接入方式!' }]},
+        accessMethod:{rules: [{ required: true, message: '请选择接入方式!' }]},
         correspondentName:{},
-        emergencyLevel:{rules: [{ required: true, message: '请输入紧急程度!' }]},
+        emergencyLevel:{rules: [{ required: true, message: '请选择紧急程度!' }]},
         customerServiceName:{},
-        needDispatch:{},
-        declarationTime:{rules: [{ required: true, message: '请输入申报时间!' }]},
+        needDispatch:{rules: [{ required: true, message: '请选择需要派工!' }]},
+        declarationTime:{rules: [{ required: true, message: '请选择申报时间!' }]},
         },
         url: {
           add: "/workorder/workOrder/add",
@@ -267,6 +267,7 @@
         this.model.type = "1";
         this.model.accessMethod = "1";
         this.model.emergencyLevel = "3";
+        this.model.needDispatch = "0";
         this.model.declarationTime = formatDate(Date.parse(new Date()),'yyyy-MM-dd hh:mm:ss');
         this.model.workOrderDetailList = [{}];
         this.visible = true;
@@ -320,6 +321,7 @@
               this.model.type = "1";
               this.model.accessMethod = "1";
               this.model.emergencyLevel = "3";
+              this.model.needDispatch = "0";
               this.model.declarationTime = formatDate(Date.parse(new Date()),'yyyy-MM-dd hh:mm:ss');
               this.model.workOrderDetailList = [{}];
               this.options.deviceNumberOptions = [];

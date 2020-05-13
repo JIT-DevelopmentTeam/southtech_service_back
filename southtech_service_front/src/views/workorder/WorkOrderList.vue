@@ -10,15 +10,21 @@
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
-            <a-form-item label="状态">
-              <j-dict-select-tag
-                placeholder="请选择状态"
-                v-model="queryParam.status"
-                dictCode="work_order_status"
-              />
+            <a-form-item label="需要派工">
+              <a-radio-group v-model="queryParam.needDispatch" :options="options.needDispatchOptions"/>
             </a-form-item>
           </a-col>
+          
           <template v-if="toggleSearchStatus">
+            <a-col :md="6" :sm="8">
+              <a-form-item label="状态">
+                <j-dict-select-tag
+                  placeholder="请选择状态"
+                  v-model="queryParam.status"
+                  dictCode="work_order_status"
+                />
+              </a-form-item>
+            </a-col>
             <a-col :md="6" :sm="8">
               <a-form-item label="类型">
                 <j-dict-select-tag
@@ -437,6 +443,9 @@ export default {
         peers:[],
         needDispatch:[]
       },
+      options:{
+        needDispatchOptions:[]
+      },
       /* 分页参数 */
       ipagination: {
         current: 1,
@@ -524,6 +533,9 @@ export default {
       initDictOptions('DIC_YES_OR_NOT').then((res) => {
         if (res.success) {
           this.$set(this.dictOptions, 'needDispatch', res.result)
+          for (let index = 0; index < res.result.length; index++) {
+             this.options.needDispatchOptions.push({label:res.result[index].text,value:res.result[index].value}); 
+          }
         }
       })
     },

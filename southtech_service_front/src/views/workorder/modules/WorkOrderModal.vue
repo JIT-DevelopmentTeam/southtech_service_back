@@ -60,6 +60,11 @@
             </a-form-item>
           </a-col>
           <a-col :lg="8">
+           <a-form-item label="需要派工" :labelCol="labelCol" :wrapperCol="wrapperCol">
+             <a-radio-group v-decorator="['needDispatch',validatorRules.needDispatch]" :options="options.needDispatchOptions"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="8">
             <a-form-item label="申报时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-date placeholder="请选择申报时间" v-decorator="[ 'declarationTime', validatorRules.declarationTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
             </a-form-item>
@@ -72,11 +77,6 @@
           <a-col :lg="8">
            <a-form-item label="代报人" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-select-user-by-dep v-decorator="['correspondentName',validatorRules.correspondentName]" :multi="false" :trigger-change="true"/>
-            </a-form-item>
-          </a-col>
-           <a-col :lg="8">
-           <a-form-item label="需要派工" :labelCol="labelCol" :wrapperCol="wrapperCol">
-             <a-radio-group v-decorator="['needDispatch',validatorRules.needDispatch]" :options="options.needDispatchOptions"/>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -214,7 +214,7 @@
         correspondentName:{},
         emergencyLevel:{rules: [{ required: true, message: '请选择紧急程度!' }]},
         customerServiceName:{},
-        needDispatch:{},
+        needDispatch:{rules: [{ required: true, message: '请选择需要派工!' }]},
         declarationTime:{rules: [{ required: true, message: '请选择申报时间!' }]},
         annex:{}
         },
@@ -273,6 +273,7 @@
           record.number = 'W'+formatDate(Date.parse(new Date()),'yyyyMMddhhmmss');
           record.accessMethod = "1";
           record.emergencyLevel = "3";
+          record.needDispatch = "0";
           record.declarationTime = formatDate(Date.parse(new Date()),'yyyy-MM-dd hh:mm:ss');
         }
         this.model = Object.assign({}, record);

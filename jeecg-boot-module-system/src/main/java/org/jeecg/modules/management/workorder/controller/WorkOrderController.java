@@ -171,21 +171,9 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                               @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
                               @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
                               HttpServletRequest req) {
-        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        List<SysUser> serviceEngineerUserList = sysUserService.listByRoleCode("service_engineer");
-        boolean isServiceEngineer = false;
-        for (SysUser serviceEngineer : serviceEngineerUserList) {
-            if (loginUser.getId().equals(serviceEngineer.getId())) {
-                isServiceEngineer = true;
-                break;
-            }
-        }
         QueryWrapper<WorkOrderPageDTO> queryWrapper = QueryGenerator.initQueryWrapper(workOrderPageDTO, req.getParameterMap());
         queryWrapper.orderByAsc("status");
         queryWrapper.orderByDesc("create_time");
-        if (isServiceEngineer) {
-            queryWrapper.eq("need_dispatch","1");
-        }
         if (StringUtils.isNotBlank(req.getParameter("clientName"))) {
             QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<Client>();
             clientQueryWrapper.like("name",req.getParameter("clientName").trim());

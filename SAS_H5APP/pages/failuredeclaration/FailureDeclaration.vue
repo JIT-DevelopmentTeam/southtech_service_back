@@ -20,12 +20,12 @@
 						<view class="uni-input">{{ contactList[dataIndex.contactIndex] != null ? contactList[dataIndex.contactIndex].text : '' }}</view>
 					</picker>
 				</view>
-				<view class="flex-item flex-item-V" v-if="dingTalkUserId">
+				<!-- <view class="flex-item flex-item-V" v-if="dingTalkUserId">
 					<view class="title"><span style="color: red;">*</span>接入方式</view>
 					<picker v-model="model.accessMethod" mode ="selector" @change="pickerChange($event.target.value,'accessMethodIndex');" :value="dataIndex.accessMethodIndex" :range="accessMethodList" range-key="text">
 						<view class="uni-input">{{ accessMethodList[dataIndex.accessMethodIndex] != null ? accessMethodList[dataIndex.accessMethodIndex].text : '' }}</view>
 					</picker>
-				</view>
+				</view> -->
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>紧急程度</view>
 					<picker v-model="model.emergencyLevel" mode ="selector" @change="pickerChange($event.target.value,'emergencyLevelIndex');" :value="dataIndex.emergencyLevelIndex" :range="emergencyLevelList" range-key="text">
@@ -33,7 +33,7 @@
 					</picker>
 				</view>
 				<view class="flex-item flex-item-V">
-					<view class="title"><span style="color: red;">*</span>客服</view>
+					<view class="title">客服</view>
 					<picker v-model="model.customerServiceName" mode ="selector" @change="pickerChange($event.target.value,'customerServiceIndex');" :value="dataIndex.customerServiceIndex" :range="customerServiceList" range-key="realname">
 						<view class="uni-input">{{ customerServiceList[dataIndex.customerServiceIndex] != null ? customerServiceList[dataIndex.customerServiceIndex].realname : ''}}</view>
 					</picker>
@@ -60,11 +60,11 @@
 				<view class="uni-title">
 					<text>故障明细</text>
 				</view>
-				<view class="flex-item flex-item-V" style="text-align:right;">
+				<!-- <view class="flex-item flex-item-V" style="text-align:right;">
 					<button type="primary" size="mini" @click="addWorkOrderDetail">添加</button>
-				</view>
+				</view> -->
 				<view class="flex-item flex-item-V">
-					<uni-card title="故障明细" note="true" v-for="(workOrderDetail,index) in model.workOrderDetailList">
+					<uni-card title="故障明细" v-for="(workOrderDetail,index) in model.workOrderDetailList">
 						<view class="uni-list">
 							<view class="uni-list-cell">
 								<view class="uni-list-cell-left">
@@ -96,7 +96,7 @@
 							<view class="uni-title uni-common-pl">描述</view>
 							<textarea v-model="workOrderDetail.description" auto-height/>
 						</view>
-						<template v-slot:footer><button type="warn" size="mini" @click="delWorkOrderDetail(workOrderDetail)">删除</button></template>
+						<!-- <template v-slot:footer><button type="warn" size="mini" @click="delWorkOrderDetail(workOrderDetail)">删除</button></template> -->
 					</uni-card>
 					<view class="flex-item flex-item-V" style="text-align:center;">
 						<button type="primary" form-type="submit">提交</button>
@@ -161,6 +161,7 @@
 						this.clientList = res.data.result.records;
 					}
 				});
+				this.model.accessMethod = '2';
 			}
 			if (this.wechatOpenId) {
 				await getClientByOpenId(this.wechatOpenId).then((res) => {
@@ -172,15 +173,23 @@
 				await getDicList("tb_contact,name,id,client_id="+this.client.id).then((res) => {
 					if (res.data.success) {
 				 		this.contactList = res.data.result;
+						if (res.data.result.length > 0) {
+							this.model.contactId = res.data.result[0].value;
+							this.dataIndex.contactIndex = 0;
+						}
 					}
 				});
 				await getDicList("tb_device_number,name,id,client_id="+this.client.id).then((res) => {
 					if (res.data.success) {
 				 		this.deviceNumberList = res.data.result;
+						this.model.workOrderDetailList = [];
+						if (res.data.result.length > 0) {
+							this.model.workOrderDetailList.push({deviceNumber:res.data.result[0].value});
+							this.dataIndex.deviceNumberIndexList[0] = 0;
+						}
 					}
 				});
 				this.model.accessMethod = '4';
-				console.log(this.model);
 			}
 			getDicList("work_order_access_method").then((res) => {
 				if (res.data.success) {
@@ -258,7 +267,6 @@
 					{value:this.model.contactId, checkType:'String', errorMsg:'请选择联系人!'},
 					{value:this.model.accessMethod, checkType:'String', errorMsg:'请选择接入方式!'},
 					{value:this.model.emergencyLevel, checkType:'String', errorMsg:'请选择紧急程度!'},
-					{value:this.model.customerServiceName, checkType:'String', errorMsg:'请选择客服!'},
 					{value:this.model.declarationTime, checkType:'String', errorMsg:'请选择申报时间!'}
 				];
 				var checkFields = validate.check(fields)
@@ -279,10 +287,10 @@
 				let selectDeviceNumber = true;
 				let selectFaultLocations = true;
 				for (let i = 0; i < this.model.workOrderDetailList.length; i++) {
-					if (this.model.workOrderDetailList[i].deviceNumber == undefined) {
+					if (this.model.workOrderDetailList[i].deviceNumber == undefined || this.model.workOrderDetailList[i].deviceNumber === '') {
 						selectDeviceNumber = false;
 					}
-					if (this.model.workOrderDetailList[i].faultLocation == undefined) {
+					if (this.model.workOrderDetailList[i].faultLocation == undefined || this.model.workOrderDetailList[i].faultLocation === '') {
 						selectFaultLocations = false;
 					}
 				}
@@ -370,11 +378,20 @@
 			  getDicList("tb_contact,name,id,client_id="+e.target.value).then((res) => {
 				if (res.data.success) {
 					this.contactList = res.data.result;
+					if (res.data.result.length > 0) {
+						this.model.contactId = res.data.result[0].value;
+						this.dataIndex.contactIndex = 0;
+					}
 				}
 			  });
 			  getDicList("tb_device_number,name,id,client_id="+e.target.value).then((res) => {
 				if (res.data.success) {
 					this.deviceNumberList = res.data.result;
+					this.model.workOrderDetailList = [];
+					if (res.data.result.length > 0) {
+						this.model.workOrderDetailList.push({deviceNumber:res.data.result[0].value});
+						this.dataIndex.deviceNumberIndexList[0] = 0;
+					}
 				}
 			  });
 		  },
