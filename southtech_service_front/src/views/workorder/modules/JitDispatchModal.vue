@@ -16,6 +16,11 @@
             </a-form-item>
           </a-col>
           <a-col :lg="12">
+            <a-form-item label="预约服务时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <j-date placeholder="请选择预约服务时间" v-decorator="[ 'appointment', validatorRules.appointment]" :trigger-change="true" date-format="YYYY-MM-DD" style="width: 100%"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="12">
             <a-form-item label="计划完成时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-date placeholder="请选择计划完成时间" v-decorator="[ 'plannedCompletionTime', validatorRules.plannedCompletionTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD" style="width: 100%"/>
             </a-form-item>
@@ -70,6 +75,7 @@
         validatorRules:{
         
         serviceEngineerName:{rules: [{ required: true, message: '请选择工程师!' }]},
+        appointment:{rules: [{ required: true, message: '请选择预约服务时间!' }]},
         plannedCompletionTime:{rules: [{ required: true, message: '请选择计划完成时间!' }]},
         peers:{}
         },
@@ -106,7 +112,7 @@
             that.confirmLoading = true;
             let httpurl = '';
             let method = '';
-            httpurl+=this.url.edit+"?serviceEngineerName="+values.serviceEngineerName+"&plannedCompletionTime="+values.plannedCompletionTime+"&workOrderDetailIds="+this.workOrderDetailIds;
+            httpurl+=this.url.edit+"?serviceEngineerName="+values.serviceEngineerName+"&appointment="+values.appointment+"&plannedCompletionTime="+values.plannedCompletionTime+"&workOrderDetailIds="+this.workOrderDetailIds;
             if (values.peers) {
               httpurl += '&peers='+values.peers;
             }
@@ -130,7 +136,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'serviceEngineerName','plannedCompletionTime','peers'))
+        this.form.setFieldsValue(pick(row,'serviceEngineerName','appointment','plannedCompletionTime','peers'))
       },
 
 

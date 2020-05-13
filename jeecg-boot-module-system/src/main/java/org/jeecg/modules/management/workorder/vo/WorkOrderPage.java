@@ -69,6 +69,8 @@ public class WorkOrderPage {
 	/**客服*/
 	@Excel(name = "客服", width = 15)
 	private String customerServiceName;
+    /**需要派工*/
+    private java.lang.String needDispatch;
 	/**申报时间*/
 	@Excel(name = "申报时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")

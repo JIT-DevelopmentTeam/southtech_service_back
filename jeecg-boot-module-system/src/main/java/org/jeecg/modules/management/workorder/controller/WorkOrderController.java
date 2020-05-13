@@ -171,9 +171,21 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                               @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
                               @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
                               HttpServletRequest req) {
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        List<SysUser> serviceEngineerUserList = sysUserService.listByRoleCode("service_engineer");
+        boolean isServiceEngineer = false;
+        for (SysUser serviceEngineer : serviceEngineerUserList) {
+            if (loginUser.getId().equals(serviceEngineer.getId())) {
+                isServiceEngineer = true;
+                break;
+            }
+        }
         QueryWrapper<WorkOrderPageDTO> queryWrapper = QueryGenerator.initQueryWrapper(workOrderPageDTO, req.getParameterMap());
         queryWrapper.orderByAsc("status");
         queryWrapper.orderByDesc("create_time");
+        if (isServiceEngineer) {
+            queryWrapper.eq("need_dispatch","1");
+        }
         if (StringUtils.isNotBlank(req.getParameter("clientName"))) {
             QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<Client>();
             clientQueryWrapper.like("name",req.getParameter("clientName").trim());
@@ -411,6 +423,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
      * 批量派工
      * @param workOrderDetailIds 工单ids
      * @param serviceEngineerName 服务工程师
+     *  @param appointment 预约服务时间
      * @param plannedCompletionTime 计划完成时间
      * @param peers 同行人
      * @return
@@ -418,6 +431,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 	@PostMapping(value = "/dispatchWorkOrderDetailByIds")
     public Result<?> dispatchWorkOrderDetailByIds(@RequestParam("workOrderDetailIds") String workOrderDetailIds,
                                                   @RequestParam("serviceEngineerName") String serviceEngineerName,
+                                                  @RequestParam("appointment") String appointment,
                                                   @RequestParam("plannedCompletionTime") String plannedCompletionTime,
                                                   String peers) {
         String[] idsArray = workOrderDetailIds.split(",");
@@ -435,6 +449,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             WorkOrderDetail workOrderDetail = workOrderDetailService.getById(id);
             workOrderDetail.setServiceEngineerName(serviceEngineerName);
             try {
+                workOrderDetail.setAppointment(DateUtils.parseDate(appointment,"yyyy-MM-dd"));
                 workOrderDetail.setPlannedCompletionTime(DateUtils.parseDate(plannedCompletionTime,"yyyy-MM-dd"));
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -454,7 +469,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             }
         }
         if (isFinish) {
-            workOrder.setStatus("7");
+            workOrder.setStatus("2");
             QueryWrapper<WorkOrderProgress> workOrderProgressQueryWrapper = new QueryWrapper<>();
             workOrderProgressQueryWrapper.eq("work_order_id",workOrder.getId());
             List<WorkOrderProgress> workOrderProgressesList = workOrderProgressService.list(workOrderProgressQueryWrapper);

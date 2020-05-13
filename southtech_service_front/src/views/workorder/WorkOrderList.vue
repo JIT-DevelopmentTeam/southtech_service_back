@@ -143,7 +143,7 @@
 
           <a-divider type="vertical" />
           <a-dropdown>
-            <a v-if="!record.serviceEngineerName" @click="dispatch(record)" class="ant-dropdown-link">
+            <a v-has="'workOrder:dispatch'" @click="dispatch(record)" class="ant-dropdown-link">
               派工
             </a>
           </a-dropdown>
@@ -258,6 +258,19 @@ export default {
           }
         },
         {
+          title: '需要派工',
+          align: 'center',
+          dataIndex: 'needDispatch',
+          customRender: text => {
+            console.log("---->"+text);
+            if (!text) {
+              return ''
+            } else {
+              return filterMultiDictText(this.dictOptions['needDispatch'], text + '')
+            }
+          }
+        },
+        {
           title: '客户',
           align: 'center',
           dataIndex: 'clientId',
@@ -280,6 +293,11 @@ export default {
               return filterMultiDictText(this.dictOptions['contactId'], text + '')
             }
           }
+        },
+         {
+          title: '联系电话',
+          align: 'center',
+          dataIndex: 'mobilePhone'
         },
         {
           title: '紧急程度',
@@ -366,7 +384,14 @@ export default {
           {
             title:'预约服务时间',
             align:"center",
-            dataIndex: 'appointment'
+            dataIndex: 'appointment',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return formatDate(text,'yyyy-MM-dd');
+              }
+            }
           },
           {
             title:'计划完成时间',
@@ -409,7 +434,8 @@ export default {
         deviceNumber:[],
         serviceEngineerName:[],
         faultLocation:[],
-        peers:[]
+        peers:[],
+        needDispatch:[]
       },
       /* 分页参数 */
       ipagination: {
@@ -493,6 +519,11 @@ export default {
       initDictOptions('sys_user,realname,username').then((res) => {
         if (res.success) {
           this.$set(this.dictOptions, 'peers', res.result)
+        }
+      });
+      initDictOptions('DIC_YES_OR_NOT').then((res) => {
+        if (res.success) {
+          this.$set(this.dictOptions, 'needDispatch', res.result)
         }
       })
     },
