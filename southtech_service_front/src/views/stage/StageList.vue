@@ -211,6 +211,11 @@ export default {
           dataIndex: 'archive'
         },
         {
+          title: '需要描述',
+          align: 'center',
+          dataIndex: 'needDescription'
+        },
+        {
           title: '资料状态',
           align: 'center',
           dataIndex: 'stateInformation'
