@@ -19,6 +19,7 @@
             stage.attachment AS "attachment",
             stage.job_description AS "jobDescription",
             stage.need_description AS "needDescription",
+            stage.need_keep AS "needKeep",
             report.description AS "description" ,
             report.id AS "reportId",
             detail.id AS "detailId"

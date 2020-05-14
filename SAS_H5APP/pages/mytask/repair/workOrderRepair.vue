@@ -123,9 +123,11 @@
 						 @deletePhotoSuccess="deletePhotoSuccess" :stageStatus="stageStatus" />
 					</conf-div>
 				</view>
-				<conf-div title="完成情况:">
-					<radio-btn :items="completion" @radioChange="comChange" :stageStatus="stageStatus" type="complete"></radio-btn>
-				</conf-div>
+				<view v-if="stage.needKeep === 'true'">
+					<conf-div title="完成情况:">
+						<radio-btn :items="completion" @radioChange="comChange" :stageStatus="stageStatus" type="complete"></radio-btn>
+					</conf-div>
+				</view>
 				<view v-if="stage.costTemplate === 'true'">
 					<conf-div title="是否保质期内:">
 						<radio-btn :items="yes_no" @radioChange="yes_noChange" :stageStatus="stageStatus" type="isQGP"></radio-btn>
@@ -339,6 +341,10 @@
 					this.completeStatus = i.value
 				}
 			})
+			
+			if (this.stage.needKeep == 'true') {
+				this.completeStatus = '1'
+			}
 		},
 		computed: {
 			getTicket() {
