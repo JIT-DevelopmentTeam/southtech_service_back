@@ -6,6 +6,7 @@
         SELECT
             progress.id AS "id",
             progress.finish_time AS "finishTime",
+            stage.stage_number AS "number",
             stage.stage_name AS "name",
             stage.check_in AS "checkIn",
             stage.check_out AS "checkOut",
@@ -17,6 +18,7 @@
             stage.trigger_receivable AS "triggerReceivable",
             stage.attachment AS "attachment",
             stage.job_description AS "jobDescription",
+            stage.need_description AS "needDescription",
             report.description AS "description" ,
             report.id AS "reportId",
             detail.id AS "detailId"
