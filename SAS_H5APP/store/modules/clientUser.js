@@ -12,6 +12,7 @@ const getters = {
 
 const mutations = {
 	setClientUserList(state, payload) {
+		sessionStorage.setItem('clientUserList', JSON.stringify(payload))
 		state.clientUserList = payload
 	}
 }

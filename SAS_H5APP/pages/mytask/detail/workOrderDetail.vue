@@ -10,7 +10,7 @@
 						<view class="label sameLine fontsmall bold">
 							客户地址：
 						</view>
-						<location :labelStyle="labelStyle" :label="getTicket.address" :left_right="left_right"></location>
+						<location :labelStyle="labelStyle" :label="getTicket.address" :long="getTicket.longitude" :lati="getTicket.latitude" :left_right="left_right"></location>
 					</view>
 				</view>
 				<view class="line">
@@ -26,9 +26,6 @@
 						</view>
 					</view>
 					<phone :phoneNum="getTicket.contactPhone"></phone>
-				</view>
-				<view class="line">
-					
 				</view>
 			</view>
 			<view class="btn">
@@ -92,7 +89,7 @@
 		},
 		computed: {
 			getTicket() {
-				let ticketList = this.$store.getters['workOrder/getTicketList']
+				let ticketList = JSON.parse(sessionStorage.getItem("ticketList"));
 				return ticketList.filter(e => e.id === this.id)[0]
 			},
 			formatDate(dateTime) {
@@ -101,7 +98,7 @@
 				}
 			},
 			formatModel() {
-				let dic = this.$store.getters['dic/getTypeList']
+				let dic = JSON.parse(sessionStorage.getItem("typeList"));
 				return dic.filter(e=>e.value == this.getTicket.type)[0].text
 			}
 		},
@@ -113,7 +110,7 @@
 
 <style scoped>
 	.uniCard {
-		margin: 10upx 0;
+		margin: 10upx 0 !important;
 	}
 
 	.label {

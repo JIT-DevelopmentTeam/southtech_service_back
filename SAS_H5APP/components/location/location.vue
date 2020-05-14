@@ -1,5 +1,5 @@
 <template>
-	<view class="sameLine">
+	<view class="sameLine" @click.stop="toMap">
 		<view v-if="left_right === '左'" class="sameLine">
 			<span class="iconfont icondingwei"></span>
 		</view>
@@ -21,11 +21,17 @@
 		props: {
 			'labelStyle': Object,
 			'label': String,
-			'left_right': String
+			'left_right': String,
+			'long': Number,
+			'lati': Number
 		},
 		computed: {
 		},
 		methods: {
+			toMap() {
+				let _this = this;
+				window.location.href = 'https://uri.amap.com/navigation?to=' + _this.long + ',' + _this.lati + ',' + _this.label + '&callnative=1';
+			}
 		}
 	}
 </script>

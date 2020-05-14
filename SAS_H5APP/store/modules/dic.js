@@ -40,23 +40,29 @@ const getters = {
 const mutations = {
 	/* 钉钉 */
 	setTypeList(state, payload) {
+		sessionStorage.setItem('typeList', JSON.stringify(payload))
 		state.typeList = payload
 	},
 	setStatusList(state, payload) {
+		sessionStorage.setItem('statusList', JSON.stringify(payload))
 		state.statusList = payload
 	},
 	setFaultLocaList(state, payload) {
+		sessionStorage.setItem('faultLocaList', JSON.stringify(payload))
 		state.faultLocaList = payload
 	},
 	
 	/* 服务号 */
 	setRegionList(state, payload){
+		sessionStorage.setItem('regionList', JSON.stringify(payload))
 		state.regionList = payload
 	},
 	setServiceTypeList(state, payload) {
+		sessionStorage.setItem('serviceTypeList', JSON.stringify(payload))
 		state.servicetypeList = payload
 	},
 	setServiceFaultLocaList(state, payload) {
+		sessionStorage.setItem('serviceFaultLocaList', JSON.stringify(payload))
 		state.servicefaultLocaList = payload
 	}
 }

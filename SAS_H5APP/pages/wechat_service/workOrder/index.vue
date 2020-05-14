@@ -44,7 +44,7 @@
 					this.dataSource = [];
 					this.pageNo = 1;
 					let obj = {
-						openId: this.$store.getters['getWeChatOpenId'],
+						openId: sessionStorage.getItem("openId"),
 						status: this.current,
 						pageNo: this.pageNo,
 						pageSize: this.pageSize
@@ -61,7 +61,7 @@
 					this.load = true;
 					this.pageNo += 1;
 					let obj = {
-						openId: this.$store.getters['getWeChatOpenId'],
+						openId: sessionStorage.getItem("openId"),
 						status: this.current,
 						pageNo: this.pageNo,
 						pageSize: this.pageSize
@@ -88,7 +88,7 @@
 		onLoad(option) {
 			this.$store.dispatch('dic/GetServiceTypeList', 'work_order_type').then(res=>{
 				let obj = {
-					openId: this.$store.getters['getWeChatOpenId'],
+					openId: sessionStorage.getItem("openId"),
 					status: this.current,
 					pageNo: this.pageNo,
 					pageSize: this.pageSize

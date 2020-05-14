@@ -38,6 +38,8 @@
             client.area AS "area",
             client.community AS "community",
             client.address AS "address",
+            client.longitude AS "longitude",
+            client.latitude AS "latitude",
             contact.`name` AS "contactName",
             contact.mobile_phone AS "contactPhone",
             contact.email AS "email",

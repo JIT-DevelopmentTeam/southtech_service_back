@@ -129,7 +129,7 @@
 		},
 		computed:{
 			formatModel() {
-				let dic = this.$store.getters['dic/getTypeList']
+				let dic = JSON.parse(sessionStorage.getItem("typeList"));
 				let result
 				if (dic != '') {
 					result = dic.filter(e=>e.key == this.ticketModelId)[0].value

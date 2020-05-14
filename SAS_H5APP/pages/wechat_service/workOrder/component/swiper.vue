@@ -99,7 +99,7 @@
 				}
 			},
 			stageList() {
-				let stageLists = this.$store.getters['stage/getServiceStageList']
+				let stageLists = JSON.parse(sessionStorage.getItem("serviceStageList"));
 				stageLists.forEach((list, index) => {
 					if (list.finishTime !== null) {
 						this.active = index+1

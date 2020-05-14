@@ -55,7 +55,7 @@
 		},
 		computed:{
 			getContactList(){
-				let item = this.$store.getters['contact/getContactList']
+				let item = JSON.parse(sessionStorage.getItem("contactList"));
 				return item;
 			}
 		},

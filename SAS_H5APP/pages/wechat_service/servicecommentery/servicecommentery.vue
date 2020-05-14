@@ -49,7 +49,7 @@
 				let workOrder = JSON.parse(decodeURIComponent(option.workOrder));
 				this.workOrderList.push(workOrder);
 			} else {
-				this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
+				this.wechatOpenId = sessionStorage.getItem("openId");
 				let that = this;
 				if (this.wechatOpenId) {
 					await getClientByOpenId(this.wechatOpenId).then((res) => {
