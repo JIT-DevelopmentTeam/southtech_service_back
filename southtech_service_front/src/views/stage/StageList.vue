@@ -200,47 +200,52 @@ export default {
           align: 'center',
           dataIndex: 'takePicture'
         },
+        // {
+        //   title: '需要费用模板',
+        //   align: 'center',
+        //   dataIndex: 'costTemplate'
+        // },
+        // {
+        //   title: '需要原件归档',
+        //   align: 'center',
+        //   dataIndex: 'archive'
+        // },
         {
-          title: '需要费用模板',
+          title: '需要保留',
           align: 'center',
-          dataIndex: 'costTemplate'
-        },
-        {
-          title: '需要原件归档',
-          align: 'center',
-          dataIndex: 'archive'
+          dataIndex: 'needKeep'
         },
         {
           title: '需要描述',
           align: 'center',
           dataIndex: 'needDescription'
         },
-        {
-          title: '资料状态',
-          align: 'center',
-          dataIndex: 'stateInformation'
-        },
-        {
-          title: '触发消息',
-          align: 'center',
-          dataIndex: 'triggerMessage'
-        },
-        {
-          title: '触发应收',
-          align: 'center',
-          dataIndex: 'triggerReceivable'
-        },
-        {
-          title: '提交附件',
-          align: 'center',
-          dataIndex: 'attachment'
-        },
-        {
-          title: '工作说明',
-          align: 'center',
-          dataIndex: 'jobDescription',
-          scopedSlots: { customRender: 'htmlSlot' }
-        },
+        // {
+        //   title: '资料状态',
+        //   align: 'center',
+        //   dataIndex: 'stateInformation'
+        // },
+        // {
+        //   title: '触发消息',
+        //   align: 'center',
+        //   dataIndex: 'triggerMessage'
+        // },
+        // {
+        //   title: '触发应收',
+        //   align: 'center',
+        //   dataIndex: 'triggerReceivable'
+        // },
+        // {
+        //   title: '提交附件',
+        //   align: 'center',
+        //   dataIndex: 'attachment'
+        // },
+        // {
+        //   title: '工作说明',
+        //   align: 'center',
+        //   dataIndex: 'jobDescription',
+        //   scopedSlots: { customRender: 'htmlSlot' }
+        // },
         {
           title: '操作',
           dataIndex: 'action',
