@@ -99,7 +99,7 @@
 				}
 			},
 			stageList() {
-				let stageLists = this.$store.getters['stage/getServiceStageList']
+				let stageLists = this.$store.getters['stage/getServiceStageList'];
 				stageLists.forEach((list, index) => {
 					if (list.finishTime !== null) {
 						this.active = index+1

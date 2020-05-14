@@ -12,6 +12,7 @@ const getters = {
 
 const mutations = {
 	setContactList(state, payload) {
+		sessionStorage.setItem('contactList', JSON.stringify(payload))
 		state.contactList = payload
 	}
 }

@@ -11,7 +11,7 @@
 					<view class="label sameLine">{{ info.contactPhone }}</view>
 				</view>
 				<view class="line">
-					<location :labelStyle="label" :label="info.address" :left_right="left_right"></location>
+					<location :labelStyle="label" :label="info.address" :long="info.longitude" :lati="info.latitude" :left_right="left_right"></location>
 				</view>
 			</view>
 			<view class="btn">
@@ -64,7 +64,7 @@
 				}
 			},
 			formatModel() {
-				let dic = this.$store.getters['dic/getTypeList']
+				let dic = JSON.parse(sessionStorage.getItem("typeList"));
 				let result
 				if (dic != '') {
 					result = dic.filter(e=>e.value == this.info.type)[0].text

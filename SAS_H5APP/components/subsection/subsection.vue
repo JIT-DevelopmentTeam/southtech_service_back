@@ -82,7 +82,7 @@
 		},
 		computed:{
 			items() {
-				let item = this.$store.getters['dic/getStatusList']
+				let item = this.$store.getters['dic/getStatusList'];
 				let items = []
 				item.forEach((list) => {
 					items.push(list.text) 

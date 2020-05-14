@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<view class="header">
-			<uni-card class="uniCard">
+			<uni-card class="uniCard" note="true">
 				<view class="info">
 					<view class="line">
 						<view class="label">{{getTicket.clientName}}</view>
@@ -9,34 +9,55 @@
 					<view class="line">
 						<view class="sameLine">
 							<view class="label sameLine fontsmall bold">
-								工单编号：
+								客户地址：
 							</view>
-							<view class="label sameLine fontsmall">
-								{{getTicket.number}}
-							</view>
-						</view>
-						<view class="sameLine">
-							<view class="label sameLine fontsmall bold">
-								分配时间：
-							</view>
-							<view class="label sameLine fontsmall">
-								{{formatDate(getTicket.assignedTime)}}
-							</view>
+							<location :labelStyle="labelStyle" :label="getTicket.address" :long="getTicket.longitude" :lati="getTicket.latitude" :left_right="left_right"></location>
 						</view>
 					</view>
 					<view class="line">
 						<view class="sameLine">
 							<view class="label sameLine fontsmall bold">
-								客户地址：
+								联系人：
 							</view>
-							<location :labelStyle="labelStyle" :label="getTicket.address"
-							 :left_right="left_right"></location>
+							<view class="label sameLine fontsmall">
+								{{getTicket.contactName}}
+							</view>
+							<view class="label sameLine fontsmall">
+								{{getTicket.contactPhone}}
+							</view>
 						</view>
+						<phone :phoneNum="getTicket.contactPhone"></phone>
 					</view>
 				</view>
 				<view class="btn">
 					<model-label :modelLabel="formatModel"></model-label>
 				</view>
+				<template v-slot:footer>
+					<view class="line">
+						<view class="label sameLine fontsmall bold">
+							工单编号：
+						</view>
+						<view class="label sameLine fontsmall">
+							{{getTicket.number}}
+						</view>
+					</view>
+					<view class="line">
+						<view class="label sameLine fontsmall bold">
+							设备名称：
+						</view>
+						<view class="label sameLine fontsmall">
+							{{getTicket.deviceName}}
+						</view>
+					</view>
+					<view class="line">
+						<view class="label sameLine fontsmall bold">
+							描述：
+						</view>
+						<view class="label sameLine fontsmall">
+							{{getTicket.description}}
+						</view>
+					</view>
+				</template>
 			</uni-card>
 		</view>
 
@@ -54,31 +75,28 @@
 						<span class="iconfont icontianjiayonghu iconStyle Btn" @click="stageStatus != 1 ? selectUser() : ''"></span>
 					</view>
 				</conf-div> -->
-				<view v-if="formatModel == '工单预约'">
+				<!-- <view v-if="formatModel == '工单预约'">
 					<conf-div title="预约时间:" :required="required">
 						<time-selector showType="yearToMinute" beginDate="1970-01-01" endDate="2030-12-31" beginTime="06:00:00" endTime="23:59:59"
 						 @btnConfirm="bindAppointmentConfirm" :isClick="stageStatus ==1 ? true : false">
 							<text>当前选择：{{ appointment }}</text>
 						</time-selector>
 					</conf-div>
-				</view>
+				</view> -->
 				<view v-if="stage.checkIn === 'true'">
 					<conf-div title="签到时间:" :required="required">
-						<time-selector showType="yearToMinute" beginDate="1970-01-01" endDate="2030-12-31" beginTime="06:00:00" endTime="23:59:59"
+						<!-- <time-selector showType="yearToMinute" beginDate="1970-01-01" endDate="2030-12-31" beginTime="06:00:00" endTime="23:59:59"
 						 @btnConfirm="bindInTimeConfirm" :isClick="stageStatus ==1 ? true : false">
 							<text>当前选择：{{ signInTime }}</text>
-						</time-selector>
+						</time-selector> -->
+						<view class="big">
+							<view class="label user">{{ signInTime }}</view>
+							<view v-if="stageStatus != 1 && jurisdiction !== 'view'" class="label">
+								<span class="iconfont iconqian iconStyle Btn" @click="signIn"></span>
+							</view>
+						</view>
 					</conf-div>
 				</view>
-				<view v-if="stage.takePicture === 'true'">
-					<conf-div title="现场拍照(最多只能上传9张):" :required="required">
-						<chooseImage :num="9" :isSave="false" :imageList="imageList" @uploadPhotoSuccess="uploadPhotoSuccess"
-						 @deletePhotoSuccess="deletePhotoSuccess" :stageStatus="stageStatus" />
-					</conf-div>
-				</view>
-				<conf-div title="完成情况:">
-					<radio-btn :items="completion" @radioChange="comChange" :stageStatus="stageStatus" type="complete"></radio-btn>
-				</conf-div>
 				<view v-if="formatModel == '故障研判'">
 					<conf-div title="故障判断:" :required="required">
 						<textarea placeholder="请输入故障判断" v-model="faultJudgement" :disabled="stageStatus ==1 ? true : false" />
@@ -101,6 +119,15 @@
 						</fl-picker>
 					</conf-div>
 				</view>
+				<view v-if="stage.takePicture === 'true'">
+					<conf-div title="现场拍照(最多只能上传9张):" :required="required">
+						<chooseImage :num="9" :isSave="false" :imageList="imageList" @uploadPhotoSuccess="uploadPhotoSuccess"
+						 @deletePhotoSuccess="deletePhotoSuccess" :stageStatus="stageStatus" />
+					</conf-div>
+				</view>
+				<conf-div title="完成情况:">
+					<radio-btn :items="completion" @radioChange="comChange" :stageStatus="stageStatus" type="complete"></radio-btn>
+				</conf-div>
 				<view v-if="stage.costTemplate === 'true'">
 					<conf-div title="是否保质期内:">
 						<radio-btn :items="yes_no" @radioChange="yes_noChange" :stageStatus="stageStatus" type="isQGP"></radio-btn>
@@ -116,7 +143,7 @@
 				</view>
 				<view v-if="stage.checkOut === 'true'">
 					<conf-div title="签出时间:" :required="required">
-							<time-selector
+							<!-- <time-selector
 							    showType="yearToMinute"
 							    beginDate="1970-01-01"
 							    endDate="2030-12-31"
@@ -126,7 +153,13 @@
 								:isClick="stageStatus ==1 ? true : false"
 							>
 							    <text>当前选择：{{ signOutTime }}</text>
-							</time-selector>
+							</time-selector> -->
+							<view class="big">
+								<view class="label user">{{ signOutTime }}</view>
+								<view v-if="stageStatus != 1 && jurisdiction !== 'view'" class="label">
+									<span class="iconfont iconqian iconStyle Btn" @click="signOut"></span>
+								</view>
+							</view>
 					</conf-div>
 				</view>
 				<view v-if="stageStatus != 1">
@@ -264,7 +297,7 @@
 			this.ticketType = option.ticketType
 			this.jurisdiction = option.jurisdiction
 			/**-------阶段配置型显示-------*/
-			this.stageLists = this.$store.getters['stage/getStageList']
+			this.stageLists = this.$store.getters['stage/getStageList'];
 			this.stage = this.stageLists.filter(e=>e.id === this.id)[0]
 			console.log(this.stage);
 			/**-------故障部位初始化--------*/
@@ -283,8 +316,8 @@
 					let result = res.data.result;
 					if (this.jurisdiction === 'view' && result.time !== null) {
 						let timeArr = result.time.split(",");
-						this.signInTime = timeArr[0];
-						this.signOutTime = timeArr[timeArr.length === 1 ? 0 : 1];
+						this.signInTime = this.formatDate(timeArr[0]);
+						this.signOutTime = this.formatDate(timeArr[timeArr.length === 1 ? 0 : 1]);
 					}
 					this.completion.forEach(item => {
 						item.checked = false;
@@ -312,12 +345,6 @@
 				})
 			}
 			
-			if (this.jurisdiction === 'edit') {
-				this.signInTime = this.formatDate(new Date());
-				this.clickTime('signIn')
-				this.signOutTime = '';
-			}
-			
 			this.completion.forEach((i) => {
 				if (i.checked) {
 					this.completeStatus = i.value
@@ -326,7 +353,7 @@
 		},
 		computed: {
 			getTicket() {
-				let ticketList = this.$store.getters['workOrder/getTicketList']
+				let ticketList = this.$store.getters['workOrder/getTicketList'];
 				return ticketList.filter(e => e.id === this.ticketId)[0]
 			},
 			formatDate(dateTime) {
@@ -338,7 +365,7 @@
 				return this.stageLists.filter(e=>e.id === this.id)[0].name
 			},
 			faultLocaList() {
-				return this.$store.getters['dic/getFaultLocaList']
+				return this.$store.getters['dic/getFaultLocaList'];
 			}
 		},
 		methods: {
@@ -414,6 +441,14 @@
 			},
 			bindAppointmentConfirm(e) {
 				this.appointment = e.key;
+			},
+			signIn() {
+				this.signInTime = this.formatDate(new Date());
+				this.clickTime('signIn')
+			},
+			signOut() {
+				this.signOutTime = this.formatDate(new Date());
+				this.clickTime('signOut')
 			},
 			bindInTimeConfirm(e) {
 				this.signInTime = e.key;
@@ -643,7 +678,7 @@
 
 <style scoped>
 	.uniCard {
-		margin: 10upx 0;
+		margin: 10upx 0 !important;
 	}
 
 	.label {

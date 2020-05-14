@@ -89,11 +89,11 @@
 		},
 		computed: {
 			getTicket() {
-				let ticketList = this.$store.getters['workOrder/getServiceTicketList']
+				let ticketList = this.$store.getters['workOrder/getServiceTicketList'];
 				return ticketList.filter(e => e.id === this.id)[0]
 			},
 			formatModel() {
-				let dic = this.$store.getters['dic/getServiceTypeList']
+				let dic = this.$store.getters['dic/getServiceTypeList'];
 				return dic.filter(e=>e.value == this.getTicket.type)[0].text
 			},
 			formatTime(dateTime) {

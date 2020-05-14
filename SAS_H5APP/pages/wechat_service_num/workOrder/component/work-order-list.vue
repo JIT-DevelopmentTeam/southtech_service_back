@@ -76,7 +76,7 @@
 				}
 			},
 			formatModel() {
-				let dic = this.$store.getters['dic/getServiceTypeList']
+				let dic = this.$store.getters['dic/getServiceTypeList'];
 				let result
 				if (dic != '') {
 					result = dic.filter(e=>e.value == this.info.type)[0].text

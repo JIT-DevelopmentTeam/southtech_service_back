@@ -32,17 +32,21 @@ const getters = {
 const mutations = {
 	/* 钉钉 */
 	setStageList(state, payload) {
+		sessionStorage.setItem('stageList', JSON.stringify(payload))
 		state.stageList = payload
 	},
 	setSign_Out(state, payload) {
+		sessionStorage.setItem('Sign_Out', JSON.stringify(payload))
 		state.sign_out = payload
 	},
 	
 	/* 服务号 */
 	setServiceStageList(state, payload) {
+		sessionStorage.setItem('serviceStageList', JSON.stringify(payload))
 		state.serviceStageList = payload
 	},
 	setServiceSign_out(state, payload) {
+		sessionStorage.setItem('serviceSign_out', JSON.stringify(payload))
 		state.serviceSign_out = payload
 	}
 }

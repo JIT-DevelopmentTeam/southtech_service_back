@@ -26,15 +26,19 @@ const getters = {
 
 const mutations = {
 	setTicketList(state, payload) {
+		sessionStorage.setItem('ticketList', JSON.stringify(payload))
 		state.ticketList = payload
 	},
 	setTicketDetailList(state, payload) {
+		sessionStorage.setItem('ticketDetailList', JSON.stringify(payload))
 		state.ticketDetailList = payload
 	},
 	setReportList(state, payload) {
+		sessionStorage.setItem('reportList', JSON.stringify(payload))
 		state.reportList = payload
 	},
 	setServiceTicketList(state, payload){
+		sessionStorage.setItem('serviceTicketList', JSON.stringify(payload))
 		state.serviceTicketList = payload
 	}
 }

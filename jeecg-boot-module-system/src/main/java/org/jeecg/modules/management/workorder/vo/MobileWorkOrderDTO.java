@@ -36,4 +36,8 @@ public class MobileWorkOrderDTO {
     private String deviceName;
     // 描述
     private String description;
+    // 经度
+    private java.lang.Double longitude;
+    // 纬度
+    private java.lang.Double latitude;
 }

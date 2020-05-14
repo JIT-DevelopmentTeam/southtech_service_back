@@ -316,10 +316,10 @@
 		},
 		computed:{
 			faultLocaList() {
-				return this.$store.getters['dic/getServiceFaultLocaList']
+				return this.$store.getters['dic/getServiceFaultLocaList'];
 			},
 			pqLocaList() {
-				return this.$store.getters['dic/getRegionList']
+				return this.$store.getters['dic/getRegionList'];
 			},
 			time(time){
 				return time =>{
