@@ -21,7 +21,7 @@
           />
         </a-form-item>
         <a-form-item label="阶段编号" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'stageNumber', validatorRules.stageNumber]" placeholder="请输入阶段编号" :di></a-input>
+          <a-input v-decorator="[ 'stageNumber', validatorRules.stageNumber]" placeholder="请输入阶段编号" :disabled="disabled"></a-input>
         </a-form-item>
         <a-form-item label="阶段名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'stageName', validatorRules.stageName]" placeholder="请输入阶段名称"></a-input>
@@ -133,6 +133,7 @@ export default {
         sm: { span: 16 }
       },
       confirmLoading: false,
+      disabled:false,
       validatorRules: {
         workOrderType: { rules: [{ required: true, message: '请选择工单类型！' }] },
         stageNumber: {
@@ -181,10 +182,13 @@ export default {
   created() {},
   methods: {
     add() {
+      this.disabled = false;
       this.edit({})
     },
     edit(record) {
-      
+      if (record.id) {
+        this.disabled = true;
+      }
       var keys=Object.keys(record);
 
       keys.forEach(k => {
