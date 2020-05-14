@@ -341,10 +341,6 @@
 					this.completeStatus = i.value
 				}
 			})
-			
-			if (this.stage.needKeep == 'true') {
-				this.completeStatus = '1'
-			}
 		},
 		computed: {
 			getTicket() {
