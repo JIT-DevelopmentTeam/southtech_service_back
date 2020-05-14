@@ -94,4 +94,7 @@ public class Stage implements Serializable {
 	/**工作说明*/
 	@Excel(name = "工作说明", width = 15)
     private java.lang.String jobDescription;
+    /**需要描述*/
+    @Excel(name = "需要描述", width = 15)
+    private java.lang.String needDescription;
 }

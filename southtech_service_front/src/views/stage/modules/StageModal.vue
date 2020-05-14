@@ -71,6 +71,9 @@
             <a-switch v-decorator="[ 'archive', { valuePropName: 'checked' }]"></a-switch>
             <!-- <a-input v-decorator="[ 'archive', validatorRules.archive]" placeholder="请输入需要原件归档"></a-input> -->
           </a-form-item>
+          <a-form-item label="需要描述" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
+            <a-switch v-decorator="[ 'needDescription', { valuePropName: 'checked' }]"></a-switch>
+          </a-form-item>
           <a-form-item label="资料状态" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
             <a-switch v-decorator="[ 'stateInformation', { valuePropName: 'checked' }]"></a-switch>
             <!-- <a-input v-decorator="[ 'stateInformation', validatorRules.stateInformation]" placeholder="请输入资料状态"></a-input> -->
@@ -165,6 +168,7 @@ export default {
         takePicture: { rules: [] },
         costTemplate: { rules: [] },
         archive: { rules: [] },
+        needDescription: { rules: [] },
         stateInformation: { rules: [] },
         triggerMessage: { rules: [] },
         triggerReceivable: { rules: [] },
@@ -213,6 +217,7 @@ export default {
             'takePicture',
             'costTemplate',
             'archive',
+            'needDescription',
             'stateInformation',
             'triggerMessage',
             'triggerReceivable',
@@ -280,6 +285,7 @@ export default {
           'takePicture',
           'costTemplate',
           'archive',
+          'needDescription',
           'stateInformation',
           'triggerMessage',
           'triggerReceivable',
