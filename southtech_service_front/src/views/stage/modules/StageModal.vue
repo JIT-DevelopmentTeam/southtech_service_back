@@ -21,7 +21,7 @@
           />
         </a-form-item>
         <a-form-item label="阶段编号" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'stageNumber', validatorRules.stageNumber]" placeholder="请输入阶段编号"></a-input>
+          <a-input v-decorator="[ 'stageNumber', validatorRules.stageNumber]" placeholder="请输入阶段编号" :disabled="disabled"></a-input>
         </a-form-item>
         <a-form-item label="阶段名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'stageName', validatorRules.stageName]" placeholder="请输入阶段名称"></a-input>
@@ -62,34 +62,30 @@
             <a-switch  v-decorator="[ 'takePicture', { valuePropName: 'checked' }]"></a-switch>
             <!-- <a-input v-decorator="[ 'takePicture', validatorRules.takePicture]" placeholder="请输入需要拍照"></a-input> -->
           </a-form-item>
-          <a-form-item label="需要费用模板" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
+          <!-- <a-form-item label="需要费用模板" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
             <a-switch v-decorator="[ 'costTemplate', { valuePropName: 'checked' }]"></a-switch>
-            
-            <!-- <a-input v-decorator="[ 'costTemplate', validatorRules.costTemplate]" placeholder="请输入需要费用模板"></a-input> -->
-          </a-form-item>
-          <a-form-item label="需要原件归档" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
+          </a-form-item> -->
+          <!-- <a-form-item label="需要原件归档" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
             <a-switch v-decorator="[ 'archive', { valuePropName: 'checked' }]"></a-switch>
-            <!-- <a-input v-decorator="[ 'archive', validatorRules.archive]" placeholder="请输入需要原件归档"></a-input> -->
+          </a-form-item> -->
+           <a-form-item label="需要保留" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
+            <a-switch v-decorator="[ 'needKeep', { valuePropName: 'checked' }]"></a-switch>
           </a-form-item>
           <a-form-item label="需要描述" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
             <a-switch v-decorator="[ 'needDescription', { valuePropName: 'checked' }]"></a-switch>
           </a-form-item>
-          <a-form-item label="资料状态" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
+          <!-- <a-form-item label="资料状态" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
             <a-switch v-decorator="[ 'stateInformation', { valuePropName: 'checked' }]"></a-switch>
-            <!-- <a-input v-decorator="[ 'stateInformation', validatorRules.stateInformation]" placeholder="请输入资料状态"></a-input> -->
-          </a-form-item>
-          <a-form-item label="触发消息" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
+          </a-form-item> -->
+          <!-- <a-form-item label="触发消息" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
             <a-switch v-decorator="[ 'triggerMessage', { valuePropName: 'checked' }]"></a-switch>
-            <!-- <a-input v-decorator="[ 'triggerMessage', validatorRules.triggerMessage]" placeholder="请输入触发消息"></a-input> -->
-          </a-form-item>
-          <a-form-item label="触发应收" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
+          </a-form-item> -->
+          <!-- <a-form-item label="触发应收" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
             <a-switch v-decorator="[ 'triggerReceivable', { valuePropName: 'checked' }]"></a-switch>
-            <!-- <a-input v-decorator="[ 'triggerReceivable', validatorRules.triggerReceivable]" placeholder="请输入触发应收"></a-input> -->
-          </a-form-item>
-          <a-form-item label="提交附件" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
+          </a-form-item> -->
+          <!-- <a-form-item label="提交附件" :labelCol="swichLabel" :wrapperCol="swichwrapperCol">
             <a-switch v-decorator="[ 'attachment', { valuePropName: 'checked' }]"></a-switch>
-            <!-- <a-input v-decorator="[ 'attachment', validatorRules.attachment]" placeholder="请输入提交附件"></a-input> -->
-          </a-form-item>
+          </a-form-item> -->
         </div>
         <a-form-item label="工作说明" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-editor v-decorator="['jobDescription',{trigger:'input'}]" />
@@ -137,6 +133,7 @@ export default {
         sm: { span: 16 }
       },
       confirmLoading: false,
+      disabled:false,
       validatorRules: {
         workOrderType: { rules: [{ required: true, message: '请选择工单类型！' }] },
         stageNumber: {
@@ -168,6 +165,7 @@ export default {
         takePicture: { rules: [] },
         costTemplate: { rules: [] },
         archive: { rules: [] },
+        needKeep: { rules: [] },
         needDescription: { rules: [] },
         stateInformation: { rules: [] },
         triggerMessage: { rules: [] },
@@ -184,10 +182,13 @@ export default {
   created() {},
   methods: {
     add() {
+      this.disabled = false;
       this.edit({})
     },
     edit(record) {
-      
+      if (record.id) {
+        this.disabled = true;
+      }
       var keys=Object.keys(record);
 
       keys.forEach(k => {
@@ -217,6 +218,7 @@ export default {
             'takePicture',
             'costTemplate',
             'archive',
+            'needKeep',
             'needDescription',
             'stateInformation',
             'triggerMessage',
@@ -285,6 +287,7 @@ export default {
           'takePicture',
           'costTemplate',
           'archive',
+          'needKeep',
           'needDescription',
           'stateInformation',
           'triggerMessage',
