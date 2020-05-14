@@ -55,12 +55,12 @@
 		data() {
 			return {
 				dataSource: [],
-				userId: sessionStorage.getItem("userId")
+				userId: this.$store.getters['getUserId']
 			}
 		},
 		computed: {
 			showList() {
-				let result = JSON.parse(sessionStorage.getItem("ticketDetailList"));
+				let result = this.$store.getters['workOrder/getTicketDetailList'];
 				return result;
 			}
 		},

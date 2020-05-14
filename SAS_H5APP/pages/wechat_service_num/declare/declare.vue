@@ -316,10 +316,10 @@
 		},
 		computed:{
 			faultLocaList() {
-				return JSON.parse(sessionStorage.getItem("serviceFaultLocaList"));
+				return this.$store.getters['dic/getServiceFaultLocaList'];
 			},
 			pqLocaList() {
-				return JSON.parse(sessionStorage.getItem("regionList"));
+				return this.$store.getters['dic/getRegionList'];
 			},
 			time(time){
 				return time =>{

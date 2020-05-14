@@ -45,7 +45,7 @@
 			}
 		},
 	 	async mounted() {
-			this.wechatOpenId = sessionStorage.getItem("openId");
+			this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
 			let that = this;
 			if (that.wechatOpenId) {
 				await getClientByOpenId(that.wechatOpenId).then((res) => {

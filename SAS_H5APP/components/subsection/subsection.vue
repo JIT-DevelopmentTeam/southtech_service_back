@@ -39,7 +39,7 @@
 					this.dataSource = [];
 					this.pageNo = 1;
 					let obj = {
-						userId: sessionStorage.getItem("userId"),
+						userId: this.$store.getters['getUserId'],
 						status: this.current+2+"",
 						pageNo: this.pageNo,
 						pageSize: this.pageSize
@@ -56,7 +56,7 @@
 					this.load = true;
 					this.pageNo += 1;
 					let obj = {
-						userId: sessionStorage.getItem("userId"),
+						userId: this.$store.getters['getUserId'],
 						status: this.current+2+"",
 						pageNo: this.pageNo,
 						pageSize: this.pageSize
@@ -82,7 +82,7 @@
 		},
 		computed:{
 			items() {
-				let item = JSON.parse(sessionStorage.getItem("statusList"));
+				let item = this.$store.getters['dic/getStatusList'];
 				let items = []
 				item.forEach((list) => {
 					items.push(list.text) 
@@ -95,7 +95,7 @@
 		},
 		created() {
 			let obj = {
-				userId: sessionStorage.getItem("userId"),
+				userId: this.$store.getters['getUserId'],
 				status: this.current+2+"",
 				pageNo: this.pageNo,
 				pageSize: this.pageSize

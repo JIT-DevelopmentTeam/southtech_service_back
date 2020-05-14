@@ -11,10 +11,16 @@
 </template>
 
 <script>
+	import * as dd from 'dingtalk-jsapi'
+	import {GetJsapiTicket} from '@/api/ddjsapi.js'
 	export default {
 		name: 'location',
 		data() {
-			return {}
+			return {
+				timeStamp: '',
+				nonceStr: '',
+				signature: ''
+			}
 		},
 		components: {
 		},
@@ -29,8 +35,39 @@
 		},
 		methods: {
 			toMap() {
-				let _this = this;
-				window.location.href = 'https://uri.amap.com/navigation?to=' + _this.long + ',' + _this.lati + ',' + _this.label + '&callnative=1';
+				let params = {
+					url: this.$url
+				}
+				GetJsapiTicket(params).then(res => {
+					this.timeStamp = res.data.result.timeStamp;
+					this.nonceStr = res.data.result.nonceStr;
+					this.signature = res.data.result.signature;
+					this.getLocation()
+				})
+			},
+			getLocation() {
+				var _this = this;
+				_this.DDConfig();
+				dd.ready(() => {
+					dd.biz.map.view({
+					    latitude: _this.lati, // 纬度
+					    longitude: _this.long, // 经度
+					    title: _this.label // 地址/POI名称
+					});
+				});
+			},
+			//钉钉config 配置
+			DDConfig() {
+				var _this = this;
+			
+				dd.config({
+					agentId: _this.$agentId,
+					corpId: _this.$corpId,
+					timeStamp: _this.timeStamp,
+					nonceStr: _this.nonceStr,
+					signature: _this.signature,
+					jsApiList: ["biz.map.view"]
+				});
 			}
 		}
 	}

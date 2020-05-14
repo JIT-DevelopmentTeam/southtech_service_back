@@ -89,7 +89,7 @@
 		},
 		computed: {
 			getTicket() {
-				let ticketList = JSON.parse(sessionStorage.getItem("ticketList"));
+				let ticketList = this.$store.getters['workOrder/getTicketList'];
 				return ticketList.filter(e => e.id === this.id)[0]
 			},
 			formatDate(dateTime) {
@@ -98,7 +98,7 @@
 				}
 			},
 			formatModel() {
-				let dic = JSON.parse(sessionStorage.getItem("typeList"));
+				let dic = this.$store.getters['dic/getTypeList'];
 				return dic.filter(e=>e.value == this.getTicket.type)[0].text
 			}
 		},

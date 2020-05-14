@@ -297,17 +297,17 @@
 			this.ticketType = option.ticketType
 			this.jurisdiction = option.jurisdiction
 			/**-------阶段配置型显示-------*/
-			this.stageLists = JSON.parse(sessionStorage.getItem("stageList"));
+			this.stageLists = this.$store.getters['stage/getStageList'];
 			this.stage = this.stageLists.filter(e=>e.id === this.id)[0]
 			console.log(this.stage);
 			/**-------故障部位初始化--------*/
-			let detailList = JSON.parse(sessionStorage.getItem("ticketDetailList"));
+			let detailList = this.$store.getters['workOrder/getTicketDetailList'];
 			let detail = detailList.filter(e=>e.detailId === this.detailId)[0];
 			this.faultLocation = detail.faultLocation;
 			this.initFaultLocation(detail.faultLocation);
 			if (this.reportId !== 'null') {
 				let params = {
-					'userId': sessionStorage.getItem("userId"),
+					'userId': this.$store.getters['getUserId'],
 					'progressId': this.id,
 					'reportId': this.reportId
 				}
@@ -353,7 +353,7 @@
 		},
 		computed: {
 			getTicket() {
-				let ticketList = JSON.parse(sessionStorage.getItem("ticketList"));
+				let ticketList = this.$store.getters['workOrder/getTicketList'];
 				return ticketList.filter(e => e.id === this.ticketId)[0]
 			},
 			formatDate(dateTime) {
@@ -365,7 +365,7 @@
 				return this.stageLists.filter(e=>e.id === this.id)[0].name
 			},
 			faultLocaList() {
-				return JSON.parse(sessionStorage.getItem("faultLocaList"));
+				return this.$store.getters['dic/getFaultLocaList'];
 			}
 		},
 		methods: {
@@ -499,7 +499,7 @@
 				formData.append("progressId", this.id);
 				formData.append("detailId", this.detailId);
 				formData.append("ticketId", this.ticketId);
-				formData.append("userId", sessionStorage.getItem("userId"));
+				formData.append("userId", this.$store.getters['getUserId']);
 				formData.append("checkIn", this.signInTime);
 				formData.append("completeStatus", this.completeStatus);
 				formData.append("checkOut", this.signOutTime);
