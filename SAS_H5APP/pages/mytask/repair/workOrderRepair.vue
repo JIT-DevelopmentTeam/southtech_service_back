@@ -85,10 +85,6 @@
 				</view> -->
 				<view v-if="stage.checkIn === 'true'">
 					<conf-div title="签到时间:" :required="required">
-						<!-- <time-selector showType="yearToMinute" beginDate="1970-01-01" endDate="2030-12-31" beginTime="06:00:00" endTime="23:59:59"
-						 @btnConfirm="bindInTimeConfirm" :isClick="stageStatus ==1 ? true : false">
-							<text>当前选择：{{ signInTime }}</text>
-						</time-selector> -->
 						<view class="big">
 							<view class="label user">{{ signInTime }}</view>
 							<view v-if="stageStatus != 1 && jurisdiction !== 'view'" class="label">
@@ -97,12 +93,14 @@
 						</view>
 					</conf-div>
 				</view>
-				<view v-if="formatModel == '故障研判'">
-					<conf-div title="故障判断:" :required="required">
-						<textarea placeholder="请输入故障判断" v-model="faultJudgement" :disabled="stageStatus ==1 ? true : false" />
-						<view class="separator"></view>
-						<label class="label operation">操作规程 >></label>
+				<view v-if="stage.needDescription === 'true'">
+					<conf-div title="描述:" :required="required">
+						<textarea placeholder="请输入描述" v-model="faultJudgement" :disabled="stageStatus ==1 ? true : false" />
+						<!-- <view class="separator"></view>
+						<label class="label operation">操作规程 >></label> -->
 					</conf-div>
+				</view>
+				<view v-if="stage.number == '005'">
 					<conf-div title="故障部位:">
 						<fl-picker
 							:listArr="faultLocaList"
@@ -125,9 +123,11 @@
 						 @deletePhotoSuccess="deletePhotoSuccess" :stageStatus="stageStatus" />
 					</conf-div>
 				</view>
-				<conf-div title="完成情况:">
-					<radio-btn :items="completion" @radioChange="comChange" :stageStatus="stageStatus" type="complete"></radio-btn>
-				</conf-div>
+				<view v-if="stage.needKeep === 'true'">
+					<conf-div title="完成情况:">
+						<radio-btn :items="completion" @radioChange="comChange" :stageStatus="stageStatus" type="complete"></radio-btn>
+					</conf-div>
+				</view>
 				<view v-if="stage.costTemplate === 'true'">
 					<conf-div title="是否保质期内:">
 						<radio-btn :items="yes_no" @radioChange="yes_noChange" :stageStatus="stageStatus" type="isQGP"></radio-btn>
@@ -136,30 +136,19 @@
 						<input placeholder="请输入费用合计(元)" type="number" v-model="cost" :disabled="stageStatus ==1 ? true : false"/>
 					</conf-div>
 				</view>
-				<view v-if="stage.attachment === 'true'">
+				<!-- <view v-if="stage.attachment === 'true'">
 					<conf-div title="附件(最多只能上传9份):" :required="required">
 						<Attachment :canUploadFile="true" :showProcess="true" :attachmentList.sync="attachmentList" @uploadSuccess="uploadSuccess" @deleteSuccess="deleteSuccess" :stageStatus="stageStatus"></Attachment>
 					</conf-div>
-				</view>
+				</view> -->
 				<view v-if="stage.checkOut === 'true'">
 					<conf-div title="签出时间:" :required="required">
-							<!-- <time-selector
-							    showType="yearToMinute"
-							    beginDate="1970-01-01"
-							    endDate="2030-12-31"
-							    beginTime="06:00:00"
-							    endTime="23:59:59"
-							    @btnConfirm="bindOutTimeConfirm" 
-								:isClick="stageStatus ==1 ? true : false"
-							>
-							    <text>当前选择：{{ signOutTime }}</text>
-							</time-selector> -->
-							<view class="big">
-								<view class="label user">{{ signOutTime }}</view>
-								<view v-if="stageStatus != 1 && jurisdiction !== 'view'" class="label">
-									<span class="iconfont iconqian iconStyle Btn" @click="signOut"></span>
-								</view>
+						<view class="big">
+							<view class="label user">{{ signOutTime }}</view>
+							<view v-if="stageStatus != 1 && jurisdiction !== 'view'" class="label">
+								<span class="iconfont iconqian iconStyle Btn" @click="signOut"></span>
 							</view>
+						</view>
 					</conf-div>
 				</view>
 				<view v-if="stageStatus != 1">
@@ -258,7 +247,7 @@
 				faultLocation: '',/* 故障部位 */
 				cost: '',/* 费用合计 */
 				faultLocaDefault: '',
-				required: true,
+				required: false,
 				timeStamp: "", //签名的方法的参数
 				nonceStr: "",
 				signature: "",
@@ -314,10 +303,12 @@
 				getReportById(params).then(res => {
 					console.log(res);
 					let result = res.data.result;
-					if (this.jurisdiction === 'view' && result.time !== null) {
+					if (/* this.jurisdiction === 'view' && */result.time !== null) {
 						let timeArr = result.time.split(",");
-						this.signInTime = this.formatDate(timeArr[0]);
-						this.signOutTime = this.formatDate(timeArr[timeArr.length === 1 ? 0 : 1]);
+						this.signInTime = format(timeArr[0]);
+						if (timeArr.length > 1) {
+							this.signOutTime = format(timeArr[1]);
+						}
 					}
 					this.completion.forEach(item => {
 						item.checked = false;
@@ -371,29 +362,31 @@
 		methods: {
 			formSubmit(e) {
 				var rule = []
-				if (this.formatModel == '工单预约') {
-					var appointmentRule = {value:this.appointment, checkType:'String', errorMsg:'预约时间不能为空'}
-					rule.push(appointmentRule)
-				}
-				if (this.stage.checkIn === 'true') {
-					var singinRule = {value:this.signInTime, checkType:'String', errorMsg:'签到时间不能为空'}
-					rule.push(singinRule)
-				}
-				if (this.stage.takePicture === 'true') {
-					var photoRule = {value:this.photoCommit, checkType:'length', errorMsg:'必须拍照'}
-					rule.push(photoRule)
-				}
-				if (this.formatModel == '故障研判') {
-					var faultJudgementRule = {value:this.faultJudgement, checkType:'String', errorMsg:'故障预判不能为空'}
-					rule.push(faultJudgementRule)
-				}
-				if (this.stage.attachment === 'true') {
-					var fileRule = {value:this.fileCommit, checkType:'length', errorMsg:'必须上传附件'}
-					rule.push(fileRule)
-				}
-				if (this.stage.checkOut === 'true') {
-					var singoutRule = {value:this.signOutTime, checkType:'String', errorMsg:'签出时间不能为空'}
-					rule.push(singoutRule)
+				if (this.completeStatus == '1') {
+					if (this.formatModel == '工单预约') {
+						var appointmentRule = {value:this.appointment, checkType:'String', errorMsg:'预约时间不能为空'}
+						rule.push(appointmentRule)
+					}
+					if (this.stage.checkIn === 'true') {
+						var singinRule = {value:this.signInTime, checkType:'String', errorMsg:'签到时间不能为空'}
+						rule.push(singinRule)
+					}
+					if (this.stage.needDescription == 'true') {
+						var faultJudgementRule = {value:this.faultJudgement, checkType:'String', errorMsg:'描述不能为空'}
+						rule.push(faultJudgementRule)
+					}
+					if (this.stage.takePicture === 'true') {
+						var photoRule = {value:this.photoCommit, checkType:'length', errorMsg:'必须拍照'}
+						rule.push(photoRule)
+					}
+					if (this.stage.attachment === 'true') {
+						var fileRule = {value:this.fileCommit, checkType:'length', errorMsg:'必须上传附件'}
+						rule.push(fileRule)
+					}
+					if (this.stage.checkOut === 'true') {
+						var singoutRule = {value:this.signOutTime, checkType:'String', errorMsg:'签出时间不能为空'}
+						rule.push(singoutRule)
+					}
 				}
 				var checkRes = formChecker.check(rule)
 				if (checkRes) {
@@ -443,11 +436,11 @@
 				this.appointment = e.key;
 			},
 			signIn() {
-				this.signInTime = this.formatDate(new Date());
+				this.signInTime = format(new Date());
 				this.clickTime('signIn')
 			},
 			signOut() {
-				this.signOutTime = this.formatDate(new Date());
+				this.signOutTime = format(new Date());
 				this.clickTime('signOut')
 			},
 			bindInTimeConfirm(e) {

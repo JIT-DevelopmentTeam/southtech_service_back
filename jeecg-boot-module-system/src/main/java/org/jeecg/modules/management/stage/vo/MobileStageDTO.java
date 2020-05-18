@@ -11,12 +11,15 @@ public class MobileStageDTO {
 
     // 进度id
     private String id;
+    // 阶段编码
+    private String number;
     // 阶段名称
     private String name;
     // 完成时间
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm")
     private Date finishTime;
+    // 阶段页面显示模板
     // 签到
     private String checkIn;
     // 签出
@@ -37,6 +40,11 @@ public class MobileStageDTO {
     private String attachment;
     // 工作要求
     private String jobDescription;
+    // 需要描述
+    private String needDescription;
+    // 需要保留
+    private String needKeep;
+
     // 汇报描述
     private String description;
     // 汇报id
