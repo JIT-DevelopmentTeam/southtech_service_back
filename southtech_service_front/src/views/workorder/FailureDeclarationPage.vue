@@ -67,12 +67,7 @@
           </a-col>
           <a-col :lg="8">
            <a-form-item label="电话" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input placeholder="请选择联系人" :value="contact != null ? contact.mobilePhone : ''" :disabled="true"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
-           <a-form-item label="电话(填)" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input :disabled="disabledWrite" v-model="contactMobile" placeholder="请填写电话"></a-input>
+              <a-input :disabled="disabledWrite" v-model="contactMobile" placeholder="请选择联系人"></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -340,7 +335,8 @@
       addContact(){
         let that = this;
         return new Promise(function (resolve,reject) {
-          if (!that.model.contactId) {
+          let contactId = that.form.getFieldValue('contactId');
+          if (!contactId) {
             if (!that.contactName && !that.contactMobile) {
               that.$message.error('请填写联系人和电话!');
               return;
@@ -412,6 +408,9 @@
           this.disabledWrite = true;
         } else {
           this.disabledWrite = false;
+          this.contactName = null;
+          this.contactMobile = null;
+          return;
         }
         getAction(this.url.getContactById+"?id="+value,null).then((res) => {
           if (res.success) {
@@ -419,6 +418,7 @@
             this.form.setFieldsValue({
                 contactId: this.contact.id
             });
+            this.contactMobile = this.contact.mobilePhone;
           }
         });
       },
@@ -440,9 +440,9 @@
         this.initDeviceNumberOptions();
       },
       async initContactOptions(){
-        this.options.contactOptions = [];
-        this.model.contactId = null;
+        this.options.contactOptions = [{label:'请选择',value:null}];
         let _this = this;
+        let contactId;
         if (this.client.id) {
           await ajaxGetDictItems("tb_contact,name,id,client_id='"+this.client.id+"'", null).then((res) => {
             if (res.success) {
@@ -450,7 +450,7 @@
                   _this.options.contactOptions.push({label:res.result[index].text,value:res.result[index].value});
                  if (index === 0) {
                     _this.disabledWrite = true;
-                    _this.model.contactId = res.result[index].value;
+                    contactId = res.result[index].value;
                   }
               }
               if (res.result.length === 0) {
@@ -459,16 +459,14 @@
               }
             }
           });
-          if (_this.model.contactId) {
-            await getAction(_this.url.getContactById+'?id='+_this.model.contactId,null).then((res) => {
+            await getAction(_this.url.getContactById+'?id='+contactId,null).then((res) => {
              if (res.success) {
                _this.contactMobile = res.result.mobilePhone;
              }
           });
-          }
         }
         this.form.setFieldsValue({
-          contactId:_this.model.contactId,
+          contactId:contactId,
         });
       },
       initDeviceNumberOptions(){
