@@ -1,7 +1,5 @@
 package org.jeecg.modules.system.entity;
 
-import java.io.Serializable;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -9,7 +7,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.jeecg.common.aspect.annotation.Dict;
-import org.jeecgframework.poi.excel.annotation.Excel;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * <p>
@@ -162,10 +162,10 @@ public class SysPermission implements Serializable {
     public SysPermission(boolean index) {
     	if(index) {
     		this.id = "9502685863ab87f0ad1134142788a385";
-        	this.name="首页";
-        	this.component="dashboard/Analysis";
-        	this.url="/dashboard/analysis";
-        	this.icon="home";
+        	this.name="服务地图";
+        	this.component="servicemap/ServiceMap";
+        	this.url="/servicemap/ServiceMap";
+        	this.icon="environment";
         	this.menuType=0;
         	this.sortNo=0.0;
         	this.ruleFlag=0;
