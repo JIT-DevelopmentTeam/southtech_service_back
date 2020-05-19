@@ -164,12 +164,12 @@ public class MobileStageController {
      */
     private String reportSave(Map<String, Object> params) {
         ProgressReport progressReport = new ProgressReport();
-        progressReport.setDescription(params.get("faultJudgement").toString());
-        progressReport.setProgressId(params.get("progressId").toString());
-        progressReport.setIsCompleted(params.get("completeStatus").toString());
-        progressReport.setWorkOrderDetailId(params.get("detailId").toString());
-        progressReport.setWorkOrderId(params.get("ticketId").toString());
-        progressReport.setFaultLocation(params.get("faultLocation").toString());
+        progressReport.setDescription(params.get("faultJudgement") != null ? params.get("faultJudgement").toString() : null);
+        progressReport.setProgressId(params.get("progressId") != null ? params.get("progressId").toString() : null);
+        progressReport.setIsCompleted(params.get("completeStatus") != null ? params.get("completeStatus").toString() : null);
+        progressReport.setWorkOrderDetailId(params.get("detailId") != null ? params.get("detailId").toString() : null);
+        progressReport.setWorkOrderId(params.get("ticketId") != null ? params.get("ticketId").toString() : null);
+        progressReport.setFaultLocation(params.get("faultLocation") != null ? params.get("faultLocation").toString() : null);
         if (!"null".equals(params.get("reportId").toString())) {
             progressReport.setId(params.get("reportId").toString());
             progressReportService.updateById(progressReport);
