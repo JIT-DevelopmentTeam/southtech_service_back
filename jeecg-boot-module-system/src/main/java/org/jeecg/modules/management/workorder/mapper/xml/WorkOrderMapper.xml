@@ -25,6 +25,7 @@
         WHERE
         workOrder.status = '1'
         AND detail.service_engineer_name IS NULL
+        AND workOrder.need_dispatch = '1'
         <if test="type != null and type != ''">
             AND workOrder.type = #{type}
         </if>

@@ -407,16 +407,18 @@
 				this.$store.dispatch('stage/GetDataList', payload)
 			},
 			initFaultLocation(valueArr) {
-				let faultArr = valueArr.split(",")
-				let resultArr = []
-				for (var i = 0; i < faultArr.length; i++) {
-					for (var j = 0; j < this.faultLocaList.length; j++) {
-						if (faultArr[i] === this.faultLocaList[j].value) {
-							resultArr.push(this.faultLocaList[j].text);
+				if (valueArr != null) {
+					let faultArr = valueArr.split(",")
+					let resultArr = []
+					for (var i = 0; i < faultArr.length; i++) {
+						for (var j = 0; j < this.faultLocaList.length; j++) {
+							if (faultArr[i] === this.faultLocaList[j].value) {
+								resultArr.push(this.faultLocaList[j].text);
+							}
 						}
 					}
+					this.faultLocaDefault = resultArr.join(",");
 				}
-				this.faultLocaDefault = resultArr.join(",");
 			},
 			selectUser() {
 				console.log('选择人员');
