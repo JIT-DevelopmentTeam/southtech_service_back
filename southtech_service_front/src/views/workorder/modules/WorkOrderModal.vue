@@ -54,11 +54,11 @@
               <!-- <j-dict-select-tag v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" :trigger-change="true" :dictCode="contactCondition()" @change="selectContact($event)"/> -->
             </a-form-item>
           </a-col>
-          <a-col :lg="8">
+          <!-- <a-col :lg="8">
            <a-form-item label="联系电话" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input placeholder="请选择联系人" :value="contact != null ? contact.mobilePhone : ''" :disabled="true"></a-input>
+              <a-input placeholder="请选择联系人" :value="contactMobile ? contactMobile : ''" :disabled="true"></a-input>
             </a-form-item>
-          </a-col>
+          </a-col> -->
           <a-col :lg="8">
            <a-form-item label="需要派工" :labelCol="labelCol" :wrapperCol="wrapperCol">
              <a-radio-group v-decorator="['needDispatch',validatorRules.needDispatch]" :options="options.needDispatchOptions"/>
@@ -229,10 +229,12 @@
           getByUserName:"/sys/user/getByUserName",
         },
         workOrderType:null,
+        isAdd:true,
         listSize:5,
         clientList:[],
         client:{},
         contact:{},
+        contactMobile:null,
         customerService:{},
         customerServiceList:[],
         options:{
@@ -275,6 +277,12 @@
           record.emergencyLevel = "3";
           record.needDispatch = "0";
           record.declarationTime = formatDate(Date.parse(new Date()),'yyyy-MM-dd hh:mm:ss');
+          this.isAdd = true;
+        } else {
+          this.isAdd = false;
+          this.client.id = record.clientId;
+          this.initContactOptions();
+          this.initDeviceNumberOptions();
         }
         this.model = Object.assign({}, record);
         this.model.workOrderDetailList = [{}];
@@ -455,10 +463,10 @@
           }
         })
       },
-      initDeviceNumberOptions(){
+      async initDeviceNumberOptions(){
         this.options.deviceNumberOptions = [];
         this.model.workOrderDetailList[0].deviceNumber = null;
-        ajaxGetDictItems("tb_device_number,name,id,client_id='"+this.client.id+"'", null).then((res) => {
+        await ajaxGetDictItems("tb_device_number,name,id,client_id='"+this.client.id+"'", null).then((res) => {
           if (res.success) {
             for (let index = 0; index < res.result.length; index++) {
                 this.options.deviceNumberOptions.push({label:res.result[index].text,value:res.result[index].value});
