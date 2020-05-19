@@ -149,7 +149,7 @@
 
           <a-divider type="vertical" />
           <a-dropdown>
-            <a v-has="'workOrder:dispatch'" @click="dispatch(record)" class="ant-dropdown-link">
+            <a v-has="'workOrder:dispatch'" v-if="record.needDispatch === '1'" @click="dispatch(record)" class="ant-dropdown-link">
               派工
             </a>
           </a-dropdown>
@@ -268,7 +268,6 @@ export default {
           align: 'center',
           dataIndex: 'needDispatch',
           customRender: text => {
-            console.log("---->"+text);
             if (!text) {
               return ''
             } else {
