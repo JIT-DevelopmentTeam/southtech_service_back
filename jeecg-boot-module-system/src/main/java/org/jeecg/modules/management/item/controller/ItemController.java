@@ -276,27 +276,25 @@ public class ItemController extends JeecgController<Item, IItemService> {
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
-            if (dataList.isEmpty()) {
-                list.add(obj);
-                if (i > 0 && i % 5000 == 0 || i == dataArray.size() - 1) {
-                    service.saveBatch(list, 5000);
-                    list.clear();
-                }
-            } else {
+            if (!dataList.isEmpty()) {
+                boolean exists = false;
                 for (int j = 0; j < dataList.size(); j++) {
                     if (obj.getNumber().equals(dataList.get(j).getNumber())) {
-                        System.out.println("--> 1");
-                        QueryWrapper<T> queryWrapper = new QueryWrapper<>();
-                        queryWrapper.eq("id", dataList.get(j).getId());
-                        service.update(obj, queryWrapper);
-                    } else {
-                        list.add(obj);
-                        if (i > 0 && i % 5000 == 0 || i == dataArray.size() - 1) {
-                            service.saveBatch(list, 5000);
-                            list.clear();
-                        }
+                        exists = true;
+                        break;
                     }
                 }
+                if (exists) {
+                    QueryWrapper<T> queryWrapper = new QueryWrapper<>();
+                    queryWrapper.eq("id", obj.getId());
+                    service.update(obj, queryWrapper);
+                    continue;
+                }
+            }
+            list.add(obj);
+            if (i > 0 && i % 5000 == 0 || i == dataArray.size() - 1) {
+                service.saveBatch(list, 5000);
+                list.clear();
             }
         }
     }
