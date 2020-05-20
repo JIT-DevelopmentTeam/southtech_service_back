@@ -74,52 +74,36 @@
         </template>
 
         <span slot="action" slot-scope="text, record">
-          <a @click="handleEdit(record)">编辑</a>
-
-          <a-divider type="vertical" />
-          <a-dropdown>
-            <a class="ant-dropdown-link">
-              更多
-              <a-icon type="down" />
-            </a>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
-                  <a>删除</a>
-                </a-popconfirm>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
+          <a title="确定删除吗?" @confirm="() => handleDelete(record.id)">删除</a>
         </span>
       </a-table>
     </div>
-    <!-- <serviceVisits-modal ref="modalForm" @ok="modalFormOk"></serviceVisits-modal> -->
   </a-card>
 </template>
 
 <script>
 import { JeecgListMixin } from '@/mixins/JeecgListMixin'
-// import ServiceVisitsModal from './modules/ServiceVisitsModal'
 import { initDictOptions, filterMultiDictText } from '@/components/dict/JDictSelectUtil'
 
 export default {
   name: 'ServiceVisitsList',
   mixins: [JeecgListMixin],
   components: {
-    // ServiceVisitsModal
   },
   props: {
-    workOrderNum: {
+    workOrder: {
       type: String
     }
   },
   watch: {
-    workOrderNum: {
+    workOrder: {
       immediate: true,
       handler(val) {
-        if (!this.workOrderNum) {
+        
+        if (!this.workOrder.id) {
           this.clearList()
         } else {
+          console.log(val);
           this.queryParam['workOrderId'] = val
           this.loadData(1)
           this.initDictConfig()
@@ -177,7 +161,7 @@ export default {
           dataIndex: 'respondents'
         },
         {
-          title: '是否完成',
+          title: '完成状态',
           align: 'center',
           dataIndex: 'isCompleted',
           customRender: text => {
@@ -215,12 +199,6 @@ export default {
           align: 'center',
           dataIndex: 'opinion',
           scopedSlots: { customRender: 'htmlSlot' }
-        },
-        {
-          title: '操作',
-          dataIndex: 'action',
-          align: 'center',
-          scopedSlots: { customRender: 'action' }
         }
       ],
       url: {
@@ -260,7 +238,7 @@ export default {
           this.$set(this.dictOptions, 'visitPeople', res.result)
         }
       })
-      initDictOptions('DIC_YES_OR_NOT').then(res => {
+      initDictOptions('service_visits_is_completed').then(res => {
         if (res.success) {
           this.$set(this.dictOptions, 'isCompleted', res.result)
         }

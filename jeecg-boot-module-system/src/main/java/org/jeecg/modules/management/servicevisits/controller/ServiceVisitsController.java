@@ -20,6 +20,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.management.workorder.entity.WorkOrder;
+import org.jeecg.modules.management.workorder.service.IWorkOrderService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -45,6 +47,9 @@ import com.alibaba.fastjson.JSON;
 public class ServiceVisitsController extends JeecgController<ServiceVisits, IServiceVisitsService> {
 	@Autowired
 	private IServiceVisitsService serviceVisitsService;
+
+     @Autowired
+     private IWorkOrderService workOrderService;
 	
 	/**
 	 * 分页列表查询
@@ -74,6 +79,23 @@ public class ServiceVisitsController extends JeecgController<ServiceVisits, ISer
 	 */
 	@PostMapping(value = "/add")
 	public Result<?> add(@RequestBody ServiceVisits serviceVisits) {
+	    QueryWrapper<ServiceVisits> serviceVisitsQueryWrapper = new QueryWrapper<>();
+	    serviceVisitsQueryWrapper.eq("work_order_id",serviceVisits.getWorkOrderId());
+	    List<ServiceVisits> serviceVisitsList = serviceVisitsService.list(serviceVisitsQueryWrapper);
+	    if (serviceVisitsList.isEmpty()) {
+	        WorkOrder workOrder = workOrderService.getById(serviceVisits.getWorkOrderId());
+            switch (serviceVisits.getIsCompleted()) {
+                case "1":
+                    workOrder.setStatus("3");
+                    break;
+                case "2":
+                    workOrder.setStatus("6");
+                    break;
+                default:
+                    workOrder.setStatus("5");
+            }
+            workOrderService.updateById(workOrder);
+        }
 		serviceVisitsService.save(serviceVisits);
 		return Result.ok("添加成功！");
 	}

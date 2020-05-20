@@ -20,7 +20,8 @@
             <a-col :span="8">
               <a-form-item label="工单单号" :labelCol="labelCol" :wrapperCol="wrapperCol">
                 <a-input
-                  v-decorator="[ 'workOrderId', validatorRules.workOrderId]"
+                  v-model="model.workOrderNum"
+                  :disabled="true"
                   placeholder="请输入工单单号"
                 ></a-input>
               </a-form-item>
@@ -64,13 +65,13 @@
               </a-form-item>
             </a-col>
             <a-col :span="8">
-              <a-form-item label="是否完成" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-form-item label="完成状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
                 <j-dict-select-tag
                   type="list"
                   v-decorator="['isCompleted', validatorRules.isCompleted]"
                   :trigger-change="true"
-                  dictCode="DIC_YES_OR_NOT"
-                  placeholder="请选择是否完成"
+                  dictCode="service_visits_is_completed"
+                  placeholder="请选择完成状态"
                 />
               </a-form-item>
             </a-col>
@@ -145,7 +146,8 @@ export default {
       title: '操作',
       width: 1300,
       visible: false,
-      model: {},
+      model: {
+      },
       rateValue: 0,
       labelCol: {
         xs: { span: 24 },
@@ -185,8 +187,10 @@ export default {
     edit(record) {
       this.form.resetFields()
       this.model = Object.assign({}, record)
-      console.log(this.workOrder)
-      this.model.workOrderId = this.workOrder.number
+      this.model.workOrderId = this.workOrder.id
+      console.log(this.workOrder);
+      this.model.workOrderNum = this.workOrder.number;
+      console.log(this.model.workOrderNum)
       this.model.customer = this.workOrder.clientId
       this.visible = true
       this.$nextTick(() => {
@@ -232,18 +236,17 @@ export default {
             .then(res => {
               if (res.success) {
                 that.$message.success(res.message)
+                that.$emit('ok');
               } else {
                 that.$message.warning(res.message)
               }
             })
             .finally(() => {
-              // console.log(this.$refs.ServiceViitsList)
-              // this.$refs.ServiceViitsList.LoadData()
-              that.confirmLoading = false
+              that.confirmLoading = false;
+              that.close()
             })
         }
       })
-      this.close()
     },
     // saveData() {
     //   const that = this

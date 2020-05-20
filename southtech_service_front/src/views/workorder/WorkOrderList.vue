@@ -165,7 +165,7 @@
         <progress-report-list :mainId="selectedMainId" />
       </a-tab-pane>
       <a-tab-pane tab="回访记录" key="3">
-        <ServiceVisitsList ref="ServiceVisitsList" :workOrderNum="workOrder.number"/>
+        <service-visits-list-page :mainId="selectedMainId"/>
       </a-tab-pane>
       <a-tab-pane tab="服务评价" key="4" forceRender>
         <service-commentery-list :mainId="selectedMainId" />
@@ -173,8 +173,8 @@
     </a-tabs>
 
     <workOrder-modal ref="modalForm" @ok="modalFormOk"></workOrder-modal>
-    <DisPatchModal ref="dispatchModalForm" @ok="dispatchModalFormOk"></DisPatchModal>
-    <ServiceVisits ref="ServiceVisits" :workOrder="workOrder" />
+    <DisPatchModal ref="dispatchModalForm" @ok="modalFormOk"></DisPatchModal>
+    <ServiceVisits ref="ServiceVisits" :workOrder="workOrder" @ok="modalFormOk"/>
   </a-card>
 </template>
 
@@ -187,9 +187,9 @@ import WorkOrderProgressPage from './WorkOrderProgressPage'
 import ServiceCommenteryList from './ServiceCommenteryList'
 import ProgressReportList from './ProgressReportList'
 import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
-import { initDictOptions, filterMultiDictText } from '@/components/dict/JDictSelectUtil'
 import ServiceVisits from '@/views/servicevists/modules/ServiceVisitsModal'
-import ServiceVisitsList from '@/views/servicevists/ServiceVisitsList'
+import { initDictOptions, filterMultiDictText } from '@/components/dict/JDictSelectUtil'
+import ServiceVisitsListPage from './ServiceVisitsListPage'
 
 import {formatDate} from '@/utils/util.js'
 
@@ -204,7 +204,7 @@ export default {
     ProgressReportList,
     WorkOrderModal,
     ServiceVisits,
-    ServiceVisitsList
+    ServiceVisitsListPage
   },
   data() {
     return {
@@ -563,7 +563,6 @@ export default {
       if (this.selectionRows.length === 1) {
         let row = this.selectionRows[0]
         this.workOrder = row
-        
         this.$refs.ServiceVisitsList.loadData();
       }
     },
@@ -632,10 +631,6 @@ export default {
       this.$refs.dispatchModalForm.edit(record);
       this.$refs.dispatchModalForm.title = "派工";
       this.$refs.dispatchModalForm.disableSubmit = false;
-    },
-    dispatchModalFormOk() {
-      this.loadData();
-      this.$emit('ok');
     },
     exportReport() {
       let url = `${window._CONFIG['domianURL']}/${this.url.exportReport}`;
