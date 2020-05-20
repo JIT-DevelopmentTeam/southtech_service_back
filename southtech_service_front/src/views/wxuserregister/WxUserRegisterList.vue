@@ -97,10 +97,10 @@
           </a-button>
         </template>
 
-        <span slot="action" slot-scope="text, record">
-          <!-- <a @click="handleEdit(record)">编辑</a>
+        <!--<span slot="action" slot-scope="text, record">
+          &lt;!&ndash; <a @click="handleEdit(record)">编辑</a>
 
-          <a-divider type="vertical" /> -->
+          <a-divider type="vertical" /> &ndash;&gt;
           <a-dropdown>
             <a class="ant-dropdown-link">更多 <a-icon type="down" /></a>
             <a-menu slot="overlay">
@@ -111,7 +111,7 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-        </span>
+        </span>-->
 
       </a-table>
     </div>
@@ -175,13 +175,13 @@
                 return filterMultiDictText(this.dictOptions['status'], text+"")
               }
             }
-          },
+          }/*,
           {
             title: '操作',
             dataIndex: 'action',
             align:"center",
             scopedSlots: { customRender: 'action' }
-          }
+          }*/
         ],
         url: {
           list: "/wxuserregister/wxUserRegister/list",
