@@ -7,12 +7,12 @@
 			<uni-card title="设备档案" v-for="(deviceNumber,index) in deviceNumberList">
 				<view class="uni-list">
 					<uni-list>
-					    <uni-list-item title="编码" :rightText="deviceNumber.number"></uni-list-item>
-						<uni-list-item title="名称" :rightText="deviceNumber.name"></uni-list-item>
-						<uni-list-item title="类型" :rightText="deviceNumber.type"></uni-list-item>
-						<uni-list-item title="保质期" :rightText="deviceNumber.qgp"></uni-list-item>
-						<uni-list-item title="签约日期" :rightText="deviceNumber.signing"></uni-list-item>
-						<uni-list-item title="验收日期" :rightText="deviceNumber.acceptance"></uni-list-item>
+					    <uni-list-item title="编码" :rightText="deviceNumber.number" :show-arrow="false"></uni-list-item>
+						<uni-list-item title="名称" :rightText="deviceNumber.name" :show-arrow="false"></uni-list-item>
+						<uni-list-item title="类型" :rightText="deviceNumber.type" :show-arrow="false"></uni-list-item>
+						<uni-list-item title="保质期" :rightText="deviceNumber.qgp" :show-arrow="false"></uni-list-item>
+						<uni-list-item title="签约日期" :rightText="deviceNumber.signing" :show-arrow="false"></uni-list-item>
+						<uni-list-item title="验收日期" :rightText="deviceNumber.acceptance" :show-arrow="false"></uni-list-item>
 						<view class="uni-title uni-common-pl">描述</view>
 						<textarea :disabled="true" :value="deviceNumber.description ? deviceNumber.description : ''"/>
 					</uni-list>

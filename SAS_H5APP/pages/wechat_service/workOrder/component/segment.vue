@@ -11,9 +11,9 @@
 			<view v-if="current == 0">
 				<step-item :ticketId="ticketId" :ticketType="ticketType" :isNavigateTo="isNavigateTo"></step-item>
 			</view>
-			<view v-else>
+			<!-- <view v-else>
 				<detail-card :ticketId="ticketId" :ticketType="ticketType"></detail-card>
-			</view>
+			</view> -->
         </view>
     </view>
 </template>
@@ -47,7 +47,7 @@
 		},
 	    data() {
 			return {
-				items: ['项目阶段','工单明细'],
+				items: ['项目阶段'],
 				current: 0,
 			}
 	    },
