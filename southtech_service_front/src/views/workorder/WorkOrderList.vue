@@ -147,12 +147,28 @@
         <span slot="action" slot-scope="text, record">
           <a @click="handleEdit(record)">编辑</a>
 
-          <a-divider type="vertical" />
-          <a-dropdown>
-            <a v-has="'workOrder:dispatch'" v-if="record.needDispatch === '1'" @click="dispatch(record)" class="ant-dropdown-link">
-              派工
-            </a>
-          </a-dropdown>
+          <div v-if="record.needDispatch === '1'" style="display: inline;">
+            <a-divider type="vertical" />
+            <a-dropdown>
+              <a v-has="'workOrder:dispatch'" @click="dispatch(record)" class="ant-dropdown-link">
+                派工
+              </a>
+            </a-dropdown>
+          </div>
+
+          <div v-has="'workOrder:del'" style="display: inline;">
+            <a-divider type="vertical" />
+            <a-dropdown>
+              <a class="ant-dropdown-link">更多 <a-icon type="down" /></a>
+              <a-menu slot="overlay">
+                <a-menu-item>
+                  <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
+                    <a>删除</a>
+                  </a-popconfirm>
+                </a-menu-item>
+              </a-menu>
+            </a-dropdown>
+          </div>
         </span>
       </a-table>
     </div>
@@ -415,7 +431,7 @@ export default {
           dataIndex: 'action',
           align: 'center',
           fixed: 'right',
-          width: 135,
+          width: 200,
           scopedSlots: { customRender: 'action' }
         }
       ],
