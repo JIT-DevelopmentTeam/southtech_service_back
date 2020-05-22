@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.DictModel;
@@ -47,10 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -105,6 +103,9 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 
      @Autowired
      private RedisUtil redisUtil;
+
+     @Autowired
+     private ISysBaseAPI sysBaseAPI;
 
 
 	/*---------------------------------主表处理-begin-------------------------------------*/
@@ -217,36 +218,10 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         WorkOrder workOrder = new WorkOrder();
         BeanUtils.copyProperties(workOrderPage, workOrder);
         workOrderService.saveMain(workOrder, workOrderPage.getWorkOrderDetailList());
-        List<SysMessageTemplate> messageTemplateList = sysMessageTemplateService.selectByCode("sys_new_ticket_reminder");
-        if (!messageTemplateList.isEmpty()) {
-            List<SysUser> userList = sysUserService.listByRoleCode("customer_service");
-            if (!userList.isEmpty()) {
-                StringBuffer userIdsStr = new StringBuffer();
-                for (SysUser user : userList) {
-                    userIdsStr.append(user.getId()+",");
-                }
-                userIdsStr = userIdsStr.deleteCharAt(userIdsStr.length()-1);
-                SysAnnouncement announcement = new SysAnnouncement();
-                announcement.setTitile(messageTemplateList.get(0).getTemplateName());
-                announcement.setMsgContent(messageTemplateList.get(0).getTemplateContent());
-                announcement.setStartTime(new Date());
-                announcement.setSender("admin");
-                announcement.setPriority("H");
-                announcement.setMsgCategory("2");
-                announcement.setMsgType("USER");
-                announcement.setSendStatus("1");
-                announcement.setSendTime(new Date());
-                announcement.setUserIds(userIdsStr.toString());
-                announcement.setDelFlag("0");
-                sysAnnouncementService.saveAnnouncement(announcement);
-                for (SysUser user : userList) {
-                    SysAnnouncementSend announcementSend = new SysAnnouncementSend();
-                    announcementSend.setAnntId(announcement.getId());
-                    announcementSend.setUserId(user.getId());
-                    announcementSend.setReadFlag("0");
-                    sysAnnouncementSendService.save(announcementSend);
-                }
-            }
+        List<SysUser> userList = sysUserService.listByRoleCode("customer_service");
+        Map<String, String> map = new HashMap<>();
+        for (SysUser user : userList) {
+            sysBaseAPI.sendSysAnnouncement("admin", user.getUsername(), "新工单提醒", map, "sys_new_ticket_reminder");
         }
         return Result.ok("添加成功！");
     }
