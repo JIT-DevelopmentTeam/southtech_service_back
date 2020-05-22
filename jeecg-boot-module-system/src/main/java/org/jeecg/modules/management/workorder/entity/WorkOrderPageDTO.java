@@ -3,7 +3,6 @@ package org.jeecg.modules.management.workorder.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.jeecgframework.poi.excel.annotation.Excel;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
@@ -41,6 +40,7 @@ public class WorkOrderPageDTO implements Serializable {
     private java.lang.String peers;
     private java.util.Date appointment;
     private java.util.Date plannedCompletionTime;
+    private java.util.Date actualCompletionTime;
     private java.lang.String workOrderDetailId;
 
 }

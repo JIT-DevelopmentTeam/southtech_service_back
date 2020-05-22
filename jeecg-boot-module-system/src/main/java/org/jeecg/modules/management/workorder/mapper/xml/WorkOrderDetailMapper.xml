@@ -42,4 +42,8 @@
 	<update id="updateCurrentProgressByWorkOrderId">
 		UPDATE ic_work_order_detail SET current_progress = #{currentProgress} WHERE work_order_id = #{workOrderId}
 	</update>
+
+	<update id="updateComlpetedTimeByWorkOrderId">
+		UPDATE ic_work_order_detail SET actual_completion_time = #{ACT} WHERE work_order_id = #{workOrderId}
+	</update>
 </mapper>

@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
 import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDetailDTO;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,5 +23,7 @@ public interface WorkOrderDetailMapper extends BaseMapper<WorkOrderDetail> {
 	List<MobileWorkOrderDetailDTO> getByWorkOrderId(@Param("workOrderId") String workOrderId);
 
 	void updateCurrentProgressByWorkOrderId(@Param("currentProgress") String currentProgress, @Param("workOrderId") String workOrderId);
+
+	void updateComlpetedTimeByWorkOrderId(@Param("ACT") Date ACT, @Param("workOrderId") String workOrderId);
 
 }

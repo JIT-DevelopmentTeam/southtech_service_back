@@ -426,6 +426,18 @@ export default {
               }
             }
           },
+          {
+            title:'实际完成时间',
+            align:"center",
+            dataIndex: 'actualCompletionTime',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return formatDate(text,'yyyy-MM-dd');
+              }
+            }
+          },
         {
           title: '操作',
           dataIndex: 'action',

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
 import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDetailDTO;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,5 +20,7 @@ public interface IWorkOrderDetailService extends IService<WorkOrderDetail> {
 	List<MobileWorkOrderDetailDTO> getByWorkOrderId(String workOrderId);
 
 	void updateCurrentProgressByWorkOrderId(String currentProgress, String workOrderId);
+
+	void updateComlpetedTimeByWorkOrderId(Date ACT, String workOrderId);
 
 }

@@ -70,4 +70,6 @@ public class WorkOrderDetail implements Serializable {
     private java.lang.String currentProgress;
     /**预约服务时间*/
     private java.util.Date appointment;
+    /**实际完成时间*/
+    private java.util.Date actualCompletionTime;
 }

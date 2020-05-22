@@ -1,8 +1,7 @@
 package org.jeecg.modules.management.mobile.stage;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.jeecg.common.api.vo.Result;
-import org.jeecg.common.util.DateUtils;
+import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.modules.management.file.entity.File;
 import org.jeecg.modules.management.file.service.IFileService;
 import org.jeecg.modules.management.progressreport.entity.ProgressReport;
@@ -31,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +61,9 @@ public class MobileStageController {
 
     @Autowired
     private IWorkOrderService workOrderService;
+
+    @Autowired
+    private ISysBaseAPI sysBaseAPI;
 
     @RequestMapping(value = "/queryStageByWorkOrderId")
     public Result<?> queryStageByWorkOrderId(HttpServletRequest req) {
@@ -103,8 +106,8 @@ public class MobileStageController {
         }
         // 检查当前工单下面的所以工单明细是否已经完成
         checkAllCompleted(params.get("ticketId").toString(), params.get("progressId").toString());
-        // 检查当前进度是否是最后一个，如果是并且进度状态为完成则修改工单状态为完成
-//        checkWorkOrderIsCompleted(params.get("ticketId").toString(), params.get("progressId").toString(), params.get("completeStatus").toString());
+        // 检查当前进度是否是最后一个，如果是并且进度状态为完成则修改工单状态为待回访
+        checkWorkOrderIsCompleted(params.get("ticketId").toString(), params.get("progressId").toString(), params.get("completeStatus").toString());
         result.setSuccess(true);
         result.setResult(progressReportId);
         result.setMessage("保存成功");
@@ -206,11 +209,11 @@ public class MobileStageController {
     public void checkWorkOrderIsCompleted(String workOrderId, String progressId, String isCompleted) {
         // 根据工单id查出所有进度
         List<WorkOrderProgress> progressList = workOrderProgressService.selectByMainId(workOrderId);
-        // 判断：如果当前进度id等于进度list的最后一个，并且isCompleted为1则执行更新工单状态为已完成
+        // 判断：如果当前进度id等于进度list的最后一个，并且isCompleted为1则执行更新工单状态为待回访
         if (progressId.equals(progressList.get(progressList.size() - 1).getId()) && "1".equals(isCompleted)) {
             WorkOrder workOrder = new WorkOrder();
             workOrder.setId(workOrderId);
-            QueryWrapper<WorkOrderDetail> queryWrapper = new QueryWrapper();
+            /*QueryWrapper<WorkOrderDetail> queryWrapper = new QueryWrapper();
             queryWrapper.eq("work_order_id", workOrderId);
             List<WorkOrderDetail> workOrderDetailList = workOrderDetailService.list(queryWrapper);
             boolean normal = true;
@@ -223,8 +226,17 @@ public class MobileStageController {
                 workOrder.setStatus("3");
             } else {
                 workOrder.setStatus("6");
-            }
+            }*/
+            workOrder.setStatus("7");
             workOrderService.updateById(workOrder);
+            workOrderDetailService.updateComlpetedTimeByWorkOrderId(new Date(), workOrderId);// 工单明细表写入实际完成时间
+            List<SysUser> userList = sysUserService.listByRoleCode("customer_service");
+            WorkOrder order = workOrderService.getById(workOrderId);
+            Map<String, String> map = new HashMap<>();
+            map.put("workOrderNum", order.getNumber());
+            for (SysUser user : userList) {
+                sysBaseAPI.sendSysAnnouncement("admin", user.getUsername(), "回访提醒", map, "return_visit_remind");
+            }
         }
     }
 

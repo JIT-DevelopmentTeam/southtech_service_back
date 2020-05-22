@@ -8,6 +8,7 @@ import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDetailDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,5 +36,10 @@ public class WorkOrderDetailServiceImpl extends ServiceImpl<WorkOrderDetailMappe
 	@Override
 	public void updateCurrentProgressByWorkOrderId(String currentProgress, String workOrderId) {
 		workOrderDetailMapper.updateCurrentProgressByWorkOrderId(currentProgress, workOrderId);
+	}
+
+	@Override
+	public void updateComlpetedTimeByWorkOrderId(Date ACT, String workOrderId) {
+		workOrderDetailMapper.updateComlpetedTimeByWorkOrderId(ACT, workOrderId);
 	}
 }
