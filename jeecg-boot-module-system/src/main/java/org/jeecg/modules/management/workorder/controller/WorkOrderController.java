@@ -429,7 +429,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             }
         }
         if (isFinish) {
-            workOrder.setStatus("2");
+            workOrder.setStatus("3");
             QueryWrapper<WorkOrderProgress> workOrderProgressQueryWrapper = new QueryWrapper<>();
             workOrderProgressQueryWrapper.eq("work_order_id",workOrder.getId());
             List<WorkOrderProgress> workOrderProgressesList = workOrderProgressService.list(workOrderProgressQueryWrapper);

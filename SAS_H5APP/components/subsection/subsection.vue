@@ -88,7 +88,7 @@
 					items.push(list.text) 
 				})
 				items.shift();
-				items.pop();
+				// items.pop();
 				// result = result.splice(items.length-1, 1);
 				return items
 			}

@@ -239,9 +239,67 @@ export default {
           }
         },
         {
-          title: '编号',
+          title: '客户',
           align: 'center',
-          dataIndex: 'number'
+          dataIndex: 'clientId',
+          customRender: text => {
+            if (!text) {
+              return ''
+            } else {
+              return filterMultiDictText(this.dictOptions['clientId'], text + '')
+            }
+          }
+        },
+        {
+          title:'设备档案',
+          align:"center",
+          dataIndex:"deviceNumber",
+          customRender:(text)=>{
+            if(!text){
+              return ''
+            }else{
+              return filterMultiDictText(this.dictOptions['deviceNumber'], text+"")
+            }
+          }
+        },
+        {
+          title: '问题描述',
+          align: 'center',
+          dataIndex: 'description'
+        },
+        {
+          title: '联系人',
+          align: 'center',
+          dataIndex: 'contactId',
+          customRender: text => {
+            if (!text) {
+              return ''
+            } else {
+              return filterMultiDictText(this.dictOptions['contactId'], text + '')
+            }
+          }
+        },
+        {
+          title: '联系电话',
+          align: 'center',
+          dataIndex: 'mobilePhone'
+        },
+        {
+          title: '紧急程度',
+          align: 'center',
+          dataIndex: 'emergencyLevel',
+          customRender: text => {
+            if (!text) {
+              return ''
+            } else {
+              return filterMultiDictText(this.dictOptions['emergencyLevel'], text + '')
+            }
+          }
+        },
+        {
+          title: '申报时间',
+          align: 'center',
+          dataIndex: 'declarationTime'
         },
         {
           title: '状态',
@@ -254,6 +312,23 @@ export default {
               return filterMultiDictText(this.dictOptions['status'], text + '')
             }
           }
+        },
+        {
+          title: '需要派工',
+          align: 'center',
+          dataIndex: 'needDispatch',
+          customRender: text => {
+            if (!text) {
+              return ''
+            } else {
+              return filterMultiDictText(this.dictOptions['needDispatch'], text + '')
+            }
+          }
+        },
+        {
+          title: '编号',
+          align: 'center',
+          dataIndex: 'number'
         },
         {
           title: '类型',
@@ -280,59 +355,6 @@ export default {
           }
         },
         {
-          title: '需要派工',
-          align: 'center',
-          dataIndex: 'needDispatch',
-          customRender: text => {
-            if (!text) {
-              return ''
-            } else {
-              return filterMultiDictText(this.dictOptions['needDispatch'], text + '')
-            }
-          }
-        },
-        {
-          title: '客户',
-          align: 'center',
-          dataIndex: 'clientId',
-          customRender: text => {
-            if (!text) {
-              return ''
-            } else {
-              return filterMultiDictText(this.dictOptions['clientId'], text + '')
-            }
-          }
-        },
-        {
-          title: '联系人',
-          align: 'center',
-          dataIndex: 'contactId',
-          customRender: text => {
-            if (!text) {
-              return ''
-            } else {
-              return filterMultiDictText(this.dictOptions['contactId'], text + '')
-            }
-          }
-        },
-         {
-          title: '联系电话',
-          align: 'center',
-          dataIndex: 'mobilePhone'
-        },
-        {
-          title: '紧急程度',
-          align: 'center',
-          dataIndex: 'emergencyLevel',
-          customRender: text => {
-            if (!text) {
-              return ''
-            } else {
-              return filterMultiDictText(this.dictOptions['emergencyLevel'], text + '')
-            }
-          }
-        },
-        {
           title: '客服',
           align: 'center',
           dataIndex: 'customerServiceName',
@@ -344,23 +366,6 @@ export default {
             }
           }
         },
-        {
-          title: '申报时间',
-          align: 'center',
-          dataIndex: 'declarationTime'
-        },
-        {
-            title:'设备档案',
-            align:"center",
-            dataIndex:"deviceNumber",
-            customRender:(text)=>{
-              if(!text){
-                return ''
-              }else{
-                return filterMultiDictText(this.dictOptions['deviceNumber'], text+"")
-              }
-            }
-          },
           {
             title:'服务工程师',
             align:"center",
