@@ -41,6 +41,7 @@ public class WorkOrderPageDTO implements Serializable {
     private java.util.Date appointment;
     private java.util.Date plannedCompletionTime;
     private java.util.Date actualCompletionTime;
+    private java.lang.String description;
     private java.lang.String workOrderDetailId;
 
 }

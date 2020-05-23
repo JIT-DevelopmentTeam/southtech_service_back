@@ -227,7 +227,7 @@ public class MobileStageController {
             } else {
                 workOrder.setStatus("6");
             }*/
-            workOrder.setStatus("7");
+            workOrder.setStatus("2");
             workOrderService.updateById(workOrder);
             workOrderDetailService.updateComlpetedTimeByWorkOrderId(new Date(), workOrderId);// 工单明细表写入实际完成时间
             List<SysUser> userList = sysUserService.listByRoleCode("customer_service");
