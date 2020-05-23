@@ -125,7 +125,6 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 								   HttpServletRequest req) {
 		QueryWrapper<WorkOrder> queryWrapper = QueryGenerator.initQueryWrapper(workOrder, req.getParameterMap());
         queryWrapper.orderByAsc("status");
-        queryWrapper.orderByDesc("create_time");
         if (StringUtils.isNotBlank(req.getParameter("clientName"))) {
             QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<Client>();
             clientQueryWrapper.like("name",req.getParameter("clientName").trim());
@@ -173,8 +172,6 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                               @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
                               HttpServletRequest req) {
         QueryWrapper<WorkOrderPageDTO> queryWrapper = QueryGenerator.initQueryWrapper(workOrderPageDTO, req.getParameterMap());
-        queryWrapper.orderByAsc("status");
-        queryWrapper.orderByDesc("create_time");
         if (StringUtils.isNotBlank(req.getParameter("clientName"))) {
             QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<Client>();
             clientQueryWrapper.like("name",req.getParameter("clientName").trim());

@@ -473,6 +473,11 @@ export default {
       options:{
         needDispatchOptions:[]
       },
+       /* 排序参数 */
+      isorter:{
+        column: 'status',
+        order: 'asc',
+      },
       /* 分页参数 */
       ipagination: {
         current: 1,
