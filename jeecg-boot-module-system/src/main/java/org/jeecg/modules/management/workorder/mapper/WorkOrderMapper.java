@@ -1,12 +1,9 @@
 package org.jeecg.modules.management.workorder.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.apache.poi.ss.formula.functions.T;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.entity.WorkOrderPageDTO;
 import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDTO;
@@ -74,5 +71,7 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder> {
             "\tic_work_order_detail workOrderDetail\n" +
             "\tINNER JOIN ic_work_order workOrder ON workOrderDetail.work_order_id = workOrder.id")
     List<WorkOrderPageDTO> queryListPage(WorkOrderPageDTO workOrderPageDTO);
+
+    List<WorkOrder> queryTimeoutWorkOrder();
 
 }

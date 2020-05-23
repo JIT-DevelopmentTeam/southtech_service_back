@@ -239,6 +239,11 @@ export default {
           }
         },
         {
+          title: '编号',
+          align: 'center',
+          dataIndex: 'number'
+        },
+        {
           title: '客户',
           align: 'center',
           dataIndex: 'clientId',
@@ -324,11 +329,6 @@ export default {
               return filterMultiDictText(this.dictOptions['needDispatch'], text + '')
             }
           }
-        },
-        {
-          title: '编号',
-          align: 'center',
-          dataIndex: 'number'
         },
         {
           title: '类型',

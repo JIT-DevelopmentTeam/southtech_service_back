@@ -145,4 +145,9 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     public List<WorkOrder> queryWorkOrderByComment(String clientId, String status) {
         return workOrderMapper.queryWorkOrderByComment(clientId,status);
     }
+
+    @Override
+    public List<WorkOrder> queryTimeoutWorkOrder() {
+        return workOrderMapper.queryTimeoutWorkOrder();
+    }
 }

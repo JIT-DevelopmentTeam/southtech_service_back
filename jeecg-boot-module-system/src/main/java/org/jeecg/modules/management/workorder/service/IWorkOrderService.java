@@ -71,4 +71,6 @@ public interface IWorkOrderService extends IService<WorkOrder> {
      * @return
      */
 	List<WorkOrder> queryWorkOrderByComment(String clientId,String status);
+
+	List<WorkOrder> queryTimeoutWorkOrder();
 }

@@ -114,4 +114,16 @@
             AND ( SELECT COUNT(*) FROM ic_service_commentery WHERE work_order_id = workOrder.id ) = 0
     </select>
 
+    <select id="queryTimeoutWorkOrder" resultType="org.jeecg.modules.management.workorder.entity.WorkOrder">
+        SELECT
+            workOrder.*
+        FROM
+            ic_work_order workOrder
+            LEFT JOIN ic_work_order_detail detail ON detail.work_order_id = workOrder.id
+        WHERE
+            1 = 1
+            AND detail.planned_completion_time &lt; CURRENT_DATE ()
+            AND detail.actual_completion_time IS NULL
+    </select>
+
 </mapper>
