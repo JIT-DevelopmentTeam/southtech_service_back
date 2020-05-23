@@ -16,25 +16,19 @@
 				</view>
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>联系人</view>
-					<picker v-model="model.contactId" mode ="selector" @change="pickerChange($event.target.value,'contactIndex');" :range="contactList" range-key="text">
+					<picker v-model="model.contactId" mode ="selector" @change="pickerContactChange($event.target.value);" :value="dataIndex.contactIndex" :range="contactList" range-key="text">
 						<view class="uni-input">{{ contactList[dataIndex.contactIndex] != null ? contactList[dataIndex.contactIndex].text : '' }}</view>
 					</picker>
 				</view>
-				<!-- <view class="flex-item flex-item-V" v-if="dingTalkUserId">
-					<view class="title"><span style="color: red;">*</span>接入方式</view>
-					<picker v-model="model.accessMethod" mode ="selector" @change="pickerChange($event.target.value,'accessMethodIndex');" :value="dataIndex.accessMethodIndex" :range="accessMethodList" range-key="text">
-						<view class="uni-input">{{ accessMethodList[dataIndex.accessMethodIndex] != null ? accessMethodList[dataIndex.accessMethodIndex].text : '' }}</view>
-					</picker>
-				</view> -->
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>紧急程度</view>
-					<picker v-model="model.emergencyLevel" mode ="selector" @change="pickerChange($event.target.value,'emergencyLevelIndex');" :value="dataIndex.emergencyLevelIndex" :range="emergencyLevelList" range-key="text">
+					<picker v-model="model.emergencyLevel" mode ="selector" @change="pickerEmergencyLevelChange($event.target.value);" :value="dataIndex.emergencyLevelIndex" :range="emergencyLevelList" range-key="text">
 						<view class="uni-input">{{ emergencyLevelList[dataIndex.emergencyLevelIndex] != null ? emergencyLevelList[dataIndex.emergencyLevelIndex].text : '' }}</view>
 					</picker>
 				</view>
 				<view class="flex-item flex-item-V">
 					<view class="title">客服</view>
-					<picker v-model="model.customerServiceName" mode ="selector" @change="pickerChange($event.target.value,'customerServiceIndex');" :value="dataIndex.customerServiceIndex" :range="customerServiceList" range-key="realname">
+					<picker v-model="model.customerServiceName" mode ="selector" @change="pickerCustomerServiceNameChange($event.target.value);" :value="dataIndex.customerServiceIndex" :range="customerServiceList" range-key="realname">
 						<view class="uni-input">{{ customerServiceList[dataIndex.customerServiceIndex] != null ? customerServiceList[dataIndex.customerServiceIndex].realname : ''}}</view>
 					</picker>
 				</view>
@@ -317,22 +311,21 @@
 			formReset: function() {
 				
 			},
-			pickerChange: function(val,fieldName) {
-				this.dataIndex[fieldName] = val;
-				switch(fieldName) {
-					case 'contactIndex':
-						this.model.contactId = this.contactList[val].value;
-						break;
-					case 'accessMethodIndex':
-						this.model.accessMethod = this.accessMethodList[val].value;
-						break;
-					case 'emergencyLevelIndex':
-						this.model.emergencyLevel = this.emergencyLevelList[val].value;
-						break;
-					case 'customerServiceIndex':
-						this.model.customerServiceName = this.customerServiceList[val].username;
-						break;
+			pickerContactChange: function(val) {
+				for (let i = 0; i < this.contactList.length; i++) {
+					if (val === this.contactList[i].value) {
+						this.dataIndex.contactIndex = i;
+						this.model.contactId = this.contactList[i].value;
+					}
 				}
+			},
+			pickerEmergencyLevelChange: function(val) {
+				this.dataIndex.emergencyLevelIndex = val;
+				this.model.emergencyLevel = this.emergencyLevelList[val].value;
+			},
+			pickerCustomerServiceNameChange: function(val) {
+				this.dataIndex.customerServiceIndex = val;
+				this.model.customerServiceName = this.customerServiceList[val].username;
 			},
 			addWorkOrderDetail: function () {
 				this.model.workOrderDetailList.push({});
@@ -447,14 +440,16 @@
 			  let formData = Object.assign({},this.model);
 			  addWorkOrder(formData).then((res) => {
 			  	if (res.data.success) {
-			  		uni.showToast({
-			  			title: res.data.message,
-			  			icon: 'none'
-			  		});
-					setTimeout(function (){
-						uni.navigateBack({
-						})
-					},3000);
+					uni.showModal({
+						title:'操作反馈',
+						content:res.data.message,
+						showCancel:false,
+						success:function(){
+							uni.navigateBack({
+								delta:2
+							})
+						}
+					})
 			  	}
 			  });
 		  }
