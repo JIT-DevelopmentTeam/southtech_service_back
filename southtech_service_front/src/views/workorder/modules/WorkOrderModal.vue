@@ -13,30 +13,19 @@
           <a-layout-content>
       <a-form :form="form">
         <a-row class="form-row" :gutter="16">
-          <a-col :lg="8">
+          <a-col :lg="12">
             <a-form-item label="编号" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-input :disabled="true" v-decorator="[ 'number', validatorRules.number]" placeholder="请输入编号"></a-input>
             </a-form-item>
           </a-col>
-          <a-col :lg="8">
+          <a-col :lg="12">
             <a-form-item label="类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
                 <j-dict-select-tag @change="setWorkOrderType" type="list" v-decorator="['type',validatorRules.type]" :trigger-change="true" dictCode="work_order_type" placeholder="请选择类型"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="8">
-           <a-form-item label="接入方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
-             <a-radio-group v-decorator="['accessMethod',validatorRules.accessMethod]" :options="options.accessMethodOptions"/>
-            </a-form-item>
-          </a-col>
-         
-          <a-col :lg="8">
-            <a-form-item label="紧急程度" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-radio-group v-decorator="['emergencyLevel',validatorRules.emergencyLevel]" :options="options.emergencyLevelOptions"/>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
+          <a-col :lg="12">
             <a-form-item label="客户" :labelCol="labelCol" :wrapperCol="wrapperCol">
-               <j-search-select-tag
+              <j-search-select-tag
                 placeholder="请选择客户"
                 v-decorator="['clientId',validatorRules.clientId]"
                 dict="tb_client,name,id"
@@ -46,9 +35,9 @@
               </j-search-select-tag>
             </a-form-item>
           </a-col>
-          <a-col :lg="8">
-           <a-form-item label="联系人" :labelCol="labelCol" :wrapperCol="wrapperCol">
-             <a-select v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" @change="selectContact">
+          <a-col :lg="12">
+            <a-form-item label="联系人" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-select v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" @change="selectContact">
                 <a-select-option v-for="(item, index) in options.contactOptions" :key="index" :value="item.value">{{item.label}}</a-select-option>
               </a-select>
               <!-- <j-dict-select-tag v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" :trigger-change="true" :dictCode="contactCondition()" @change="selectContact($event)"/> -->
@@ -59,27 +48,38 @@
               <a-input placeholder="请选择联系人" :value="contactMobile ? contactMobile : ''" :disabled="true"></a-input>
             </a-form-item>
           </a-col> -->
-          <a-col :lg="8">
+          <a-col :lg="12">
+           <a-form-item label="接入方式" :labelCol="labelCol" :wrapperCol="wrapperCol">
+             <a-radio-group v-decorator="['accessMethod',validatorRules.accessMethod]" :options="options.accessMethodOptions"/>
+            </a-form-item>
+          </a-col>
+         
+          <a-col :lg="12">
+            <a-form-item label="紧急程度" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-radio-group v-decorator="['emergencyLevel',validatorRules.emergencyLevel]" :options="options.emergencyLevelOptions"/>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="12">
            <a-form-item label="需要派工" :labelCol="labelCol" :wrapperCol="wrapperCol">
              <a-radio-group v-decorator="['needDispatch',validatorRules.needDispatch]" :options="options.needDispatchOptions"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="8">
+          <a-col :lg="12">
             <a-form-item label="申报时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-date placeholder="请选择申报时间" v-decorator="[ 'declarationTime', validatorRules.declarationTime]" :trigger-change="true" :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
             </a-form-item>
           </a-col>
-           <a-col :lg="8">
+          <a-col :lg="12">
+            <a-form-item label="代报人" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <j-select-user-by-dep v-decorator="['correspondentName',validatorRules.correspondentName]" :multi="false" :trigger-change="true"/>
+            </a-form-item>
+          </a-col>
+           <a-col :lg="12">
             <a-form-item label="客服" :labelCol="labelCol" :wrapperCol="wrapperCol">
                 <j-select-user-by-dep v-decorator="['customerServiceName',validatorRules.customerServiceName]" :multi="false" :trigger-change="true" :disabled="true"/>
               </a-form-item>
           </a-col>
-          <a-col :lg="8">
-           <a-form-item label="代报人" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <j-select-user-by-dep v-decorator="['correspondentName',validatorRules.correspondentName]" :multi="false" :trigger-change="true"/>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
+          <a-col :lg="12">
             <a-form-item label="附件" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <j-upload v-decorator="['annex']" name="workOrderDetail"></j-upload>
             </a-form-item>
