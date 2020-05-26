@@ -2,6 +2,8 @@ package org.jeecg.modules.management.workorder.vo;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class MobileWorkOrderDTO {
     // 工单id
@@ -40,4 +42,6 @@ public class MobileWorkOrderDTO {
     private java.lang.Double longitude;
     // 纬度
     private java.lang.Double latitude;
+    // 设备签约日期
+    private Date signing;
 }

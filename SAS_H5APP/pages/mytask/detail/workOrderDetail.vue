@@ -50,6 +50,14 @@
 				</view>
 				<view class="line">
 					<view class="label sameLine fontsmall bold">
+						签约日期：
+					</view>
+					<view class="label sameLine fontsmall">
+						{{getTicket.signing}}
+					</view>
+				</view>
+				<view class="line">
+					<view class="label sameLine fontsmall bold">
 						描述：
 					</view>
 					<view class="label sameLine fontsmall">

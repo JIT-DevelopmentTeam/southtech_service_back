@@ -50,7 +50,8 @@
             workOrder.number AS "number",
             detail.assigned_time AS "assignedTime",
             detail.description AS "description",
-            device.`name` AS "deviceName"
+            device.`name` AS "deviceName",
+            device.signing AS "signing"
         FROM
             `ic_work_order` workOrder
             LEFT JOIN tb_client client ON client.id = workOrder.client_id
