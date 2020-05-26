@@ -5,6 +5,11 @@
       <a-form layout="inline" @keyup.enter.native="searchQuery">
         <a-row :gutter="24">
           <a-col :md="6" :sm="8">
+            <a-form-item label="客户">
+              <a-input placeholder="请输入客户" v-model="queryParam.clientName"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
             <a-form-item label="编码">
               <a-input placeholder="请输入编码" v-model="queryParam.number"></a-input>
             </a-form-item>
@@ -18,11 +23,6 @@
             <a-col :md="6" :sm="8">
               <a-form-item label="类型">
                 <a-input placeholder="请输入类型" v-model="queryParam.type"></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="8">
-              <a-form-item label="所属客户">
-                <a-input placeholder="请输入所属客户" v-model="queryParam.clientName"></a-input>
               </a-form-item>
             </a-col>
           </template>
@@ -45,6 +45,7 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
        <a-button @click="synchronizeDeviceNumber" v-has="'deviceNumber:synchronize'" type="primary" icon="cloud-download">同步</a-button>
+       <a-button type="primary" icon="download" @click="handleExportXls('设备档案')">导出</a-button>
     </div>
 
     <!-- table区域-begin -->
@@ -181,6 +182,7 @@
         ],
         url: {
           list: "/client/client/listDeviceNumberByMainId",
+          exportXlsUrl: "/client/client/exportXlsDeviceNumber",
           delete: "/client/client/deleteDeviceNumber",
           deleteBatch: "/client/client/deleteBatchDeviceNumber",
           synchronizeDeviceNumber: '/client/client/synchronizeDeviceNumber'

@@ -32,6 +32,9 @@ public class DingTalkConstant {
     // 新增代办任务
     public static final String ADD_WORK_RECORD_URL = "https://oapi.dingtalk.com/topapi/workrecord/add";
 
+    // 更新待办任务
+    public static final String UPDATE_WORK_RECORD_URL = "https://oapi.dingtalk.com/topapi/workrecord/update";
+
     // 获取用户userId
     public static final String GET_USER_INFO = "https://oapi.dingtalk.com/user/getuserinfo";
 

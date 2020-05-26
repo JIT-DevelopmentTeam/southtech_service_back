@@ -1,7 +1,17 @@
 package org.jeecg.modules.management.mobile.stage;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.dingtalk.api.DefaultDingTalkClient;
+import com.dingtalk.api.DingTalkClient;
+import com.dingtalk.api.request.OapiWorkrecordUpdateRequest;
+import com.dingtalk.api.response.OapiWorkrecordUpdateResponse;
+import com.taobao.api.ApiException;
+import org.apache.commons.lang.StringUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.api.ISysBaseAPI;
+import org.jeecg.common.util.RedisUtil;
+import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.management.file.entity.File;
 import org.jeecg.modules.management.file.service.IFileService;
 import org.jeecg.modules.management.progressreport.entity.ProgressReport;
@@ -18,6 +28,7 @@ import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderProgressService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
 import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDetailDTO;
+import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +75,9 @@ public class MobileStageController {
 
     @Autowired
     private ISysBaseAPI sysBaseAPI;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     @RequestMapping(value = "/queryStageByWorkOrderId")
     public Result<?> queryStageByWorkOrderId(HttpServletRequest req) {
@@ -230,6 +244,25 @@ public class MobileStageController {
             workOrder.setStatus("2");
             workOrderService.updateById(workOrder);
             workOrderDetailService.updateComlpetedTimeByWorkOrderId(new Date(), workOrderId);// 工单明细表写入实际完成时间
+            QueryWrapper<WorkOrderDetail> workOrderDetailQueryWrapper = new QueryWrapper<>();
+            workOrderDetailQueryWrapper.eq("work_order_id",workOrder.getId());
+            WorkOrderDetail workOrderDetail = workOrderDetailService.getOne(workOrderDetailQueryWrapper);
+            if (oConvertUtils.isNotEmpty(workOrderDetail)) {
+                SysUser serviceEngineer = sysUserService.getUserByName(workOrderDetail.getServiceEngineerName());
+                if (oConvertUtils.isNotEmpty(serviceEngineer) && StringUtils.isNotBlank(serviceEngineer.getEnterpriseId()) && StringUtils.isNotBlank(workOrderDetail.getDingtalkRecordId())) {
+                    // 清除钉钉待办
+                    DingTalkClient client = new DefaultDingTalkClient(DingTalkConstant.UPDATE_WORK_RECORD_URL);
+                    OapiWorkrecordUpdateRequest req = new OapiWorkrecordUpdateRequest();
+                    req.setUserid(serviceEngineer.getEnterpriseId());
+                    req.setRecordId(workOrderDetail.getDingtalkRecordId());
+                    try {
+                        OapiWorkrecordUpdateResponse rsp = client.execute(req, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
+                        System.out.println(rsp.getBody());
+                    } catch (ApiException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
             List<SysUser> userList = sysUserService.listByRoleCode("customer_service");
             WorkOrder order = workOrderService.getById(workOrderId);
             Map<String, String> map = new HashMap<>();

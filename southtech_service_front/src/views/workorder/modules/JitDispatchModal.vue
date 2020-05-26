@@ -82,7 +82,7 @@
         url: {
           edit: "/workorder/workOrder/dispatchWorkOrderDetailByIds",
         },
-        workOrderDetailIds:null
+        workOrderDetailId:null
       }
     },
     created () {
@@ -94,7 +94,7 @@
       edit (record) {
         this.form.resetFields();
         this.model = Object.assign({}, record);
-        this.workOrderDetailIds = this.model.ids;
+        this.workOrderDetailId = this.model.ids;
         this.visible = true;
         this.$nextTick(() => {
           this.form.setFieldsValue(pick(this.model, 'serviceEngineerName'));
@@ -112,7 +112,7 @@
             that.confirmLoading = true;
             let httpurl = '';
             let method = '';
-            httpurl+=this.url.edit+"?serviceEngineerName="+values.serviceEngineerName+"&appointment="+values.appointment+"&plannedCompletionTime="+values.plannedCompletionTime+"&workOrderDetailIds="+this.workOrderDetailIds;
+            httpurl+=this.url.edit+"?serviceEngineerName="+values.serviceEngineerName+"&appointment="+values.appointment+"&plannedCompletionTime="+values.plannedCompletionTime+"&workOrderDetailId="+this.workOrderDetailId;
             if (values.peers) {
               httpurl += '&peers='+values.peers;
             }

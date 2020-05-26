@@ -2,6 +2,7 @@
   <a-card :bordered="false" :class="'cust-erp-sub-tab'">
     <!-- 操作按钮区域 -->
     <div class="table-operator">
+      <a-button v-if="mainId" @click="handleAdd" type="primary" icon="plus">新增</a-button>
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>

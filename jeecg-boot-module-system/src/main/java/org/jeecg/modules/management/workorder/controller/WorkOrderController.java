@@ -172,6 +172,8 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                               @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
                               HttpServletRequest req) {
         QueryWrapper<WorkOrderPageDTO> queryWrapper = QueryGenerator.initQueryWrapper(workOrderPageDTO, req.getParameterMap());
+        queryWrapper.orderByAsc("status");
+        queryWrapper.orderByDesc("create_time");
         if (StringUtils.isNotBlank(req.getParameter("clientName"))) {
             QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<Client>();
             clientQueryWrapper.like("name",req.getParameter("clientName").trim());
@@ -389,15 +391,14 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
      * @return
      */
 	@PostMapping(value = "/dispatchWorkOrderDetailByIds")
-    public Result<?> dispatchWorkOrderDetailByIds(@RequestParam("workOrderDetailIds") String workOrderDetailIds,
+    public Result<?> dispatchWorkOrderDetailByIds(@RequestParam("workOrderDetailId") String workOrderDetailId,
                                                   @RequestParam("serviceEngineerName") String serviceEngineerName,
                                                   @RequestParam("appointment") String appointment,
                                                   @RequestParam("plannedCompletionTime") String plannedCompletionTime,
                                                   String peers) {
-        String[] idsArray = workOrderDetailIds.split(",");
         LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        WorkOrderDetail findParent = workOrderDetailService.getById(idsArray[0]);
-        WorkOrder workOrder = workOrderService.getById(findParent.getWorkOrderId());
+        WorkOrderDetail workOrderDetail = workOrderDetailService.getById(workOrderDetailId);
+        WorkOrder workOrder = workOrderService.getById(workOrderDetail.getWorkOrderId());
         SysUser serviceEngineer = sysUserService.getUserByName(serviceEngineerName);
         String domainName = null;
         try {
@@ -405,46 +406,40 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (String id : idsArray) {
-            WorkOrderDetail workOrderDetail = workOrderDetailService.getById(id);
-            workOrderDetail.setServiceEngineerName(serviceEngineerName);
-            try {
-                workOrderDetail.setAppointment(DateUtils.parseDate(appointment,"yyyy-MM-dd"));
-                workOrderDetail.setPlannedCompletionTime(DateUtils.parseDate(plannedCompletionTime,"yyyy-MM-dd"));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            if (StringUtils.isNotBlank(peers)) {
-                workOrderDetail.setPeers(peers);
-            }
-            workOrderDetail.setAssigneeName(loginUser.getUsername());
-            workOrderDetail.setAssignedTime(DateUtils.getDate());
-            workOrderDetailService.updateById(workOrderDetail);
+        workOrderDetail.setServiceEngineerName(serviceEngineerName);
+        try {
+            workOrderDetail.setAppointment(DateUtils.parseDate(appointment,"yyyy-MM-dd"));
+            workOrderDetail.setPlannedCompletionTime(DateUtils.parseDate(plannedCompletionTime,"yyyy-MM-dd"));
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
-        List<WorkOrderDetail> workOrderDetailList = workOrderDetailService.selectByMainId(workOrder.getId());
-        boolean isFinish = true;
-        for (WorkOrderDetail workOrderDetail : workOrderDetailList) {
-            if (workOrderDetail.getAssignedTime() == null) {
-                isFinish = false;
-            }
+        if (StringUtils.isNotBlank(peers)) {
+            workOrderDetail.setPeers(peers);
         }
-        if (isFinish) {
-            workOrder.setStatus("3");
-            QueryWrapper<WorkOrderProgress> workOrderProgressQueryWrapper = new QueryWrapper<>();
-            workOrderProgressQueryWrapper.eq("work_order_id",workOrder.getId());
-            List<WorkOrderProgress> workOrderProgressesList = workOrderProgressService.list(workOrderProgressQueryWrapper);
-            for (int i = 0; i < workOrderProgressesList.size(); i++) {
-                if (i == 1) {
-                    workOrderProgressesList.get(i).setFinishTime(new Date());
-                    workOrderProgressService.updateById(workOrderProgressesList.get(i));
+        workOrderDetail.setAssigneeName(loginUser.getUsername());
+        workOrderDetail.setAssignedTime(DateUtils.getDate());
+        workOrder.setStatus("3");
+        QueryWrapper<WorkOrderProgress> workOrderProgressQueryWrapper = new QueryWrapper<>();
+        workOrderProgressQueryWrapper.eq("work_order_id",workOrder.getId());
+        // 获取进度列表完成至下一个并绑定
+        List<WorkOrderProgress> workOrderProgressesList = workOrderProgressService.list(workOrderProgressQueryWrapper);
+        for (int i = 0; i < workOrderProgressesList.size(); i++) {
+            if (workOrderDetail.getCurrentProgress().equals(workOrderProgressesList.get(i).getId())) {
+                // 完成当前进度(工单分派)
+                WorkOrderProgress currentWorkOrderProgress = workOrderProgressesList.get(i);
+                currentWorkOrderProgress.setFinishTime(DateUtils.getDate());
+                workOrderProgressService.updateById(currentWorkOrderProgress);
+                // 绑定下一个进度下标(工单分派后下一个进度)
+                int nextIndex = i + 1;
+                if (nextIndex <= workOrderProgressesList.size()) {
+                    // 绑定当前新进度
+                    workOrderDetail.setCurrentProgress(workOrderProgressesList.get(nextIndex).getId());
+                    break;
                 }
             }
-            for (WorkOrderDetail workOrderDetail : workOrderDetailList) {
-                workOrderDetail.setCurrentProgress(workOrderProgressesList.get(2).getId());
-                workOrderDetailService.updateById(workOrderDetail);
-            }
-            workOrderService.updateById(workOrder);
         }
+        workOrderDetailService.updateById(workOrderDetail);
+        workOrderService.updateById(workOrder);
         // 钉钉发起待办
         Client client = clientService.getById(workOrder.getClientId());
         List<SysMessageTemplate> messageTemplateList = sysMessageTemplateService.selectByCode("dingTalk_dispatch_remind");
@@ -464,6 +459,8 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             try {
                 OapiWorkrecordAddResponse rsp = dingTalkClient.execute(req, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
                 if (rsp.isSuccess()) {
+                    workOrderDetail.setDingtalkRecordId(rsp.getRecordId());
+                    workOrderDetailService.updateById(workOrderDetail);
                     log.info("钉钉派单待办提醒发送成功!");
                 } else {
                     log.info("钉钉派单待办提醒发送失败,错误码:"+rsp.getCode()+",错误信息:"+rsp.getErrmsg());

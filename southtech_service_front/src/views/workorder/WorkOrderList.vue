@@ -107,10 +107,11 @@
 
       <a-table
         ref="table"
-        size="middle"
+        size="small"
         bordered
         rowKey="id"
         :columns="columns"
+        :components="components"
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
@@ -147,7 +148,7 @@
         <span slot="action" slot-scope="text, record">
           <a @click="handleEdit(record)">编辑</a>
 
-          <div v-if="record.needDispatch === '1'" style="display: inline;">
+          <div v-if="record.needDispatch === '1' && (record.status === '1' || record.status === '3')" style="display: inline;">
             <a-divider type="vertical" />
             <a-dropdown>
               <a v-has="'workOrder:dispatch'" @click="dispatch(record)" class="ant-dropdown-link">
@@ -209,6 +210,8 @@ import ServiceVisitsListPage from './ServiceVisitsListPage'
 
 import {formatDate} from '@/utils/util.js'
 
+
+
 export default {
   name: 'WorkOrderList',
   mixins: [JeecgListMixin],
@@ -220,7 +223,7 @@ export default {
     ProgressReportList,
     WorkOrderModal,
     ServiceVisits,
-    ServiceVisitsListPage
+    ServiceVisitsListPage,
   },
   data() {
     return {
@@ -241,7 +244,9 @@ export default {
         {
           title: '编号',
           align: 'center',
-          dataIndex: 'number'
+          dataIndex: 'number',
+          type: 'income',
+          note: 'transfer'
         },
         {
           title: '客户',
@@ -270,6 +275,8 @@ export default {
         {
           title: '问题描述',
           align: 'center',
+          ellipsis: true,
+          width: 250,
           dataIndex: 'description'
         },
         {
@@ -480,8 +487,8 @@ export default {
       },
        /* 排序参数 */
       isorter:{
-        column: 'status',
-        order: 'asc',
+         column: null,
+         order: null,
       },
       /* 分页参数 */
       ipagination: {
@@ -673,10 +680,23 @@ export default {
     exportReport() {
       let url = `${window._CONFIG['domianURL']}/${this.url.exportReport}`;
       window.location.href = url;
-    }
+    },
   }
 }
 </script>
-<style scoped>
-@import '~@assets/less/common.less';
+<style>
+/* @import '~@assets/less/common.less'; */
+
+.resize-table-th {
+  position: relative;
+}
+.table-draggable-handle {
+  /* width: 10px !important; */
+  height: 100% !important;
+  left: auto !important;
+  right: -5px;
+  cursor: col-resize;
+  touch-action: none;
+  border: none;
+}
 </style>
