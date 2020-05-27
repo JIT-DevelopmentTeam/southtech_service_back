@@ -75,7 +75,7 @@
 
         confirmLoading: false,
         validatorRules:{
-        number:{rules: [{ required: true, message: '请输入编码!' },{validator: (rule, value, callback) => validateDuplicateValue('tb_device_number', 'number', value, this.model.id, callback)}]},
+        number:{rules: [{validator: (rule, value, callback) => validateDuplicateValue('tb_device_number', 'number', value, this.model.id, callback)}]},
         name:{rules: [{ required: true, message: '请输入名称!' }]},
         type:{rules: [{ required: true, message: '请输入类型!' }]},
         description:{},

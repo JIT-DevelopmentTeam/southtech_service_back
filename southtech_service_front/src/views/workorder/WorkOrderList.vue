@@ -111,7 +111,6 @@
         bordered
         rowKey="id"
         :columns="columns"
-        :components="components"
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
@@ -241,13 +240,13 @@ export default {
             return parseInt(index) + 1
           }
         },
-        {
-          title: '编号',
-          align: 'center',
-          dataIndex: 'number',
-          type: 'income',
-          note: 'transfer'
-        },
+        // {
+        //   title: '编号',
+        //   align: 'center',
+        //   dataIndex: 'number',
+        //   type: 'income',
+        //   note: 'transfer'
+        // },
         {
           title: '客户',
           align: 'center',
@@ -273,15 +272,22 @@ export default {
           }
         },
         {
+          title:'保修期至',
+          align:"center",
+          width:100,
+          dataIndex:"qgp",
+        },
+        {
           title: '问题描述',
           align: 'center',
           ellipsis: true,
-          width: 250,
+          width: 200,
           dataIndex: 'description'
         },
         {
           title: '联系人',
           align: 'center',
+          width: 70,
           dataIndex: 'contactId',
           customRender: text => {
             if (!text) {
@@ -294,11 +300,12 @@ export default {
         {
           title: '联系电话',
           align: 'center',
-          dataIndex: 'mobilePhone'
+          dataIndex: 'mobilePhone',
         },
         {
           title: '紧急程度',
           align: 'center',
+          width:80,
           dataIndex: 'emergencyLevel',
           customRender: text => {
             if (!text) {
@@ -311,11 +318,12 @@ export default {
         {
           title: '申报时间',
           align: 'center',
-          dataIndex: 'declarationTime'
+          dataIndex: 'declarationTime',
         },
         {
           title: '状态',
           align: 'center',
+          width: 70,
           dataIndex: 'status',
           customRender: text => {
             if (!text) {
@@ -341,6 +349,7 @@ export default {
           title: '类型',
           align: 'center',
           dataIndex: 'type',
+          width: 80,
           customRender: text => {
             if (!text) {
               return ''
@@ -348,6 +357,12 @@ export default {
               return filterMultiDictText(this.dictOptions['type'], text + '')
             }
           }
+        },
+        {
+          title: '申报人',
+          align: 'center',
+          width: 70,
+          dataIndex: 'createrName'
         },
         {
           title: '接入方式',
@@ -364,6 +379,7 @@ export default {
         {
           title: '客服',
           align: 'center',
+          width: 70,
           dataIndex: 'customerServiceName',
           customRender: text => {
             if (!text) {
@@ -376,6 +392,7 @@ export default {
           {
             title:'服务工程师',
             align:"center",
+            width: 70,
             dataIndex: 'serviceEngineerName',
             customRender:(text)=>{
               if(!text){
@@ -417,6 +434,7 @@ export default {
           {
             title:'预约服务时间',
             align:"center",
+            width: 100,
             dataIndex: 'appointment',
             customRender:(text)=>{
               if(!text){
@@ -429,6 +447,7 @@ export default {
           {
             title:'计划完成时间',
             align:"center",
+            width: 100,
             dataIndex: 'plannedCompletionTime',
             customRender:(text)=>{
               if(!text){
@@ -441,6 +460,7 @@ export default {
           {
             title:'实际完成时间',
             align:"center",
+            width: 100,
             dataIndex: 'actualCompletionTime',
             customRender:(text)=>{
               if(!text){
@@ -484,11 +504,6 @@ export default {
       },
       options:{
         needDispatchOptions:[]
-      },
-       /* 排序参数 */
-      isorter:{
-         column: null,
-         order: null,
       },
       /* 分页参数 */
       ipagination: {
@@ -537,11 +552,6 @@ export default {
       initDictOptions('tb_contact,name,id').then(res => {
         if (res.success) {
           this.$set(this.dictOptions, 'contactId', res.result)
-        }
-      })
-      initDictOptions('tb_contact,mobile_phone,id').then(res => {
-        if (res.success) {
-          this.$set(this.dictOptions, 'mobilePhone', res.result)
         }
       })
       initDictOptions('work_order_emergency_level').then(res => {

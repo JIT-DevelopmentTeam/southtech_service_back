@@ -31,8 +31,8 @@
             detail.fault_location AS "faultLocation",
             detail.appointment AS "appointment",
             device.`name` AS "deviceName",
-            USER.realname AS "enginerName",
-            USER.enterprise_id AS "enterpriseId",
+            creater.realname AS "createrName",
+            creater.enterprise_id AS "enterpriseId",
             progress.`name` AS "currentProgress",
             progress.id AS "progressId",
             report.is_completed AS "isCompleted",
@@ -41,7 +41,7 @@
             `ic_progress_report` report
             LEFT JOIN ic_work_order_detail detail ON detail.id = report.work_order_detail_id
             LEFT JOIN tb_device_number device ON device.id = detail.device_number
-            LEFT JOIN sys_user user ON user.username = detail.service_engineer_name
+            LEFT JOIN sys_user creater ON creater.username = report.create_by
             LEFT JOIN ic_work_order workOrder ON workOrder.id = report.work_order_id
             LEFT JOIN ic_work_order_progress progress ON progress.id = report.progress_id
             LEFT JOIN tb_stage stage ON stage.id = progress.stage_id

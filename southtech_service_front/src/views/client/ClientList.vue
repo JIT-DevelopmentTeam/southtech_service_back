@@ -44,7 +44,7 @@
     
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <!-- <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button> -->
+      <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
       <a-button @click="synchronizeClient" v-has="'client:synchronize'" type="primary" icon="cloud-download">同步</a-button>
       
       <!-- <a-button type="primary" icon="download" @click="handleExportXls('客户信息')">导出</a-button>
