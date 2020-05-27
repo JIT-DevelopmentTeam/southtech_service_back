@@ -27,7 +27,6 @@ public class DeviceNumber extends BaseEntity implements Serializable {
 	@TableId(type = IdType.ID_WORKER_STR)
 	private java.lang.String id;
 	/**创建人*/
-	@Excel(name = "创建人", width = 15)
 	private java.lang.String createBy;
 	/**创建日期*/
 	@Excel(name = "创建日期", width = 20, format = "yyyy-MM-dd HH:mm:ss")
@@ -35,15 +34,12 @@ public class DeviceNumber extends BaseEntity implements Serializable {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private java.util.Date createTime;
 	/**更新人*/
-	@Excel(name = "更新人", width = 15)
 	private java.lang.String updateBy;
 	/**更新日期*/
-	@Excel(name = "更新日期", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private java.util.Date updateTime;
 	/**所属部门*/
-	@Excel(name = "所属部门", width = 15)
 	private java.lang.String sysOrgCode;
 	/**编号*/
 	@Excel(name = "编号", width = 15)
@@ -55,20 +51,25 @@ public class DeviceNumber extends BaseEntity implements Serializable {
 	@Excel(name = "类型", width = 15)
 	private java.lang.String type;
 	/**描述*/
-	@Excel(name = "描述", width = 15)
+	@Excel(name = "描述", width = 30)
 	private java.lang.String description;
     /**保质期*/
-    @Excel(name = "保质期", width = 15)
+    @Excel(name = "保质期", width = 15,format = "yyyy-MM-dd")
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private java.util.Date qgp;
     /**保质期至*/
-    @Excel(name = "签约日期", width = 15)
+    @Excel(name = "签约日期", width = 15,format = "yyyy-MM-dd")
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern="yyyy-MM-dd")
     private java.util.Date signing;
     /**验收日期*/
+    @Excel(name = "验收日期", width = 15,format = "yyyy-MM-dd")
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     private java.util.Date acceptance;
+    /**添加方式*/
+    private java.lang.String addMethod;
 	/**所属客户*/
 	private java.lang.String clientId;
 }

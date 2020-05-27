@@ -72,4 +72,6 @@ public class WorkOrderDetail implements Serializable {
     private java.util.Date appointment;
     /**实际完成时间*/
     private java.util.Date actualCompletionTime;
+    /**钉钉待办id*/
+    private java.lang.String dingtalkRecordId;
 }

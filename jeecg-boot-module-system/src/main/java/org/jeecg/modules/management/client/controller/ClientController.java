@@ -8,10 +8,13 @@ import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.base.controller.JeecgController;
 import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.HttpHelper;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.oConvertUtils;
@@ -33,6 +36,9 @@ import org.jeecg.modules.management.wxuserregister.service.IWxUserRegisterServic
 import org.jeecg.modules.wechat.constant.WechatConstant;
 import org.jeecg.modules.wechat.entity.WxUserEntity;
 import org.jeecg.modules.wechat.util.WxUserUtils;
+import org.jeecgframework.poi.excel.def.NormalExcelConstants;
+import org.jeecgframework.poi.excel.entity.ExportParams;
+import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.jeewx.api.core.exception.WexinReqException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +51,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 
 /**
@@ -431,6 +437,7 @@ public class ClientController extends JeecgController<Client, IClientService> {
 	 */
 	@PostMapping(value = "/addDeviceNumber")
 	public Result<?> addDeviceNumber(@RequestBody DeviceNumber deviceNumber) {
+	    deviceNumber.setAddMethod("0");
 		deviceNumberService.save(deviceNumber);
 		return Result.ok("添加成功！");
 	}
@@ -550,6 +557,53 @@ public class ClientController extends JeecgController<Client, IClientService> {
 	        return Result.error("同步出错,请联系管理员!");
         }
 	    return Result.ok("同步成功!");
+    }
+
+    /**
+     * 导出设备档案
+     * @return
+     */
+    @RequestMapping(value = "/exportXlsDeviceNumber")
+    public ModelAndView exportXlsDeviceNumber(HttpServletRequest request, DeviceNumber deviceNumber) {
+        // Step.1 组装查询条件
+        QueryWrapper<DeviceNumber> queryWrapper = QueryGenerator.initQueryWrapper(deviceNumber, request.getParameterMap());
+        queryWrapper.eq("add_method","0");
+        LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+
+        // Step.2 获取导出数据
+        List<DeviceNumber> pageList = deviceNumberService.list(queryWrapper);
+        List<DeviceNumber> exportList = null;
+
+        // 过滤选中数据
+        String selections = request.getParameter("selections");
+        if (oConvertUtils.isNotEmpty(selections)) {
+            List<String> selectionList = Arrays.asList(selections.split(","));
+            exportList = pageList.stream().filter(item -> selectionList.contains(getId(item))).collect(Collectors.toList());
+        } else {
+            exportList = pageList;
+        }
+
+        // Step.3 AutoPoi 导出Excel
+        ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+        mv.addObject(NormalExcelConstants.FILE_NAME, "设备档案"); //此处设置的filename无效 ,前端会重更新设置一下
+        mv.addObject(NormalExcelConstants.CLASS, DeviceNumber.class);
+        mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("设备档案", "导出人:" + sysUser.getRealname(), "设备档案"));
+        mv.addObject(NormalExcelConstants.DATA_LIST, exportList);
+        return mv;
+    }
+
+    /**
+     * 获取对象ID
+     *
+     * @return
+     */
+    private String getId(DeviceNumber deviceNumber) {
+        try {
+            return PropertyUtils.getProperty(deviceNumber, "id").toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /*--------------------------------子表处理-设备编号-end----------------------------------------------*/

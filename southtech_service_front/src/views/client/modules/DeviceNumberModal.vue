@@ -19,14 +19,6 @@
         <a-form-item label="类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'type', validatorRules.type]" placeholder="请输入类型"></a-input>
         </a-form-item>
-        <a-form-item label="客户" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <j-search-select-tag
-            placeholder="请选择客户"
-            v-decorator="['clientId',validatorRules.clientId]"
-            dict="tb_client,name,id"
-            :async="true">
-          </j-search-select-tag>
-        </a-form-item>
         <a-form-item label="描述" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-textarea rows="4" placeholder="请输入描述" v-decorator="[ 'description', validatorRules.description]" style="resize:none;"/>
         </a-form-item>
@@ -36,7 +28,9 @@
         <a-form-item label="签约日期" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-date placeholder="请选择签约日期" v-decorator="[ 'signing', validatorRules.signing]" :trigger-change="true" style="width: 100%"/>
         </a-form-item>
-
+        <a-form-item label="验收日期" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-date placeholder="请选择验收日期" v-decorator="[ 'acceptance', validatorRules.acceptance]" :trigger-change="true" style="width: 100%"/>
+        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
@@ -46,6 +40,7 @@
 
   import { httpAction } from '@/api/manage'
   import pick from 'lodash.pick'
+  import { validateDuplicateValue } from '@/utils/util'
   import JDate from '@/components/jeecg/JDate'  
   import JSearchSelectTag from '@/components/dict/JSearchSelectTag'
 
@@ -80,13 +75,13 @@
 
         confirmLoading: false,
         validatorRules:{
-        number:{rules: [{ required: true, message: '请输入编码!' }]},
+        number:{rules: [{ required: true, message: '请输入编码!' },{validator: (rule, value, callback) => validateDuplicateValue('tb_device_number', 'number', value, this.model.id, callback)}]},
         name:{rules: [{ required: true, message: '请输入名称!' }]},
         type:{rules: [{ required: true, message: '请输入类型!' }]},
-        clientId:{rules: [{ required: true, message: '请选择客户!' }]},
         description:{},
-        qgp:{rules: [{ required: true, message: '请选择保质期至!' }]},
-        signing:{rules: [{ required: true, message: '请选择签约时间!' }]},
+        qgp:{},
+        signing:{},
+        acceptance:{}
         },
         url: {
           add: "/client/client/addDeviceNumber",
@@ -106,7 +101,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'createBy','createTime','updateBy','updateTime','sysOrgCode','number','name','type','description','qgp','signing','clientId'))
+          this.form.setFieldsValue(pick(this.model,'createBy','createTime','updateBy','updateTime','sysOrgCode','number','name','type','description','qgp','signing','acceptance','clientId'))
         })
       },
       close () {
@@ -129,6 +124,7 @@
                method = 'put';
             }
             let formData = Object.assign(this.model, values);
+            formData['clientId'] = this.mainId
             console.log("表单提交数据",formData)
             httpAction(httpurl,formData,method).then((res)=>{
               if(res.success){
@@ -149,7 +145,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'createBy','createTime','updateBy','updateTime','sysOrgCode','number','name','type','description','qgp','signing','clientId'))
+        this.form.setFieldsValue(pick(row,'createBy','createTime','updateBy','updateTime','sysOrgCode','number','name','type','description','qgp','signing','acceptance','clientId'))
       },
 
 
