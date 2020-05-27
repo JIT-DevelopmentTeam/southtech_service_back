@@ -28,7 +28,6 @@ import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderProgressService;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
 import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDetailDTO;
-import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,7 +89,7 @@ public class MobileStageController {
         SysUser user = sysUserService.getByEnterpriseId(req.getParameter("userId"));
         String progressId = req.getParameter("progressId");
         String reportId = req.getParameter("reportId");
-        MobileReportDTO reportDTO = progressReportService.getByReportId(user.getUsername(), progressId, reportId);
+        MobileReportDTO reportDTO = progressReportService.getByReportId(progressId, reportId);
         List<File> photoList = getByReportId(reportId, "Photo");
         List<File> fileList = getByReportId(reportId, "File");
         reportDTO.setPhotoList(photoList);

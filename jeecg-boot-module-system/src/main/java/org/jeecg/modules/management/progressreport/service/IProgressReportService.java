@@ -22,7 +22,7 @@ public interface IProgressReportService extends IService<ProgressReport> {
      * @param reportId 汇报id
      * @return
      */
-    MobileReportDTO getByReportId(String userName, String progressId, String reportId);
+    MobileReportDTO getByReportId(String progressId, String reportId);
 
     /**
      * 根据workOrderId查询汇报记录列表

@@ -18,7 +18,7 @@
                 s1.time
             FROM
                 ic_sign_in s1
-                INNER JOIN ( SELECT MAX( create_time ) AS 'create_time' FROM ic_sign_in WHERE service_engineer_name = #{userName} AND progress_id = #{progressId} GROUP BY type ORDER BY type ) s2 ON s1.create_time = s2.create_time
+                INNER JOIN ( SELECT MAX( create_time ) AS 'create_time' FROM ic_sign_in WHERE progress_id = #{progressId} GROUP BY type ORDER BY type ) s2 ON s1.create_time = s2.create_time
             ) t ON t.report_id = report.id
             LEFT JOIN ic_work_order_detail detail ON detail.id = report.work_order_detail_id
         WHERE

@@ -31,8 +31,8 @@ public class ProgressReportServiceImpl extends ServiceImpl<ProgressReportMapper,
      * @return
      */
     @Override
-    public MobileReportDTO getByReportId(String userName, String progressId, String reportId) {
-        return progressReportMapper.getByReportId(userName, progressId, reportId);
+    public MobileReportDTO getByReportId(String progressId, String reportId) {
+        return progressReportMapper.getByReportId(progressId, reportId);
     }
 
     /**

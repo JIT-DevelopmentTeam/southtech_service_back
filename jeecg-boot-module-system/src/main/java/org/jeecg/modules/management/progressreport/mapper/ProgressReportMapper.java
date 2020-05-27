@@ -23,7 +23,7 @@ public interface ProgressReportMapper extends BaseMapper<ProgressReport> {
      * @param reportId 汇报id
      * @return
      */
-    MobileReportDTO getByReportId(@Param("userName") String userName, @Param("progressId") String progressId, @Param("reportId") String reportId);
+    MobileReportDTO getByReportId(@Param("progressId") String progressId, @Param("reportId") String reportId);
 
     /**
      * 根据workOrderId查询汇报记录列表
