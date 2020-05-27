@@ -7,8 +7,8 @@
 						<view class="inline">{{ item.deviceName }}</view>
 					</view>
 				    <view>
-				    	<view class="inline">服务工程师：</view>
-				    	<view class="inline">{{item.enginerName}}</view>
+				    	<view class="inline">汇报人：</view>
+				    	<view class="inline">{{item.createrName}}</view>
 				    </view>
 					<view class="gird">
 						<view>
