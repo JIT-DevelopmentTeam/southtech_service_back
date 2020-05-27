@@ -172,8 +172,6 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                               @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
                               HttpServletRequest req) {
         QueryWrapper<WorkOrderPageDTO> queryWrapper = QueryGenerator.initQueryWrapper(workOrderPageDTO, req.getParameterMap());
-        queryWrapper.orderByAsc("status");
-        queryWrapper.orderByDesc("create_time");
         if (StringUtils.isNotBlank(req.getParameter("clientName"))) {
             QueryWrapper<Client> clientQueryWrapper = new QueryWrapper<Client>();
             clientQueryWrapper.like("name",req.getParameter("clientName").trim());
@@ -416,28 +414,31 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         if (StringUtils.isNotBlank(peers)) {
             workOrderDetail.setPeers(peers);
         }
-        workOrderDetail.setAssigneeName(loginUser.getUsername());
-        workOrderDetail.setAssignedTime(DateUtils.getDate());
-        workOrder.setStatus("3");
-        QueryWrapper<WorkOrderProgress> workOrderProgressQueryWrapper = new QueryWrapper<>();
-        workOrderProgressQueryWrapper.eq("work_order_id",workOrder.getId());
-        // 获取进度列表完成至下一个并绑定
-        List<WorkOrderProgress> workOrderProgressesList = workOrderProgressService.list(workOrderProgressQueryWrapper);
-        for (int i = 0; i < workOrderProgressesList.size(); i++) {
-            if (workOrderDetail.getCurrentProgress().equals(workOrderProgressesList.get(i).getId())) {
-                // 完成当前进度(工单分派)
-                WorkOrderProgress currentWorkOrderProgress = workOrderProgressesList.get(i);
-                currentWorkOrderProgress.setFinishTime(DateUtils.getDate());
-                workOrderProgressService.updateById(currentWorkOrderProgress);
-                // 绑定下一个进度下标(工单分派后下一个进度)
-                int nextIndex = i + 1;
-                if (nextIndex <= workOrderProgressesList.size()) {
-                    // 绑定当前新进度
-                    workOrderDetail.setCurrentProgress(workOrderProgressesList.get(nextIndex).getId());
-                    break;
+        // 第一次派工才允许执行进度更新
+        if (oConvertUtils.isEmpty(workOrderDetail.getAssignedTime())) {
+            QueryWrapper<WorkOrderProgress> workOrderProgressQueryWrapper = new QueryWrapper<>();
+            workOrderProgressQueryWrapper.eq("work_order_id",workOrder.getId());
+            // 获取进度列表完成至下一个并绑定
+            List<WorkOrderProgress> workOrderProgressesList = workOrderProgressService.list(workOrderProgressQueryWrapper);
+            for (int i = 0; i < workOrderProgressesList.size(); i++) {
+                if (workOrderDetail.getCurrentProgress().equals(workOrderProgressesList.get(i).getId())) {
+                    // 完成当前进度(工单分派)
+                    WorkOrderProgress currentWorkOrderProgress = workOrderProgressesList.get(i);
+                    currentWorkOrderProgress.setFinishTime(DateUtils.getDate());
+                    workOrderProgressService.updateById(currentWorkOrderProgress);
+                    // 绑定下一个进度下标(工单分派后下一个进度)
+                    int nextIndex = i + 1;
+                    if (nextIndex <= workOrderProgressesList.size()) {
+                        // 绑定当前新进度
+                        workOrderDetail.setCurrentProgress(workOrderProgressesList.get(nextIndex).getId());
+                        break;
+                    }
                 }
             }
         }
+        workOrderDetail.setAssigneeName(loginUser.getUsername());
+        workOrderDetail.setAssignedTime(DateUtils.getDate());
+        workOrder.setStatus("3");
         workOrderDetailService.updateById(workOrderDetail);
         workOrderService.updateById(workOrder);
         // 钉钉发起待办
@@ -503,8 +504,6 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             }
             ServiceReport serviceReport = new ServiceReport();
             serviceReport.setNumber(i+1);
-            serviceReport.setProvince(client.getProvince());
-            serviceReport.setCity(client.getCity());
             serviceReport.setClientName(client.getName());
             // 炉型 ?
             serviceReport.setFurnace("");

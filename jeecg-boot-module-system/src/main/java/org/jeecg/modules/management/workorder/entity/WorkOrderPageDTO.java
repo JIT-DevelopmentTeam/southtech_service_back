@@ -12,6 +12,7 @@ import java.io.Serializable;
 public class WorkOrderPageDTO implements Serializable {
 
     private java.lang.String id;
+    private java.lang.String createrName;
     private java.lang.String createBy;
     @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
@@ -34,6 +35,9 @@ public class WorkOrderPageDTO implements Serializable {
     private java.util.Date declarationTime;
     private java.lang.String annex;
     private java.lang.String deviceNumber;
+    @JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern="yyyy-MM-dd")
+    private java.util.Date qgp;
     private java.lang.String serviceEngineerName;
     private java.lang.String faultLocation;
     private java.util.Date assignedTime;

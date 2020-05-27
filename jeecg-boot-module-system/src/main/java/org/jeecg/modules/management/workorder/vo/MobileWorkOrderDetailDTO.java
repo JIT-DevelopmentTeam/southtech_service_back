@@ -13,8 +13,8 @@ public class MobileWorkOrderDetailDTO {
     private String detailId;
     // 设备名
     private String deviceName;
-    // 工程师
-    private String enginerName;
+    // 汇报人
+    private String createrName;
     // 当前阶段
     private String currentProgress;
     // 进度id

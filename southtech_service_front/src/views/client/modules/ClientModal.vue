@@ -12,7 +12,7 @@
         <a-row class="form-row" :gutter="16">
           <a-col :lg="8">
             <a-form-item label="编码" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input v-decorator="[ 'number', validatorRules.number]" placeholder="请输入编码"></a-input>
+              <a-input :disabled="true" v-decorator="[ 'number', validatorRules.number]" placeholder="请输入编码"></a-input>
             </a-form-item>
           </a-col>
           <a-col :lg="8">
@@ -35,32 +35,12 @@
               <j-select-user-by-dep v-decorator="['userId',validatorRules.userId]"  :trigger-change="true" :multi="false"/>
             </a-form-item>
           </a-col>
-          <a-col :lg="8">
-             <a-form-item label="省" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input @blur="getLocationByAddress" v-decorator="[ 'province', validatorRules.province]" placeholder="请输入省"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
-            <a-form-item label="市" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input @blur="getLocationByAddress" v-decorator="[ 'city', validatorRules.city]" placeholder="请输入市"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
-            <a-form-item label="区" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input @blur="getLocationByAddress" v-decorator="[ 'area', validatorRules.area]" placeholder="请输入区"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :lg="8">
-            <a-form-item label="镇" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-input @blur="getLocationByAddress" v-decorator="[ 'community', validatorRules.community]" placeholder="请输入镇"></a-input>
-            </a-form-item>
-          </a-col>
         </a-row>
 
-        <a-row class="form-row" :gutter="8">
-          <a-col :lg="8">
+        <a-row class="form-row" :gutter="16">
+          <a-col :lg="16">
             <a-form-item label="详细地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
-              <a-textarea @blur="getLocationByAddress" style="resize: none;" v-decorator="['address']" rows="4" placeholder="请输入详细地址"/>
+              <a-textarea @change="getLocationByAddress" style="resize: none;" v-decorator="['address',validatorRules.address]" rows="4" placeholder="请输入详细地址"/>
             </a-form-item>
           </a-col>
         </a-row>
@@ -101,6 +81,7 @@
   import JDate from '@/components/jeecg/JDate'  
   import JSelectUserByDep from '@/components/jeecgbiz/JSelectUserByDep'
   import JDictSelectTag from "@/components/dict/JDictSelectTag"
+  import {formatDate} from '@/utils/util.js'
 
   export default {
     name: "ClientModal",
@@ -130,13 +111,9 @@
         number:{rules: [{ required: true, message: '请输入编码!' }]},
         name:{rules: [{ required: true, message: '请输入名称!' }]},
         type:{rules: [{ required: true, message: '请选择类型!' }]},
-        sourceId:{rules: [{ required: true, message: '请选择来源!' }]},
-        province:{rules: [{ required: true, message: '请输入省!' }]},
-        city:{rules: [{ required: true, message: '请输入市!' }]},
-        area:{rules: [{ required: true, message: '请输入区!' }]},
-        community:{rules: [{ required: true, message: '请输入镇!' }]},
-        address:{},
-        userId:{rules: [{ required: true, message: '请选择所属用户!' }]},
+        sourceId:{},
+        address:{rules: [{ required: true, message: '请输入详细地址!' }]},
+        userId:{},
         industry:{},
         property:{},
         longitude:{},
@@ -158,12 +135,13 @@
       edit (record) {
         if (!record.id) {
           record.type = '1';
+          record.number = 'C'+formatDate(Date.parse(new Date()),'yyyyMMddhhmmss');
         }
         this.form.resetFields();
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'number','name','type','sourceId','province','city','area','community','address','userId','industry','property','longitude','latitude'))
+          this.form.setFieldsValue(pick(this.model,'number','name','type','sourceId','address','userId','industry','property','longitude','latitude'))
         })
       },
       close () {
@@ -206,15 +184,11 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'number','name','type','sourceId','province','city','area','community','address','userId','lastContactTime','industry','property','longitude','latitude'))
+        this.form.setFieldsValue(pick(row,'number','name','type','sourceId','address','userId','lastContactTime','industry','property','longitude','latitude'))
       },
-      getLocationByAddress() {
-        let formValus = this.form.getFieldsValue();
-        if (!formValus.province || !formValus.city || !formValus.area || !formValus.community || !formValus.address) {
-          return;
-        }
-        let fullAddress = formValus.province + formValus.city + formValus.area + formValus.community + formValus.address;
-        getAction(this.url.getLocationByAddress,{address:fullAddress}).then((res) => {
+      async getLocationByAddress(e) {
+        let address = e.target.value;
+        await getAction(this.url.getLocationByAddress,{address:address}).then((res) => {
           if (res.success) {
             this.form.setFieldsValue({
               longitude:res.result.longitude,

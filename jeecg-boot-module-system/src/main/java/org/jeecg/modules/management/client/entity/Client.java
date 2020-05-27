@@ -57,18 +57,6 @@ public class Client extends BaseEntity implements Serializable {
 	/**来源*/
     @Excel(name = "来源", width = 15)
     private java.lang.String sourceId;
-	/**省*/
-    @Excel(name = "省", width = 15)
-    private java.lang.String province;
-	/**市*/
-    @Excel(name = "市", width = 15)
-    private java.lang.String city;
-	/**区*/
-    @Excel(name = "区", width = 15)
-    private java.lang.String area;
-	/**镇*/
-    @Excel(name = "镇", width = 15)
-    private java.lang.String community;
 	/**详细地址*/
     @Excel(name = "详细地址", width = 15)
     private java.lang.String address;

@@ -9,6 +9,7 @@ import com.taobao.api.ApiException;
 import org.apache.commons.lang.StringUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.api.ISysBaseAPI;
+import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
@@ -110,7 +111,7 @@ public class MobileStageController {
         // 工单预约阶段更新预约时间
         updateAppointment(params);
         // 进度汇报保存
-        String progressReportId = reportSave(params);
+        String progressReportId = reportSave(params,user);
         // 签到 签出保存
         if (!"".equals(params.get("checkIn"))) {
             signInSave("1", params, user, progressReportId);
@@ -154,6 +155,8 @@ public class MobileStageController {
         signIn.setServiceEngineerName(user.getUsername());
         signIn.setType(type);
         signIn.setReportId(reportId);
+        signIn.setCreateBy(user.getUsername());
+        signIn.setCreateTime(DateUtils.getDate());
         try {
             switch (type) {
                 case "1":
@@ -179,7 +182,7 @@ public class MobileStageController {
      *
      * @param params
      */
-    private String reportSave(Map<String, Object> params) {
+    private String reportSave(Map<String, Object> params,SysUser user) {
         ProgressReport progressReport = new ProgressReport();
         progressReport.setDescription(params.get("faultJudgement").toString());
         progressReport.setProgressId(params.get("progressId").toString());
@@ -187,6 +190,8 @@ public class MobileStageController {
         progressReport.setWorkOrderDetailId(params.get("detailId").toString());
         progressReport.setWorkOrderId(params.get("ticketId").toString());
         progressReport.setFaultLocation(params.get("faultLocation") != null ? params.get("faultLocation").toString() : null);
+        progressReport.setCreateBy(user.getUsername());
+        progressReport.setCreateTime(DateUtils.getDate());
         if (!"null".equals(params.get("reportId").toString())) {
             progressReport.setId(params.get("reportId").toString());
             progressReportService.updateById(progressReport);
@@ -257,6 +262,10 @@ public class MobileStageController {
                     req.setRecordId(workOrderDetail.getDingtalkRecordId());
                     try {
                         OapiWorkrecordUpdateResponse rsp = client.execute(req, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
+                        if (rsp.isSuccess()) {
+                            workOrderDetail.setDingtalkRecordId(null);
+                            workOrderDetailService.updateById(workOrderDetail);
+                        }
                         System.out.println(rsp.getBody());
                     } catch (ApiException e) {
                         e.printStackTrace();
