@@ -311,9 +311,13 @@
 					let result = res.data.result;
 					if (/* this.jurisdiction === 'view' && */result.time !== null) {
 						let timeArr = result.time.split(",");
-						this.signInTime = format(timeArr[0]);
-						if (timeArr.length > 1) {
-							this.signOutTime = format(timeArr[1]);
+						let typeArr = result.type.split(",");
+						for (var i = 0; i < typeArr.length; i++) {
+							if (typeArr[i] == "1") {
+								this.signInTime = format(timeArr[i]);
+							} else {
+								this.signOutTime = format(timeArr[i]);
+							}
 						}
 					}
 					this.yes_no.forEach(item => {
