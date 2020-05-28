@@ -37,22 +37,6 @@ public class WorkOrderDTO {
     private String clientName;
 
     /**
-     * 省
-     */
-    private java.lang.String province;
-    /**
-     * 市
-     */
-    private java.lang.String city;
-    /**
-     * 区
-     */
-    private java.lang.String area;
-    /**
-     * 镇
-     */
-    private java.lang.String community;
-    /**
      * 详细地址
      */
     private java.lang.String address;

@@ -22,14 +22,6 @@ public class MobileWorkOrderDTO {
     private String contactPhone;
     // 邮箱
     private String email;
-    // 省
-    private String province;
-    // 市
-    private String city;
-    // 区
-    private String area;
-    // 镇
-    private String community;
     // 详细地址
     private String address;
     // 分配时间
