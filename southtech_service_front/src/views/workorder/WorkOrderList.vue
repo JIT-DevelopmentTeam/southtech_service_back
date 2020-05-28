@@ -305,7 +305,7 @@ export default {
         {
           title: '紧急程度',
           align: 'center',
-          width:80,
+          width:90,
           dataIndex: 'emergencyLevel',
           customRender: text => {
             if (!text) {
@@ -368,6 +368,7 @@ export default {
           title: '接入方式',
           align: 'center',
           dataIndex: 'accessMethod',
+          width: 100,
           customRender: text => {
             if (!text) {
               return ''
