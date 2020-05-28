@@ -185,6 +185,7 @@ public class MobileStageController {
         ProgressReport progressReport = new ProgressReport();
         progressReport.setDescription(params.get("faultJudgement").toString());
         progressReport.setProgressId(params.get("progressId").toString());
+        progressReport.setIsNeedToReplace(params.get("parts").toString());
         progressReport.setIsCompleted(params.get("completeStatus").toString());
         progressReport.setWorkOrderDetailId(params.get("detailId").toString());
         progressReport.setWorkOrderId(params.get("ticketId").toString());

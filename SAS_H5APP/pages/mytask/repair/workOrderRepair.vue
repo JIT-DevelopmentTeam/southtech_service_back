@@ -117,6 +117,11 @@
 						</fl-picker>
 					</conf-div>
 				</view>
+				<view v-if="stage.number == '005'">
+					<conf-div title="是否需要更换配件:">
+						<radio-btn :items="yes_no" @radioChange="partsChange" :stageStatus="stageStatus" type="parts"></radio-btn>
+					</conf-div>
+				</view>
 				<view v-if="stage.takePicture === 'true'">
 					<conf-div title="现场拍照(最多只能上传9张):" :required="required">
 						<chooseImage :num="9" :isSave="false" :imageList="imageList" @uploadPhotoSuccess="uploadPhotoSuccess"
@@ -241,6 +246,7 @@
 				person_DD_ID: '',/* 同行人员钉钉ID */
 				signInTime: '',/* 签到时间 */
 				signOutTime: '',/* 签出时间 */
+				parts: '',/* 是否需要更换配件 */
 				completeStatus: '',/* 完成情况 */
 				isQGP: '',/* 是否保质期内 */
 				faultJudgement: '',/* 故障判断 */
@@ -310,6 +316,13 @@
 							this.signOutTime = format(timeArr[1]);
 						}
 					}
+					this.yes_no.forEach(item => {
+						item.checked = false;
+						if (item.value == result.isNeedToReplace) {
+							item.checked = true;
+							this.parts = item.value;
+						}
+					});
 					this.completion.forEach(item => {
 						item.checked = false;
 						if (item.value == result.isCompleted) {
@@ -336,6 +349,11 @@
 				})
 			}
 			
+			this.yes_no.forEach(i => {
+				if (i.checked) {
+					this.parts = i.value
+				}
+			})
 			this.completion.forEach((i) => {
 				if (i.checked) {
 					this.completeStatus = i.value
@@ -496,6 +514,7 @@
 				formData.append("ticketId", this.ticketId);
 				formData.append("userId", this.$store.getters['getUserId']);
 				formData.append("checkIn", this.signInTime);
+				formData.append("parts", this.parts);
 				formData.append("completeStatus", this.completeStatus);
 				formData.append("checkOut", this.signOutTime);
 				formData.append("signInLongitude", this.signInLongitude);
@@ -578,6 +597,9 @@
 			deleteSuccess(entityList, id) {
 				this.fileCommit = entityList;
 				this.fileDel.push(id);
+			},
+			partsChange(value) {
+				this.parts = value
 			},
 			comChange(value) {
 				this.completeStatus = value
