@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.OapiWorkrecordAddRequest;
+import com.dingtalk.api.request.OapiWorkrecordUpdateRequest;
 import com.dingtalk.api.response.OapiWorkrecordAddResponse;
+import com.dingtalk.api.response.OapiWorkrecordUpdateResponse;
 import com.taobao.api.ApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -398,6 +400,25 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         WorkOrderDetail workOrderDetail = workOrderDetailService.getById(workOrderDetailId);
         WorkOrder workOrder = workOrderService.getById(workOrderDetail.getWorkOrderId());
         SysUser serviceEngineer = sysUserService.getUserByName(serviceEngineerName);
+        // 清除旧待办
+        if (StringUtils.isNotBlank(workOrderDetail.getDingtalkRecordId()) && StringUtils.isNotBlank(workOrderDetail.getServiceEngineerName())) {
+            SysUser oldServiceEngineer = sysUserService.getUserByName(workOrderDetail.getServiceEngineerName());
+            if (oConvertUtils.isNotEmpty(oldServiceEngineer)) {
+                DingTalkClient client = new DefaultDingTalkClient(DingTalkConstant.UPDATE_WORK_RECORD_URL);
+                OapiWorkrecordUpdateRequest req = new OapiWorkrecordUpdateRequest();
+                req.setUserid(oldServiceEngineer.getEnterpriseId());
+                req.setRecordId(workOrderDetail.getDingtalkRecordId());
+                try {
+                    OapiWorkrecordUpdateResponse rsp = client.execute(req, redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString());
+                    if (rsp.isSuccess()) {
+                        log.info("钉钉待办移除成功!(重新派工)");
+                    }
+                } catch (ApiException e) {
+                    log.error("钉钉待办移除出错!(重新派工)");
+                    e.printStackTrace();
+                }
+            }
+        }
         String domainName = null;
         try {
             domainName = PropertiesLoaderUtils.loadAllProperties(("domainname/domain_name_config.properties")).getProperty("domain_name");
