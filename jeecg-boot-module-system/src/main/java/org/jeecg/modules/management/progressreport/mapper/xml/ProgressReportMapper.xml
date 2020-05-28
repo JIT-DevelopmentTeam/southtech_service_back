@@ -5,6 +5,7 @@
     <select id="getByReportId" resultType="org.jeecg.modules.management.progressreport.vo.MobileReportDTO">
         SELECT
             report.description as "description",
+            report.is_need_to_replace as "isNeedToReplace",
             report.is_completed as "isCompleted",
             report.fault_location as "faultLocation",
             GROUP_CONCAT(t.time) as "time",

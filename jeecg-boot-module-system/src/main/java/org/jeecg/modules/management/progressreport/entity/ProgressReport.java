@@ -52,6 +52,9 @@ public class ProgressReport implements Serializable {
 	/**汇报状态*/
 	@Excel(name = "汇报状态", width = 15)
 	private java.lang.String isCompleted;
+	/**是否需要更换配件*/
+	@Excel(name = "是否需要更换配件", width = 15)
+	private java.lang.String isNeedToReplace;
 	/**工单id*/
 	@Excel(name = "工单id", width = 15)
 	private java.lang.String workOrderId;

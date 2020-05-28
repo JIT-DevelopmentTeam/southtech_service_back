@@ -12,6 +12,7 @@ import java.util.List;
 public class MobileReportDTO {
 
     private String time;
+    private String isNeedToReplace;
     private String isCompleted;
     private String description;
     private String faultLocation;
