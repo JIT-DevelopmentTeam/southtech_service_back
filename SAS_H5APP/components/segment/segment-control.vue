@@ -60,6 +60,7 @@
 	        }
 	    },
 		created() {
+			uni.hideLoading();
 		}
 	}
 </script>
