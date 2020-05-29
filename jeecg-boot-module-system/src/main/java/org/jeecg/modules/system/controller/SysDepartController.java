@@ -30,6 +30,7 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.*;
+import org.jeecg.modules.dingtalk.accesstoken.util.DingTalkAccessTokenUtils;
 import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.system.entity.SysDepart;
 import org.jeecg.modules.system.entity.SysUser;
@@ -371,6 +372,7 @@ public class SysDepartController {
      */
     @RequestMapping(value = "/synchronize",method = RequestMethod.GET)
     public Result<?> synchronize() {
+        DingTalkAccessTokenUtils.setToken();
         String accessToken = redisUtil.get(DingTalkConstant.ACCESS_TOKEN_KEY).toString();
         try {
             // 同步部门

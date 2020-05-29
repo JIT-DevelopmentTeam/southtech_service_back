@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.jeecg.common.util.DateUtils;
+import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.management.stage.entity.Stage;
 import org.jeecg.modules.management.stage.mapper.StageMapper;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
@@ -97,15 +98,15 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     @Transactional
     public void updateMain(WorkOrder workOrder, List<WorkOrderDetail> workOrderDetailList) {
         workOrderMapper.updateById(workOrder);
-
-        //1.先删除子表数据
-        workOrderDetailMapper.deleteByMainId(workOrder.getId());
-
-        //2.子表数据重新插入
         if (workOrderDetailList != null) {
-            for (WorkOrderDetail entity : workOrderDetailList) {
-                entity.setWorkOrderId(workOrder.getId());
-                workOrderDetailMapper.insert(entity);
+            QueryWrapper<WorkOrderDetail> workOrderDetailQueryWrapper = new QueryWrapper<>();
+            workOrderDetailQueryWrapper.eq("work_order_id",workOrder.getId());
+            WorkOrderDetail workOrderDetail = workOrderDetailMapper.selectOne(workOrderDetailQueryWrapper);
+            if (oConvertUtils.isNotEmpty(workOrderDetail)) {
+                workOrderDetail.setDeviceNumber(workOrderDetailList.get(0).getDeviceNumber());
+                workOrderDetail.setFaultLocation(workOrderDetailList.get(0).getFaultLocation());
+                workOrderDetail.setDescription(workOrderDetailList.get(0).getDescription());
+                workOrderDetailMapper.updateById(workOrderDetail);
             }
         }
     }

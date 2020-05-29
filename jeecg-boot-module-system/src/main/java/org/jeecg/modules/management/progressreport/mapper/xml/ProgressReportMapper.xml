@@ -9,6 +9,7 @@
             report.is_completed as "isCompleted",
             report.fault_location as "faultLocation",
             GROUP_CONCAT(t.time) as "time",
+            GROUP_CONCAT(t.type) as "type",
             detail.appointment as "appointment"
         FROM
             ic_progress_report report
@@ -16,7 +17,8 @@
             SELECT
             DISTINCT
                 s1.report_id,
-                s1.time
+                s1.time,
+                s1.type
             FROM
                 ic_sign_in s1
                 INNER JOIN ( SELECT MAX( create_time ) AS 'create_time' FROM ic_sign_in WHERE progress_id = #{progressId} GROUP BY type ORDER BY type ) s2 ON s1.create_time = s2.create_time
