@@ -94,8 +94,8 @@
 					</conf-div>
 				</view>
 				<view v-if="stage.needDescription === 'true'">
-					<conf-div title="描述:" :required="required">
-						<textarea placeholder="请输入描述" v-model="faultJudgement" :disabled="stageStatus ==1 ? true : false" />
+					<conf-div title="具体项目:" :required="required">
+						<textarea placeholder="请输入具体项目" v-model="faultJudgement" :disabled="stageStatus ==1 ? true : false" />
 						<!-- <view class="separator"></view>
 						<label class="label operation">操作规程 >></label> -->
 					</conf-div>
@@ -394,7 +394,7 @@
 						rule.push(singinRule)
 					}
 					if (this.stage.needDescription == 'true') {
-						var faultJudgementRule = {value:this.faultJudgement, checkType:'String', errorMsg:'描述不能为空'}
+						var faultJudgementRule = {value:this.faultJudgement, checkType:'String', errorMsg:'具体项目不能为空'}
 						rule.push(faultJudgementRule)
 					}
 					if (this.stage.takePicture === 'true') {
