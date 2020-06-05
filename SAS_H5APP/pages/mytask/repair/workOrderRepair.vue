@@ -533,19 +533,19 @@
 					if (res.status === 200) {
 						this.savePhoto(res.data.result);
 						this.saveFile(res.data.result);
-						uni.showToast({
-							title: '保存成功',
-							duration: 500,
-							mask: true,
-							complete: () => {
+						// uni.showToast({
+						// 	title: '保存成功',
+						// 	duration: 500,
+						// 	mask: true,
+						// 	complete: () => {
 								uni.navigateBack({
 									delta:1
 								});
 								var payload = {'workOrderId': this.ticketId}
 								this.$store.dispatch('workOrder/GetWorkOrderDetail', payload)
 								this.$store.dispatch('stage/GetDataList', payload)
-							}
-						})
+						// 	}
+						// })
 					}
 				})
 			},

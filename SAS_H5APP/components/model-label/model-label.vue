@@ -28,7 +28,7 @@
 						result = '#97f079'
 						break;
 					case '远程服务':
-						result = '#9679f0'
+						result = '#aa55ff'
 						break;
 					case '回访工单':
 						result = '#f37ae5'
