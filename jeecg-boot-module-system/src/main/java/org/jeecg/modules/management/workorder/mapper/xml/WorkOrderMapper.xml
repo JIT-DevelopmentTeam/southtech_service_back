@@ -40,6 +40,7 @@
             workOrder.type AS "type",
             workOrder.id AS "id",
             workOrder.number AS "number",
+            workOrder.annex AS "annex",
             detail.assigned_time AS "assignedTime",
             detail.description AS "description",
             device.`name` AS "deviceName",
@@ -59,6 +60,18 @@
                 AND workOrder.status = #{status}
             </if>
         ORDER BY workOrder.declaration_time DESC
+    </select>
+
+    <select id="getWorkOrderAnnex" resultType="org.jeecg.modules.management.workorder.entity.WorkOrder">
+        SELECT
+            workOrder.*
+        FROM
+            ic_work_order workOrder
+        WHERE
+        1 = 1
+        <if test="workOrderId != null and workOrderId != ''">
+            AND workOrder.id = #{workOrderId}
+        </if>
     </select>
 
     <select id="queryWXworkOrderList" resultType="org.jeecg.modules.management.workorder.vo.MobileWorkOrderDTO">

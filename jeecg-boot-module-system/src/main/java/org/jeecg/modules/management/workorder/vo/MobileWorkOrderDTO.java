@@ -36,4 +36,6 @@ public class MobileWorkOrderDTO {
     private java.lang.Double latitude;
     // 设备签约日期
     private Date signing;
+    // 附件
+    private String annex;
 }

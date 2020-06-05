@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -52,6 +53,23 @@ public class MobileWorkOrderController {
         pageList = workOrderService.queryMobileList(pageList, user.getUsername(), req.getParameter("status"));
         result.setSuccess(true);
         result.setResult(pageList);
+        return result;
+    }
+
+    @RequestMapping(value = "/getWorkOrderAnnex", method = RequestMethod.GET)
+    public Result<?> getWorkOrderAnnex(@RequestParam(name = "ticketId") String ticketId, HttpServletRequest request) {
+        Result<List<String>> result = new Result<>();
+        List<String> annexList = new ArrayList<>();
+        WorkOrder workOrderAnnex = workOrderService.getWorkOrderAnnex(ticketId);
+        String annex = workOrderAnnex.getAnnex();
+        if (annex != null) {
+            String[] annexSplit = annex.split(",");
+            for (String annex_ : annexSplit) {
+                annexList.add(annex_);
+            }
+        }
+        result.setSuccess(true);
+        result.setResult(annexList);
         return result;
     }
 
