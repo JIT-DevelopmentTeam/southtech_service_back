@@ -13,6 +13,7 @@ import com.taobao.api.ApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
+import org.hibernate.jdbc.Work;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.base.controller.JeecgController;
@@ -42,6 +43,7 @@ import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -503,71 +505,89 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
         String title = "维修记录报表";
         List<ServiceReport> exportList = new ArrayList<>();
-        List<WorkOrderDetail> workOrderDetailList = workOrderDetailService.list();
-        // 故障部位
-        List<DictModel> faultLocationDictItemList = sysDictService.queryDictItemsByCode("work_order_detail_fault_location");
-        // 工单状态
-        List<DictModel> stageDictItemList = sysDictService.queryDictItemsByCode("work_order_status");
-        for (int i = 0; i < workOrderDetailList.size(); i++) {
-            WorkOrderDetail workOrderDetail = workOrderDetailList.get(i);
-            WorkOrder workOrder = workOrderService.getById(workOrderDetail.getWorkOrderId());
-            SysUser serviceEngineer = sysUserService.getUserByName(workOrderDetail.getServiceEngineerName());
-            Client client = clientService.getById(workOrder.getClientId());
-            DeviceNumber deviceNumber = deviceNumberService.getById(workOrderDetail.getDeviceNumber());
-            String[] faultLocationValues = workOrderDetail.getFaultLocation().split(",");
-            StringBuffer faultLocationText = new StringBuffer();
-            for (String faultLocationValue : faultLocationValues) {
-                for (DictModel faultLocationDictItem : faultLocationDictItemList) {
-                    if (faultLocationValue.equals(faultLocationDictItem.getValue())) {
-                        faultLocationText.append(faultLocationDictItem.getText()+",");
+        QueryWrapper<WorkOrder> workOrderQueryWrapper = new QueryWrapper<>();
+        workOrderQueryWrapper.eq("type","1");
+        // 获取所有维修工单
+        List<WorkOrder> workOrderList = workOrderService.list(workOrderQueryWrapper);
+        List<String> workOrderIdsList = new ArrayList<>();
+        // 将父级工单存入Map,以便优化无必要的循环调用父级数据接口
+        Map<String,WorkOrder> workOrderMap = new HashMap<>();
+        for (WorkOrder workOrder : workOrderList) {
+            workOrderIdsList.add(workOrder.getId());
+            workOrderMap.put(workOrder.getId(),workOrder);
+        }
+        if (!workOrderIdsList.isEmpty()) {
+            QueryWrapper<WorkOrderDetail> workOrderDetailQueryWrapper = new QueryWrapper<>();
+            workOrderDetailQueryWrapper.in("work_order_id",workOrderIdsList);
+            List<WorkOrderDetail> workOrderDetailList = workOrderDetailService.list(workOrderDetailQueryWrapper);
+            // 故障部位
+            List<DictModel> faultLocationDictItemList = sysDictService.queryDictItemsByCode("work_order_detail_fault_location");
+            // 存入Map优化多重循环判断
+            Map<String,String> faultLocationDictItemMap = new HashMap<>();
+            for (DictModel faultLocationDictItem : faultLocationDictItemList) {
+                faultLocationDictItemMap.put(faultLocationDictItem.getValue(),faultLocationDictItem.getText());
+            }
+            // 工单状态
+            List<DictModel> stageDictItemList = sysDictService.queryDictItemsByCode("work_order_status");
+            // 存入Map优化多重循环判断
+            Map<String,String> stageDictItemMap = new HashMap<>();
+            for (DictModel stageDictItem : stageDictItemList) {
+                stageDictItemMap.put(stageDictItem.getValue(),stageDictItem.getText());
+            }
+            for (int i = 0; i < workOrderDetailList.size(); i++) {
+                WorkOrderDetail workOrderDetail = workOrderDetailList.get(i);
+                Client client = clientService.getById(workOrderMap.get(workOrderDetail.getWorkOrderId()).getClientId());
+                DeviceNumber deviceNumber = deviceNumberService.getById(workOrderDetail.getDeviceNumber());
+                String[] faultLocationValues = workOrderDetail.getFaultLocation().split(",");
+                StringBuffer faultLocationText = new StringBuffer();
+                for (String faultLocationValue : faultLocationValues) {
+                    faultLocationText.append(faultLocationDictItemMap.get(faultLocationValue)+",");
+                }
+                ServiceReport serviceReport = new ServiceReport();
+                serviceReport.setNumber(i+1);
+                serviceReport.setClientName(client.getName());
+                serviceReport.setFurnace(deviceNumber.getName());
+                serviceReport.setFeedbackQuestion(workOrderDetail.getDescription());
+                // 问题类型 ?
+                serviceReport.setQuestionType("");
+                if (faultLocationText.length() > 0) {
+                    faultLocationText = faultLocationText.deleteCharAt(faultLocationText.length()-1);
+                    serviceReport.setFaultLocation(faultLocationText.toString());
+                }
+                if (oConvertUtils.isNotEmpty(deviceNumber.getQgp())) {
+                    serviceReport.setIsQgp(System.currentTimeMillis() <= deviceNumber.getQgp().getTime() ? "是" : "否");
+                }
+                // 是否收费 ?
+                serviceReport.setIsCharge("");
+                if (StringUtils.isNotBlank(workOrderDetail.getServiceEngineerName())) {
+                    SysUser serviceEngineer = sysUserService.getUserByName(workOrderDetail.getServiceEngineerName());
+                    if (oConvertUtils.isNotEmpty(serviceEngineer)) {
+                        serviceReport.setServiceEngineerName(serviceEngineer.getRealname());
                     }
                 }
-            }
-            ServiceReport serviceReport = new ServiceReport();
-            serviceReport.setNumber(i+1);
-            serviceReport.setClientName(client.getName());
-            // 炉型 ?
-            serviceReport.setFurnace("");
-            serviceReport.setFeedbackQuestion("");
-            // 问题类型 ?
-            serviceReport.setQuestionType("");
-            if (faultLocationText.length() > 0) {
-                faultLocationText = faultLocationText.deleteCharAt(faultLocationText.length()-1);
-                serviceReport.setFaultLocation(faultLocationText.toString());
-            }
-            if (oConvertUtils.isNotEmpty(deviceNumber.getQgp())) {
-                serviceReport.setIsQgp(System.currentTimeMillis() <= deviceNumber.getQgp().getTime() ? "是" : "否");
-            }
-            // 是否收费 ?
-            serviceReport.setIsCharge("");
-            serviceReport.setServiceEngineerName(serviceEngineer.getRealname());
-            serviceReport.setAppointment(workOrderDetail.getAppointment());
-            if ("3".equals(workOrder.getStatus())) {
-                QueryWrapper<Stage> stageQueryWrapper = new QueryWrapper<>();
-                stageQueryWrapper.eq("work_order_type",workOrder.getType());
-                stageQueryWrapper.orderByDesc("order_index");
-                stageQueryWrapper.last("LIMIT 0,1");
-                Stage stage = stageService.getOne(stageQueryWrapper);
-                QueryWrapper<WorkOrderProgress> workOrderProgressQueryWrapper = new QueryWrapper<>();
-                workOrderProgressQueryWrapper.eq("work_order_id",workOrder.getId());
-                workOrderProgressQueryWrapper.eq("stage_id",stage.getId());
-                WorkOrderProgress finishProgress = workOrderProgressService.getOne(workOrderProgressQueryWrapper);
-                if (oConvertUtils.isNotEmpty(finishProgress.getFinishTime())) {
-                    serviceReport.setCompleteTime(finishProgress.getFinishTime());
+                serviceReport.setAppointment(workOrderDetail.getAppointment());
+                if ("3".equals(workOrderMap.get(workOrderDetail.getWorkOrderId()).getStatus())) {
+                    QueryWrapper<WorkOrderProgress> workOrderProgressQueryWrapper = new QueryWrapper<>();
+                    workOrderProgressQueryWrapper.eq("work_order_id",workOrderMap.get(workOrderDetail.getWorkOrderId()).getId());
+                    workOrderProgressQueryWrapper.orderByDesc("create_time");
+                    workOrderProgressQueryWrapper.last("LIMIT 0,1");
+                    WorkOrderProgress finishProgress = workOrderProgressService.getOne(workOrderProgressQueryWrapper);
+                    if (oConvertUtils.isNotEmpty(finishProgress.getFinishTime())) {
+                        serviceReport.setCompleteTime(finishProgress.getFinishTime());
+                    }
                 }
+                // 处理结果 ?
+                serviceReport.setProcessResult("");
+                serviceReport.setStatus(stageDictItemMap.get(workOrderMap.get(workOrderDetail.getWorkOrderId()).getStatus()));
+                // 未完成原因 ?
+                serviceReport.setReasonForIncomplete("");
+                // 客户对处理结果是否满意 ?
+                serviceReport.setResultsEvaluation("");
+                // 客户对服务人员工作是否满意 ?
+                serviceReport.setStaffEvaluation("");
+                exportList.add(serviceReport);
             }
-            serviceReport.setProcessResult("");
-            for (DictModel stageDictItem : stageDictItemList) {
-                if (workOrder.getStatus().equals(stageDictItem.getValue())) {
-                    serviceReport.setStatus(stageDictItem.getText());
-                }
-            }
-            serviceReport.setReasonForIncomplete("");
-            serviceReport.setResultsEvaluation("");
-            serviceReport.setStaffEvaluation("");
-            exportList.add(serviceReport);
         }
-
         mv.addObject(NormalExcelConstants.FILE_NAME, title); //此处设置的filename无效 ,前端会重更新设置一下
         mv.addObject(NormalExcelConstants.CLASS, ServiceReport.class);
         mv.addObject(NormalExcelConstants.PARAMS, new ExportParams(title, "", title));

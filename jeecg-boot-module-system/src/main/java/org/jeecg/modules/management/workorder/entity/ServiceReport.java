@@ -48,10 +48,10 @@ public class ServiceReport {
     @Excel(name = "前往或电话处理的售后人员",width = 15)
     private String serviceEngineerName;
     /**开始时间*/
-    @Excel(name = "开始时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "开始时间", width = 20, format = "yyyy-MM-dd")
     private Date appointment;
     /**完成时间*/
-    @Excel(name = "完成时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "完成时间", width = 20, format = "yyyy-MM-dd")
     private Date completeTime;
     /**处理结果*/
     @Excel(name = "处理结果",width = 15)
