@@ -34,6 +34,13 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder> {
     List<MobileWorkOrderDTO> queryMobileList(Page<MobileWorkOrderDTO> page, @Param(value = "userName") String userName, @Param(value = "status") String status);
 
     /**
+     * 钉钉-根据工单id查询附件
+     * @param workOrderId
+     * @return
+     */
+    WorkOrder getWorkOrderAnnex(@Param(value = "workOrderId") String workOrderId);
+
+    /**
      * 服务号-查询所有工单
      * @param page
      * @param status

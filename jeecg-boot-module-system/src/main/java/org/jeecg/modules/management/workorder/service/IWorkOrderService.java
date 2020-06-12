@@ -57,6 +57,13 @@ public interface IWorkOrderService extends IService<WorkOrder> {
 	Page<MobileWorkOrderDTO> queryMobileList(Page<MobileWorkOrderDTO> page, String userName, String status);
 
 	/**
+	 * 钉钉-根据工单id查询附件
+	 * @param workOrderId
+	 * @return
+	 */
+	WorkOrder getWorkOrderAnnex(String workOrderId);
+
+	/**
 	 * 服务号-查询所有工单
 	 * @param page
 	 * @param status

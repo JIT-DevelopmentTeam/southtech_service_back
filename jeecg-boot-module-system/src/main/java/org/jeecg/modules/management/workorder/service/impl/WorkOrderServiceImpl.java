@@ -132,6 +132,16 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     }
 
     /**
+     * 钉钉-根据工单id查询附件
+     * @param workOrderId
+     * @return
+     */
+    @Override
+    public WorkOrder getWorkOrderAnnex(String workOrderId) {
+        return workOrderMapper.getWorkOrderAnnex(workOrderId);
+    }
+
+    /**
      * 服务号-查询所有工单
      * @param page
      * @param status

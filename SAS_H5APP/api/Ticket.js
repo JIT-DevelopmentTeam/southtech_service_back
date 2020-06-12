@@ -33,6 +33,15 @@ export function getWorkOrderList(params) {
 	})
 }
 
+/* 获取工单附件 */
+export function getWorkOrderAnnex(params) {
+	return http({
+		url: '/mobile/workOrder/getWorkOrderAnnex',
+		method: 'get',
+		params: params
+	})
+}
+
 /* 阶段维护保存 */
 export function ticketRepairSave(params/* , header */) {
 	return http({

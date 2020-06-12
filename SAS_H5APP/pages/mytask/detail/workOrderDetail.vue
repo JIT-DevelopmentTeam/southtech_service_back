@@ -64,6 +64,14 @@
 						{{getTicket.description}}
 					</view>
 				</view>
+				<view class="line" v-if="getTicket.annex != null">
+					<view class="label sameLine fontsmall bold">
+						附件：
+					</view>
+					<view class="label sameLine fontsmall">
+						<button class="mini-btn" type="primary" size="mini" @click="goToAnnex(getTicket.id)">查看附件</button>
+					</view>
+				</view>
 			</template>
 		</uni-card>
 		<segment-control :ticketId="getTicket.id" :ticketType="getTicket.type"></segment-control>
@@ -111,7 +119,11 @@
 			}
 		},
 		methods: {
-			
+			goToAnnex(id) {
+				uni.navigateTo({
+					url: 'annexView?ticketId=' + id
+				})
+			}
 		}
 	}
 </script>
@@ -149,7 +161,7 @@
 	}
 
 	.mini-btn {
-		position: absolute;
+		/* position: absolute; */
 		top: 15upx;
 		right: 10upx;
 		color: #FFFFFF;

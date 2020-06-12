@@ -31,6 +31,12 @@
 			}
 		},
 		{
+			"path":"pages/mytask/detail/annexView",// 附件
+			"style":{
+				// "disableScroll": true
+			}
+		},
+		{
 			"path":"pages/mytask/repair/workOrderRepair",// 工单维护
 			"style":{
 				// "disableScroll": true
