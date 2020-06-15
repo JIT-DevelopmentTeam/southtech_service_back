@@ -2,6 +2,7 @@ package org.jeecg.modules.management.mobile.workOrder;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.modules.management.progressreport.service.IProgressReportService;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.service.IWorkOrderDetailService;
@@ -17,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/mobile/workOrder")
@@ -34,6 +37,9 @@ public class MobileWorkOrderController {
 
     @Autowired
     protected IProgressReportService progressReportService;
+
+    @Autowired
+    private ISysBaseAPI sysBaseAPI;
 
 
     //-----------------------------------钉钉----------------------------------
@@ -96,6 +102,11 @@ public class MobileWorkOrderController {
         WorkOrder workOrder = new WorkOrder();
         BeanUtils.copyProperties(workOrderPage, workOrder);
         workOrderService.saveMain(workOrder, workOrderPage.getWorkOrderDetailList());
+        List<SysUser> userList = sysUserService.listByRoleCode("customer_service");
+        Map<String, String> map = new HashMap<>();
+        for (SysUser user : userList) {
+            sysBaseAPI.sendSysAnnouncement("admin", user.getUsername(), "新工单提醒", map, "sys_new_ticket_reminder");
+        }
         return Result.ok("添加成功！");
     }
 
