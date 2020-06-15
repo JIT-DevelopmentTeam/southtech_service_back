@@ -391,7 +391,7 @@
 			  });
 		  },
 		  pickerDeviceNumberChange:function(e,index) {
-			  this.dataIndex.deviceNumberIndexList.push(e.target.value);
+			  //this.dataIndex.deviceNumberIndexList.push(e.target.value);
 			  this.model.workOrderDetailList[index].deviceNumber = this.deviceNumberList[e.target.value].value;
 		  },
 		  selectFaultLocations:function(val,index) {

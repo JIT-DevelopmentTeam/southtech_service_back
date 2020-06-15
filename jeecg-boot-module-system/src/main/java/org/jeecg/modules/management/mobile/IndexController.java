@@ -164,17 +164,17 @@ public class IndexController {
             addUser.setCountry(userResult.getString("country"));
             addUser.setProvince(userResult.getString("province"));
             addUser.setAccessToken(accessToken);
-            addUser.setAccessTokenExpireId(new Timestamp(System.currentTimeMillis() + accessTokenExpireId * 1000));
+            addUser.setAccessTokenExpireId(new Timestamp(System.currentTimeMillis() + accessTokenExpireId * 1000L));
             addUser.setRefreshToken(refreshToken);
-            addUser.setRefreshTokenExpireId(new Timestamp(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 30));
+            addUser.setRefreshTokenExpireId(new Timestamp(System.currentTimeMillis() + 1000L * 60L * 60L * 24L * 30L));
             wxUserService.save(addUser);
             return Result.ok(addUser);
         }
         wxUser.setAccessToken(accessToken);
-        wxUser.setAccessTokenExpireId(new Timestamp(System.currentTimeMillis() + accessTokenExpireId * 1000));
+        wxUser.setAccessTokenExpireId(new Timestamp(System.currentTimeMillis() + accessTokenExpireId * 1000L));
         wxUser.setRefreshToken(refreshToken);
         if (oConvertUtils.isEmpty(wxUser.getRefreshTokenExpireId())) {
-            wxUser.setRefreshTokenExpireId(new Timestamp(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 30));
+            wxUser.setRefreshTokenExpireId(new Timestamp(System.currentTimeMillis() + 1000L * 60L * 60L * 24L * 30L));
         }
         wxUserService.updateById(wxUser);
         return Result.ok(wxUser);
