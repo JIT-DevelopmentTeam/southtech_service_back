@@ -8,18 +8,21 @@
 				<view class="line">
 					<view class="sameLine">
 						<view class="label sameLine fontsmall bold">
-							工单编号：
+							客户地址：
 						</view>
-						<view class="label sameLine fontsmall">
-							{{getTicket.number}}
-						</view>
+						<location :labelStyle="labelStyle" :label="getTicket.address" :left_right="left_right"></location>
 					</view>
+				</view>
+				<view class="line">
 					<view class="sameLine">
 						<view class="label sameLine fontsmall bold">
-							分配时间：
+							联系人：
 						</view>
 						<view class="label sameLine fontsmall">
-							{{formatTime(getTicket.assignedTime)}}
+							{{getTicket.contactName}}
+						</view>
+						<view class="label sameLine fontsmall">
+							{{getTicket.contactPhone}}
 						</view>
 					</view>
 				</view>
@@ -29,31 +32,43 @@
 			</view>
 			<template v-slot:footer>
 				<view class="line">
-					<view class="sameLine">
-						<view class="label sameLine fontsmall bold">
-							客户地址：
-						</view>
-						<location :labelStyle="labelStyle" :label="getTicket.province+getTicket.city+getTicket.area+getTicket.community+getTicket.address" :left_right="left_right"></location>
+					<view class="label sameLine fontsmall bold">
+						工单编号：
+					</view>
+					<view class="label sameLine fontsmall">
+						{{getTicket.number}}
 					</view>
 				</view>
 				<view class="line">
-					<view class="sameLine">
-						<view class="label sameLine fontsmall bold">
-							主联系人：
-						</view>
-						<view class="label sameLine fontsmall">
-							{{getTicket.contactName}}
-						</view>
+					<view class="label sameLine fontsmall bold">
+						设备名称：
+					</view>
+					<view class="label sameLine fontsmall">
+						{{getTicket.deviceName}}
 					</view>
 				</view>
 				<view class="line">
-					<view class="sameLine">
-						<view class="label sameLine fontsmall bold">
-							联系方式：
-						</view>
-						<view class="label sameLine fontsmall">
-							{{getTicket.contactPhone}}
-						</view>
+					<view class="label sameLine fontsmall bold">
+						签约日期：
+					</view>
+					<view class="label sameLine fontsmall">
+						{{getTicket.signing}}
+					</view>
+				</view>
+				<view class="line">
+					<view class="label sameLine fontsmall bold">
+						描述：
+					</view>
+					<view class="label sameLine fontsmall">
+						{{getTicket.description}}
+					</view>
+				</view>
+				<view class="line" v-if="getTicket.annex != null">
+					<view class="label sameLine fontsmall bold">
+						附件：
+					</view>
+					<view class="label sameLine fontsmall">
+						<button class="mini-btn" type="primary" size="mini" @click="goToAnnex(getTicket.id)">查看附件</button>
 					</view>
 				</view>
 			</template>
@@ -103,14 +118,18 @@
 			}
 		},
 		methods: {
-			
+			goToAnnex(id) {
+				uni.navigateTo({
+					url: '../../../mytask/detail/annexView?ticketId=' + id
+				})
+			}
 		}
 	}
 </script>
 
 <style scoped>
 	.uniCard {
-		margin: 10upx 0;
+		margin: 10upx 0 !important;
 	}
 
 	.label {
@@ -141,7 +160,7 @@
 	}
 
 	.mini-btn {
-		position: absolute;
+		/* position: absolute; */
 		top: 15upx;
 		right: 10upx;
 		color: #FFFFFF;
@@ -149,7 +168,7 @@
 	}
 
 	.phone {
-		top: 270upx;
+		top: 100upx;
 	}
 
 	.right {
