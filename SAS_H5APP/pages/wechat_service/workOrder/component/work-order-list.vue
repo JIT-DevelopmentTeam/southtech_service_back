@@ -12,7 +12,7 @@
 						<view class="label sameLine">{{ info.contactPhone }}</view>
 					</view>
 					<view class="line">
-						<location :labelStyle="label" :label="info.province+info.city+info.area+info.community+info.address" :left_right="left_right"></location>
+						<location :labelStyle="label" :label="info.address" :left_right="left_right"></location>
 					</view>
 				</view>
 				<view class="btn">
