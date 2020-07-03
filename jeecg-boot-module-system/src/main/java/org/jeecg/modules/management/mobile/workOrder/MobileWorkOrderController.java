@@ -101,6 +101,8 @@ public class MobileWorkOrderController {
     public Result<?> add(@RequestBody WorkOrderPage workOrderPage) {
         WorkOrder workOrder = new WorkOrder();
         BeanUtils.copyProperties(workOrderPage, workOrder);
+        SysUser sysUser = sysUserService.getByEnterpriseId(workOrderPage.getCreateBy());
+        workOrder.setCreateBy(sysUser.getUsername());
         workOrderService.saveMain(workOrder, workOrderPage.getWorkOrderDetailList());
         List<SysUser> userList = sysUserService.listByRoleCode("customer_service");
         Map<String, String> map = new HashMap<>();
