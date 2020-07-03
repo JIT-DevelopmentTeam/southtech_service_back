@@ -80,8 +80,8 @@
 								url: ''
 							}
 						]
-					},
-					{
+					}, */
+					/* {
 						title: "辅助支持",
 						textList: [{
 								text: "知识库",
@@ -112,11 +112,11 @@
 								url: ''
 							}
 						]
-					},
-					{
+					}, */
+					/* {
 						title: "其他功能",
 						textList: [{
-								text: "贡献榜",
+								text: "数据统计",
 								icon: "iconkaoqintongji1",
 								color: "#f1bb7a",
 								pageType: 'page',
@@ -144,8 +144,8 @@
 								url: ''
 							}
 						]
-					},
-					{
+					}, */
+					/* {
 						title: "审核",
 						show: false,
 						textList: [{
