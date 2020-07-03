@@ -143,6 +143,7 @@
 	     async mounted() {
 			 // 初始化
 			this.dingTalkUserId = this.$store.getters['getUserId'];
+			this.model.createBy = this.dingTalkUserId;
 			this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
 			if (this.dingTalkUserId) {
 				getUserByEnterpriseId(this.dingTalkUserId).then((res) => {
@@ -249,6 +250,7 @@
 					correspondentName:null,
 					annex:null,
 					workOrderDetailList:[],
+					createBy:null
 				}
 			}
 		},
