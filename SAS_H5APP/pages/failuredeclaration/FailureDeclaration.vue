@@ -143,7 +143,7 @@
 	     async mounted() {
 			 // 初始化
 			this.dingTalkUserId = this.$store.getters['getUserId'];
-			this.model.createBy = this.dingTalkUserId;
+			this.model.createBy = this.$store.getters['getUserId'];
 			this.wechatOpenId = this.$store.getters['getWeChatOpenId'];
 			if (this.dingTalkUserId) {
 				getUserByEnterpriseId(this.dingTalkUserId).then((res) => {
