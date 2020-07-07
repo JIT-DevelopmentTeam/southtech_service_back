@@ -119,6 +119,7 @@
         @change="handleTableChange"
         :scroll="tableScroll"
       >
+        <span slot="status" slot-scope="text, record" :class="(text*1 === 1 || text*1 === 3) ? 'text-color' : ''">{{ spanText("status", text + '')  }}</span>
         <template slot="htmlSlot" slot-scope="text">
           <div v-html="text"></div>
         </template>
@@ -325,13 +326,14 @@ export default {
           align: 'center',
           width: 70,
           dataIndex: 'status',
-          customRender: text => {
-            if (!text) {
-              return ''
-            } else {
-              return filterMultiDictText(this.dictOptions['status'], text + '')
-            }
-          }
+          // customRender: text => {
+          //   if (!text) {
+          //     return ''
+          //   } else {
+          //     return filterMultiDictText(this.dictOptions['status'], text + '')
+          //   }
+          // },
+          scopedSlots: { customRender: 'status' }
         },
         {
           title: '需要派工',
@@ -529,6 +531,13 @@ export default {
     }
   },
   methods: {
+    spanText(type, text) {
+      if(!text){
+        return ''
+      }else{
+        return filterMultiDictText(this.dictOptions[type], text+"")
+      }
+    },
     initDictConfig() {
       initDictOptions('work_order_status').then(res => {
         if (res.success) {
@@ -710,4 +719,7 @@ export default {
   touch-action: none;
   border: none;
 }
+  .text-color {
+    color: red;
+  }
 </style>
