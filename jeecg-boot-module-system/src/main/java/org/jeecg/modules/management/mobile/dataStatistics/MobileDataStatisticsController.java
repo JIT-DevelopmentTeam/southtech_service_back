@@ -31,9 +31,9 @@ public class MobileDataStatisticsController {
     public Result<?> dataStatistics(String userId) {
         Map<String, Object> result = new HashMap<>();
         SysUser sysUser = sysUserService.getByEnterpriseId(userId);
-        Integer all = workOrderService.dataStatistics(null, null);// 接单量
-        Integer completed = workOrderService.dataStatistics(null, "6");// 完成量
-        Integer myAll = workOrderService.dataStatistics(sysUser.getUsername(), null);// 我的接单量
+        Integer all = workOrderService.dataStatistics("", "");// 接单量
+        Integer completed = workOrderService.dataStatistics("", "6");// 完成量
+        Integer myAll = workOrderService.dataStatistics(sysUser.getUsername(), "");// 我的接单量
         Integer myCompleted = workOrderService.dataStatistics(sysUser.getUsername(), "6");// 我的完成量
         result.put("all", all);
         result.put("completed", completed);

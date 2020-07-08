@@ -84,6 +84,6 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder> {
 
     Integer dataStatistics(@Param("userName") String userName, @Param("status") String status);
 
-    List<RankingDTO> ranking(String status);
+    List<RankingDTO> ranking(@Param("status") String status);
 
 }
