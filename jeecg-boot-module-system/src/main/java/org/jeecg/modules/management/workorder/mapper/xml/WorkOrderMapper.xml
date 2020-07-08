@@ -162,6 +162,7 @@
 	    WHERE
             YEAR(a.declaration_time) = YEAR(CURDATE())
             AND a.need_dispatch = "1"
+            And detail.service_engineer_name &lt;&gt; ""
             <if test="status != null and status != ''">
                 AND a.status = #{status}
             </if>

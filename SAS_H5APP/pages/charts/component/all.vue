@@ -74,14 +74,17 @@
 				]};
 				dataStatistics({userId: _self.$store.getters['getUserId']}).then(res => {
 					if (res.data.code === 200) {
-						Arcbar1.series[0].data = res.data.result.completed / res.data.result.all;
+						if (res.data.result.completed !== 0 || res.data.result.all !== 0) {
+							Arcbar1.series[0].data = res.data.result.completed / res.data.result.all;
+						}
 						_self.all = res.data.result.all;
 						_self.completed = res.data.result.completed;
 						_self.showArcbar1("canvasArcbar1",Arcbar1);
+						
 					}
 				})
 				let Funnel1={series:[]};
-				ranking({status: null}).then(res => {
+				ranking({status: ""}).then(res => {
 					if (res.data.code === 200) {
 						Funnel1.series = res.data.result;
 						_self.showFunnel1("canvasFunnel1",Funnel1);

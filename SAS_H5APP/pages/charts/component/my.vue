@@ -49,10 +49,13 @@
 				]};
 				dataStatistics({userId: _self.$store.getters['getUserId']}).then(res => {
 					if (res.data.code === 200) {
-						Arcbar2.series[0].data = res.data.result.myCompleted / res.data.result.myAll;
+						if (res.data.result.myCompleted !== 0 || res.data.result.myAll !== 0) {
+							Arcbar2.series[0].data = res.data.result.myCompleted / res.data.result.myAll;
+						}
 						_self.all = res.data.result.myAll;
 						_self.completed = res.data.result.myCompleted;
 						_self.showArcbar2("canvasArcbar2",Arcbar2);
+						
 					}
 				})
 			},
