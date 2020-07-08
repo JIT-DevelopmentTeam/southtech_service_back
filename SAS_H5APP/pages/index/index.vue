@@ -113,16 +113,16 @@
 							}
 						]
 					}, */
-					/* {
+					{
 						title: "其他功能",
 						textList: [{
 								text: "数据统计",
 								icon: "iconkaoqintongji1",
 								color: "#f1bb7a",
 								pageType: 'page',
-								url: ''
+								url: '/pages/charts/data-statistics/data-statistics'
 							},
-							{
+							/* {
 								text: "库存查询",
 								icon: "iconfuwuqi",
 								color: "#7aeeef",
@@ -142,9 +142,9 @@
 								color: "#7886f1",
 								pageType: 'page',
 								url: ''
-							}
+							} */
 						]
-					}, */
+					},
 					/* {
 						title: "审核",
 						show: false,

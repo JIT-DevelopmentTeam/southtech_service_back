@@ -15,6 +15,7 @@ import org.jeecg.modules.management.workorder.mapper.WorkOrderMapper;
 import org.jeecg.modules.management.workorder.mapper.WorkOrderProgressMapper;
 import org.jeecg.modules.management.workorder.service.IWorkOrderService;
 import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDTO;
+import org.jeecg.modules.management.workorder.vo.RankingDTO;
 import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -160,5 +161,26 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     @Override
     public List<WorkOrder> queryTimeoutWorkOrder() {
         return workOrderMapper.queryTimeoutWorkOrder();
+    }
+
+    /**
+     * 数据统计（统计本年累计完成和累计接单）
+     * @param userName 服务工程师
+     * @param status  工单状态
+     * @return
+     */
+    @Override
+    public Integer dataStatistics(String userName, String status) {
+        return workOrderMapper.dataStatistics(userName, status);
+    }
+
+    /**
+     * 排行榜（年度接单和年度完成排行榜）
+     * @param status
+     * @return
+     */
+    @Override
+    public List<RankingDTO> ranking(String status) {
+        return workOrderMapper.ranking(status);
     }
 }

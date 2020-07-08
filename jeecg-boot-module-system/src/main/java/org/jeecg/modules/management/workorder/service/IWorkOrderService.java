@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.entity.WorkOrderDetail;
 import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDTO;
+import org.jeecg.modules.management.workorder.vo.RankingDTO;
 import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 
 import java.io.Serializable;
@@ -80,4 +81,19 @@ public interface IWorkOrderService extends IService<WorkOrder> {
 	List<WorkOrder> queryWorkOrderByComment(String clientId,String status);
 
 	List<WorkOrder> queryTimeoutWorkOrder();
+
+	/**
+	 * 数据统计（统计本年累计完成和累计接单）
+	 * @param userName
+	 * @param status
+	 * @return
+	 */
+	Integer dataStatistics(String userName, String status);
+
+	/**
+	 * 排行榜（年度接单和年度完成排行榜）
+	 * @param status
+	 * @return
+	 */
+	List<RankingDTO> ranking(String status);
 }

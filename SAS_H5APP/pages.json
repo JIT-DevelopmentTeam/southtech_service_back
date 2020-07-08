@@ -61,7 +61,7 @@
 			}
 		}
 	    ,{
-            "path" : "pages/failuredeclaration/FailureDeclaration",
+            "path" : "pages/failuredeclaration/FailureDeclaration",// 故障代报
             "style" : {}
         }
         ,{
@@ -80,6 +80,10 @@
 		    "path" : "pages/wechat_service/login/index",
 		    "style" : {}
 		}
+        ,{
+            "path" : "pages/charts/data-statistics/data-statistics",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

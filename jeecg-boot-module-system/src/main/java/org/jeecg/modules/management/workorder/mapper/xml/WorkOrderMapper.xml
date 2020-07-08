@@ -135,4 +135,41 @@
             AND detail.actual_completion_time IS NULL
     </select>
 
+    <select id="dataStatistics" resultType="java.lang.Integer">
+        SELECT
+            count( 1 )
+        FROM
+            ic_work_order a
+            LEFT JOIN ic_work_order_detail detail ON detail.work_order_id = a.id
+        WHERE
+            YEAR(a.declaration_time) = YEAR(CURDATE())
+            <if test="userName != null and userName != ''">
+                AND detail.service_engineer_name = #{userName}
+            </if>
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+    </select>
+    
+    <select id="ranking" resultType="org.jeecg.modules.management.workorder.vo.RankingDTO">
+        SELECT
+            user.realname AS "name",
+            COUNT( 1 ) AS "data"
+        FROM
+            ic_work_order a
+            LEFT JOIN ic_work_order_detail detail ON detail.work_order_id = a.id
+	        LEFT JOIN sys_user user ON user.username = detail.service_engineer_name
+	    WHERE
+            YEAR(a.declaration_time) = YEAR(CURDATE())
+            AND a.need_dispatch = "1"
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+        GROUP BY
+            detail.service_engineer_name
+        ORDER BY
+            data DESC
+        LIMIT 0, 5
+    </select>
+
 </mapper>

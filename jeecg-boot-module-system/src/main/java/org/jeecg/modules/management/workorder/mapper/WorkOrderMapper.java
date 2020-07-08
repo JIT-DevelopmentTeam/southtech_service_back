@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Select;
 import org.jeecg.modules.management.workorder.entity.WorkOrder;
 import org.jeecg.modules.management.workorder.entity.WorkOrderPageDTO;
 import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDTO;
+import org.jeecg.modules.management.workorder.vo.RankingDTO;
 import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 
 import java.util.List;
@@ -80,5 +81,9 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder> {
     List<WorkOrderPageDTO> queryListPage(WorkOrderPageDTO workOrderPageDTO);
 
     List<WorkOrder> queryTimeoutWorkOrder();
+
+    Integer dataStatistics(@Param("userName") String userName, @Param("status") String status);
+
+    List<RankingDTO> ranking(String status);
 
 }

@@ -152,3 +152,21 @@ export function batchSaveServiceCommentery(params) {
 		data:params
 	});
 }
+
+/* 数据统计 */
+export function dataStatistics(params) {
+	return http({
+		url:'/mobile/dataStatistics/dataStatistics',
+		method:'get',
+		params:params
+	});
+}
+
+/* 排行榜 */
+export function ranking(params) {
+	return http({
+		url:'/mobile/dataStatistics/ranking',
+		method:'get',
+		params:params
+	});
+}
