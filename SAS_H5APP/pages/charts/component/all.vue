@@ -314,12 +314,12 @@
 	}
 	
 	.arcbarDiv {
-		margin-left: -100upx;
+		margin-left: -90upx;
 	}
 	
 	.arcbar-div {
 		display: inline;
-		margin-left: 110upx;
+		margin-left: 90upx;
 	}
 	
 	page{background:#F2F2F2;width: 750upx;overflow-x: hidden;}
