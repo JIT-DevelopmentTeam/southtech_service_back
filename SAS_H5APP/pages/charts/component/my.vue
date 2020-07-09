@@ -4,10 +4,17 @@
 			<view class="qiun-title-dot-light">本年累计</view>
 		</view>
 		<view class="qiun-charts3">
-			<canvas canvas-id="canvasArcbar2" id="canvasArcbar2" class="charts3"></canvas>
+			<canvas canvas-id="canvasArcbar3" id="canvasArcbar3" class="charts3"></canvas>
+			<canvas canvas-id="canvasArcbar4" id="canvasArcbar4" class="charts3"></canvas>
 			<view class="arcbarDiv">
-				<view class="arcbarSpan">接单量：{{ all }}</view>
-				<view class="arcbarSpan">完成量：{{ completed }}</view>
+				<view  class="arcbar-div">
+					<view class="arcbarSpan">接单：{{ all }}</view>
+					<view class="arcbarSpan">完成：{{ completed }}</view>
+				</view>
+				<view  class="arcbar-div">
+					<view class="arcbarSpan">接单：{{ all }}</view>
+					<view class="arcbarSpan">待回访：{{ visit }}</view>
+				</view>
 			</view>
 		</view>
 	</view>
@@ -17,7 +24,8 @@
 	import uCharts from '@/utils/u-charts.js';
 	import {dataStatistics} from '@/api/Ticket.js';
 	var _self;
-	var canvaArcbar2;
+	var canvaArcbar3;
+	var canvaArcbar4;
 	
 	export default {
 		name: 'my',
@@ -28,39 +36,89 @@
 				pixelRatio:1,
 				arcbarWidth:'',//圆弧进度图，进度条宽度,此设置可使各端宽度一致
 				all:0,
-				completed:0
+				completed:0,
+				visit: 0,
 			}
 		},
 		created() {
 			_self = this;
-			this.cWidth3=uni.upx2px(350);//这里要与样式的宽高对应
-			this.cHeight3=uni.upx2px(350);//这里要与样式的宽高对应
+			this.cWidth3=uni.upx2px(300);//这里要与样式的宽高对应
+			this.cHeight3=uni.upx2px(300);//这里要与样式的宽高对应
 			this.arcbarWidth=uni.upx2px(30);
 			this.getServerData();
 		},
 		methods: {
 			getServerData(){
-				let Arcbar2={series:[
+				let Arcbar3={series:[
 					{
-						name: '完成率',
 						data: 0.00,
 						color: '#406bdc'
 					}
 				]};
-				dataStatistics({userId: _self.$store.getters['getUserId']}).then(res => {
+				dataStatistics({userId: _self.$store.getters['getUserId'], status: "6"}).then(res => {
 					if (res.data.code === 200) {
 						if (res.data.result.myCompleted !== 0 || res.data.result.myAll !== 0) {
-							Arcbar2.series[0].data = res.data.result.myCompleted / res.data.result.myAll;
+							Arcbar3.series[0].data = res.data.result.myCompleted / res.data.result.myAll;
 						}
 						_self.all = res.data.result.myAll;
 						_self.completed = res.data.result.myCompleted;
-						_self.showArcbar2("canvasArcbar2",Arcbar2);
+						_self.showArcbar3("canvasArcbar3",Arcbar3);
+						
+					}
+				})
+				let Arcbar4={series:[
+					{
+						data: 0.00,
+						color: '#406bdc'
+					}
+				]};
+				dataStatistics({userId: _self.$store.getters['getUserId'], status: "2"}).then(res => {
+					if (res.data.code === 200) {
+						if (res.data.result.myCompleted !== 0 || res.data.result.myAll !== 0) {
+							Arcbar4.series[0].data = res.data.result.myCompleted / res.data.result.myAll;
+						}
+						_self.visit = res.data.result.myCompleted;
+						_self.showArcbar4("canvasArcbar4",Arcbar4);
 						
 					}
 				})
 			},
-			showArcbar2(canvasId,chartData){
-				canvaArcbar2=new uCharts({
+			showArcbar3(canvasId,chartData){
+				canvaArcbar3=new uCharts({
+					$this:_self,
+					canvasId: canvasId,
+					type: 'arcbar',
+					fontSize:11,
+					legend:{show:false},
+					background:'#FFFFFF',
+					pixelRatio:_self.pixelRatio,
+					series: chartData.series,
+					animation: true,
+					width: _self.cWidth3*_self.pixelRatio,
+					height: _self.cHeight3*_self.pixelRatio,
+					dataLabel: true,
+					title: {
+						name: Math.round(chartData.series[0].data*100)+'%',//这里我自动计算了，您可以直接给任意字符串
+						color: chartData.series[0].color,
+						fontSize: 25*_self.pixelRatio
+					},
+					subtitle: {
+						name: chartData.series[0].name,//这里您可以直接给任意字符串
+						color: '#666666',
+						fontSize: 15*_self.pixelRatio
+					},
+					extra: {
+						arcbar:{
+							type:'circle',//整圆类型进度条图
+							width: _self.arcbarWidth*_self.pixelRatio,//圆弧的宽度
+							startAngle:0.5//整圆类型只需配置起始角度即可
+						}
+					}
+				});
+				
+			},
+			showArcbar4(canvasId,chartData){
+				canvaArcbar4=new uCharts({
 					$this:_self,
 					canvasId: canvasId,
 					type: 'arcbar',
@@ -101,29 +159,18 @@
 /*样式的width和height一定要与定义的cWidth和cHeight相对应*/
 	.qiun-charts3 {
 		width: 750upx;
-		height: 460upx;
-		background-color: #FFFFFF;
-		position: relative;
+		height: 420upx;
+		// background-color: #FFFFFF;
+		// position: relative;
+		margin-left: 50upx;
 	}
 
 	.charts3 {
-		width: 750upx;
-		height: 350upx;
-		margin-left: 200upx;
+		width: 350upx;
+		height: 300upx;
+		// margin-left: 50upx;
+		display: inline-block;
 	}
-	
-	/*样式的width和height一定要与定义的cWidth和cHeight相对应*/
-		.qiun-charts {
-			width: 750upx;
-			height: 560upx;
-			background-color: #FFFFFF;
-		}
-		
-		.charts {
-			width: 750upx;
-			height: 500upx;
-			background-color: #FFFFFF;
-		}
 	
 	.qiun-title-dot-light {
 		color: blue;
@@ -134,10 +181,27 @@
 	.arcbarSpan {
 		color: blue;
 		display: inline;
-		margin-left: 50upx;
+		margin-left: 20upx;
 	}
 	
 	.arcbarDiv {
-		margin-left: 170upx;
+		margin-left: -100upx;
 	}
+	
+	.arcbar-div {
+		display: inline;
+		margin-left: 110upx;
+	}
+	
+	page{background:#F2F2F2;width: 750upx;overflow-x: hidden;}
+	.qiun-padding{padding:2%; width:96%;}
+	.qiun-wrap{display:flex; flex-wrap:wrap;}
+	.qiun-rows{display:flex; flex-direction:row !important;}
+	.qiun-columns{display:flex; flex-direction:column !important;}
+	.qiun-common-mt{margin-top:10upx;}
+	.qiun-bg-white{background:#FFFFFF;}
+	.qiun-title-bar{width:96%; padding:10upx 2%; flex-wrap:nowrap;}
+	.qiun-title-dot-light{border-left: 10upx solid #0ea391; padding-left: 10upx; font-size: 32upx;color: #000000}
+	.qiun-charts{width: 750upx; height:500upx;background-color: #FFFFFF;}
+	.charts{width: 750upx; height:500upx;background-color: #FFFFFF;}
 </style>

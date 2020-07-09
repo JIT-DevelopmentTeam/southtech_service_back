@@ -28,13 +28,17 @@ public class MobileDataStatisticsController {
     private ISysUserService sysUserService;
 
     @GetMapping(value = "/dataStatistics")
-    public Result<?> dataStatistics(String userId) {
+    public Result<?> dataStatistics(String userId, String status) {
         Map<String, Object> result = new HashMap<>();
-        SysUser sysUser = sysUserService.getByEnterpriseId(userId);
         Integer all = workOrderService.dataStatistics("", "");// 接单量
-        Integer completed = workOrderService.dataStatistics("", "6");// 完成量
-        Integer myAll = workOrderService.dataStatistics(sysUser.getUsername(), "");// 我的接单量
-        Integer myCompleted = workOrderService.dataStatistics(sysUser.getUsername(), "6");// 我的完成量
+        Integer completed = workOrderService.dataStatistics("", status);// 完成量
+        SysUser sysUser = sysUserService.getByEnterpriseId(userId);
+        Integer myAll = 0;
+        Integer myCompleted = 0;
+        if (sysUser != null) {
+            myAll = workOrderService.dataStatistics(sysUser.getUsername(), "");// 我的接单量
+            myCompleted = workOrderService.dataStatistics(sysUser.getUsername(), status);// 我的完成量
+        }
         result.put("all", all);
         result.put("completed", completed);
         result.put("myAll", myAll);
