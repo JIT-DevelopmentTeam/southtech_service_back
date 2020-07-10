@@ -106,26 +106,32 @@
 						
 					}
 				})
-				let Column1 = {categories:[],series:[{data:[]}]};
+				let Column1 = {categories:[],series:[{data:[]}],max: 0};
 				ranking({status: ""}).then(res => {
 					if (res.data.code === 200) {
 						let arr = res.data.result;
 						arr.forEach(i => {
+							if (i.data > Column1.max) {
+								Column1.max = i.data;
+							}
 							Column1.categories.push(i.name);
 							Column1.series[0].data.push(i.data);
-							_self.showColumn1("canvasColumn1",Column1);
 						})
+						_self.showColumn1("canvasColumn1",Column1);
 					}
 				})
-				let Column2 = {categories:[],series:[{data:[]}]};
+				let Column2 = {categories:[],series:[{data:[]}],max: 0};
 				ranking({status: "6"}).then(res => {
 					if (res.data.code === 200) {
 						let arr = res.data.result;
 						arr.forEach(i => {
+							if (i.data > Column2.max) {
+								Column2.max = i.data;
+							}
 							Column2.categories.push(i.name);
 							Column2.series[0].data.push(i.data);
-							_self.showColumn2("canvasColumn2",Column2);
 						})
+						_self.showColumn2("canvasColumn2",Column2);
 					}
 				})
 			},
@@ -214,6 +220,8 @@
 					},
 					yAxis: {
 						//disabled:true
+						min:1,
+						max: chartData.max+5
 					},
 					dataLabel: true,
 					width: _self.cWidth*_self.pixelRatio,
@@ -244,6 +252,8 @@
 					},
 					yAxis: {
 						//disabled:true
+						min:1,
+						max: chartData.max+5
 					},
 					dataLabel: true,
 					width: _self.cWidth*_self.pixelRatio,
