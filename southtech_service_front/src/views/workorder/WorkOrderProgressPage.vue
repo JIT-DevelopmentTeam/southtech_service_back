@@ -4,7 +4,7 @@
     <!-- table区域-begin -->
     <div>
       <a-steps :current="finishIndex"  size="small">
-        <a-step v-for="progress in progressList" :title="progress.name" :key="progress">
+        <a-step v-for="progress in progressList" :title="progress.name" :key="progress.id">
           <span slot="description">{{progress.finishTime}}</span>
         </a-step>
       </a-steps>
