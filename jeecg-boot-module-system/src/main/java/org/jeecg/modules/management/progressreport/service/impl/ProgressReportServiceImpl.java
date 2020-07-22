@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.jeecg.modules.management.progressreport.entity.ProgressReport;
 import org.jeecg.modules.management.progressreport.mapper.ProgressReportMapper;
 import org.jeecg.modules.management.progressreport.service.IProgressReportService;
+import org.jeecg.modules.management.progressreport.vo.ExportReportDTO;
 import org.jeecg.modules.management.progressreport.vo.MobileReportDTO;
 import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDetailDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,4 +46,13 @@ public class ProgressReportServiceImpl extends ServiceImpl<ProgressReportMapper,
         return progressReportMapper.getByWorkOrderId(workOrderId);
     }
 
+    /**
+     * 根据workOrderDetailId查询汇报记录列表
+     * @param workOrderDetailId
+     * @return
+     */
+    @Override
+    public List<ExportReportDTO> getByWorkOrderDetailId(String workOrderDetailId) {
+        return progressReportMapper.getByWorkOrderDetailId(workOrderDetailId);
+    }
 }

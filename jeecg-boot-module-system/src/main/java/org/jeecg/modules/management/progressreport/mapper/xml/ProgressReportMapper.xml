@@ -53,4 +53,15 @@
         ORDER BY
             stage.order_index
     </select>
+
+    <select id="getByWorkOrderDetailId" resultType="org.jeecg.modules.management.progressreport.vo.ExportReportDTO">
+        SELECT
+            a.description AS "description",
+            progress.name AS "progressName"
+        FROM
+            ic_progress_report a
+            LEFT JOIN ic_work_order_progress progress ON progress.id = a.progress_id
+        WHERE
+            a.work_order_detail_id = #{workOrderDetailId}
+    </select>
 </mapper>

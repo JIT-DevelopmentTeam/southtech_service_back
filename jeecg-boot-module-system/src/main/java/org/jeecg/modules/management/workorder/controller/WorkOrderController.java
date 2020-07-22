@@ -13,7 +13,6 @@ import com.taobao.api.ApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
-import org.hibernate.jdbc.Work;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.base.controller.JeecgController;
@@ -28,7 +27,8 @@ import org.jeecg.modules.management.client.entity.Client;
 import org.jeecg.modules.management.client.entity.DeviceNumber;
 import org.jeecg.modules.management.client.service.IClientService;
 import org.jeecg.modules.management.client.service.IDeviceNumberService;
-import org.jeecg.modules.management.stage.entity.Stage;
+import org.jeecg.modules.management.progressreport.service.IProgressReportService;
+import org.jeecg.modules.management.progressreport.vo.ExportReportDTO;
 import org.jeecg.modules.management.stage.service.IStageService;
 import org.jeecg.modules.management.workorder.entity.*;
 import org.jeecg.modules.management.workorder.service.*;
@@ -36,14 +36,16 @@ import org.jeecg.modules.management.workorder.vo.WorkOrderDTO;
 import org.jeecg.modules.management.workorder.vo.WorkOrderPage;
 import org.jeecg.modules.message.entity.SysMessageTemplate;
 import org.jeecg.modules.message.service.ISysMessageTemplateService;
-import org.jeecg.modules.system.entity.*;
-import org.jeecg.modules.system.service.*;
+import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysAnnouncementSendService;
+import org.jeecg.modules.system.service.ISysAnnouncementService;
+import org.jeecg.modules.system.service.ISysDictService;
+import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -110,6 +112,9 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 
      @Autowired
      private ISysBaseAPI sysBaseAPI;
+
+     @Autowired
+     private IProgressReportService progressReportService;
 
 
 	/*---------------------------------主表处理-begin-------------------------------------*/
@@ -538,6 +543,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                 WorkOrderDetail workOrderDetail = workOrderDetailList.get(i);
                 Client client = clientService.getById(workOrderMap.get(workOrderDetail.getWorkOrderId()).getClientId());
                 DeviceNumber deviceNumber = deviceNumberService.getById(workOrderDetail.getDeviceNumber());
+                List<ExportReportDTO> progressReports = progressReportService.getByWorkOrderDetailId(workOrderDetail.getId());
                 String[] faultLocationValues = workOrderDetail.getFaultLocation().split(",");
                 StringBuffer faultLocationText = new StringBuffer();
                 for (String faultLocationValue : faultLocationValues) {
@@ -577,7 +583,11 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                     }
                 }
                 // 处理结果 ?
-                serviceReport.setProcessResult("");
+                if (progressReports.size() > 0) {
+                    serviceReport.setProcessResult(progressReports.get(progressReports.size()-1).getDescription());
+                } else {
+                    serviceReport.setProcessResult("");
+                }
                 serviceReport.setStatus(stageDictItemMap.get(workOrderMap.get(workOrderDetail.getWorkOrderId()).getStatus()));
                 // 未完成原因 ?
                 serviceReport.setReasonForIncomplete("");
@@ -585,6 +595,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                 serviceReport.setResultsEvaluation("");
                 // 客户对服务人员工作是否满意 ?
                 serviceReport.setStaffEvaluation("");
+                serviceReport.setProgressReportList(progressReports);
                 exportList.add(serviceReport);
             }
         }

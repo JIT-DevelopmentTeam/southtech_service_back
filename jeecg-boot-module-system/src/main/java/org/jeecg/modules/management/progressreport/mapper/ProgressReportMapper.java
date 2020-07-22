@@ -3,6 +3,7 @@ package org.jeecg.modules.management.progressreport.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.management.progressreport.entity.ProgressReport;
+import org.jeecg.modules.management.progressreport.vo.ExportReportDTO;
 import org.jeecg.modules.management.progressreport.vo.MobileReportDTO;
 import org.jeecg.modules.management.workorder.vo.MobileWorkOrderDetailDTO;
 
@@ -31,5 +32,12 @@ public interface ProgressReportMapper extends BaseMapper<ProgressReport> {
      * @return
      */
     List<MobileWorkOrderDetailDTO> getByWorkOrderId(@Param("workOrderId") String workOrderId);
+
+    /**
+     * 根据workOrderDetailId查询汇报记录列表
+     * @param workOrderDetailId
+     * @return
+     */
+    List<ExportReportDTO> getByWorkOrderDetailId(@Param("workOrderDetailId") String workOrderDetailId);
 
 }
