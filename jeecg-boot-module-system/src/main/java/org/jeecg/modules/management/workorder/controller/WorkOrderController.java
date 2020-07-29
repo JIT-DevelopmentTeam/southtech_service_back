@@ -214,6 +214,11 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         return Result.ok(pageList);
     }
 
+    @GetMapping(value = "/queryUnDispatchTicket")
+    public Result<?> queryUnDispatchTicket(String clientId) {
+        return Result.ok(workOrderService.queryUnDispatchTicket(clientId));
+    }
+
 	/**
      *   添加
      * @param workOrderPage

@@ -86,4 +86,6 @@ public interface WorkOrderMapper extends BaseMapper<WorkOrder> {
 
     List<RankingDTO> ranking(@Param("status") String status);
 
+    Integer queryUnDispatchTicket(@Param("clientId") String clientId);
+
 }

@@ -173,4 +173,14 @@
         LIMIT 0, 5
     </select>
 
+    <select id="queryUnDispatchTicket" resultType="java.lang.Integer">
+        SELECT
+            COUNT( 1 )
+        FROM
+            ic_work_order
+        WHERE
+            status = "1"
+            AND client_id = #{clientId}
+    </select>
+
 </mapper>

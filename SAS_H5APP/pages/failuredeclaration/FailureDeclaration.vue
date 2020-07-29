@@ -9,7 +9,7 @@
 					<view class="title"><span style="color: red;">*</span>编号:</view>
 					<input type="text" :disabled="true" v-model="model.number" class="uni-input" placeholder="编号"/>
 				</view>
-				<view class="flex-item flex-item-V">
+				<view class="flex-item flex-item-V" v-if="wechatOpenId === null">
 					<view class="title"><span style="color: red;">*</span>客户</view>
 					<button type="primary" v-if="dingTalkUserId" size="mini" @click="openClients">选择客户</button>
 					<p><strong>当前选择:</strong>{{ client != null ? client.name : ''}}</p>

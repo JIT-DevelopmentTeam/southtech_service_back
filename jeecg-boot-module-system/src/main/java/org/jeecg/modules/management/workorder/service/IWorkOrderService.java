@@ -96,4 +96,11 @@ public interface IWorkOrderService extends IService<WorkOrder> {
 	 * @return
 	 */
 	List<RankingDTO> ranking(String status);
+
+	/**
+	 * 根据客户查询未派工单数量
+	 * @param clientId
+	 * @return
+	 */
+	Integer queryUnDispatchTicket(String clientId);
 }

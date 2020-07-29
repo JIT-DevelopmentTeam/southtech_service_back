@@ -34,6 +34,11 @@
             </a-form-item>
           </a-col>
           <a-col :lg="12">
+            <a-form-item label="未派工单数量" :labelCol="labelCol" :wrapperCol="wrapperCol">
+              <a-input :disabled="true" v-model="unDispatchCount" placeholder="请输入未派工单数量"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :lg="12">
             <a-form-item label="联系人(选)" :labelCol="labelCol" :wrapperCol="wrapperCol">
               <a-select v-decorator="['contactId',validatorRules.contactId]" placeholder="请选择联系人" @change="selectContact">
                 <a-select-option v-for="(item, index) in options.contactOptions" :key="index" :value="item.value">{{item.label}}</a-select-option>
@@ -232,7 +237,8 @@
           getClientById:"/client/client/getClientById",
           getContactById:"/client/client/getContactById",
           getByUserName:"/sys/user/getByUserName",
-          addContactReturn:"/client/client/addContactReturn"
+          addContactReturn:"/client/client/addContactReturn",
+          queryUnDispatchTicket: "/workorder/workOrder/queryUnDispatchTicket"
         },
         listSize:5,
         clientList:[],
@@ -248,6 +254,7 @@
           needDispatchOptions:[],
           contactOptions:[]
         },
+        unDispatchCount: 0
       }
     },
     created () {
@@ -464,6 +471,12 @@
                _this.contactMobile = res.result.mobilePhone;
              }
           });
+          await getAction(_this.url.queryUnDispatchTicket+'?clientId='+_this.client.id).then(res => {
+            console.log(res)
+            if (res.success) {
+              _this.unDispatchCount = res.result
+            }
+          })
         }
         this.form.setFieldsValue({
           contactId:contactId,

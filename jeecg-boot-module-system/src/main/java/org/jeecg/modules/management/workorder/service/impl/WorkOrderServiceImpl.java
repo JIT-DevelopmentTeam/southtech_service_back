@@ -183,4 +183,14 @@ public class WorkOrderServiceImpl extends ServiceImpl<WorkOrderMapper, WorkOrder
     public List<RankingDTO> ranking(String status) {
         return workOrderMapper.ranking(status);
     }
+
+    /**
+     * 根据客户查询未派工单数量
+     * @param clientId
+     * @return
+     */
+    @Override
+    public Integer queryUnDispatchTicket(String clientId) {
+        return workOrderMapper.queryUnDispatchTicket(clientId);
+    }
 }
