@@ -472,7 +472,6 @@
              }
           });
           await getAction(_this.url.queryUnDispatchTicket+'?clientId='+_this.client.id).then(res => {
-            console.log(res)
             if (res.success) {
               _this.unDispatchCount = res.result
             }
