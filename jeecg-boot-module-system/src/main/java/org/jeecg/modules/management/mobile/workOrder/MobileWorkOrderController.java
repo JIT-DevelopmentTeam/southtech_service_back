@@ -79,6 +79,11 @@ public class MobileWorkOrderController {
         return result;
     }
 
+    @GetMapping(value = "/queryUnDispatchTicket")
+    public Result<?> queryUnDispatchTicket(String clientId) {
+        return Result.ok(workOrderService.queryUnDispatchTicket(clientId));
+    }
+
     //-----------------------------------服务号----------------------------------
     @GetMapping(value = "/worderOrderListByComment")
     public Result<?> worderOrderListByComment(@RequestParam(value = "clientId") String clientId) {

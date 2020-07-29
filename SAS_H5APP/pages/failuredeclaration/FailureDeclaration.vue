@@ -13,6 +13,7 @@
 					<view class="title"><span style="color: red;">*</span>客户</view>
 					<button type="primary" v-if="dingTalkUserId" size="mini" @click="openClients">选择客户</button>
 					<p><strong>当前选择:</strong>{{ client != null ? client.name : ''}}</p>
+					<p><strong>未派工单数量:</strong>{{ unDispatchCount }}</p>
 				</view>
 				<view class="flex-item flex-item-V">
 					<view class="title"><span style="color: red;">*</span>联系人</view>
@@ -126,7 +127,7 @@
 	import uniPopup from "@dcloudio/uni-ui/lib/uni-popup/uni-popup"
 	import uniSearchBar from '@dcloudio/uni-ui/lib/uni-search-bar/uni-search-bar'
 	import validate from '@/components/form/validate'
-	import { getDicList,listUserByRoleCode,listClient,getClientById,addWorkOrder,getUserByEnterpriseId,getClientByOpenId } from '@/api/Ticket.js'
+	import { getDicList,listUserByRoleCode,listClient,getClientById,queryUnDispatchTicket,addWorkOrder,getUserByEnterpriseId,getClientByOpenId } from '@/api/Ticket.js'
 	import { formatDateStr } from '@/utils/formatDate.js'
 	
 	export default {
@@ -251,7 +252,8 @@
 					annex:null,
 					workOrderDetailList:[],
 					createBy:null
-				}
+				},
+				unDispatchCount: 0
 			}
 		},
 		computed: {
@@ -364,6 +366,11 @@
 				 return;
 			 }
 			 this.model.clientId = e.target.value;
+			 queryUnDispatchTicket(e.target.value).then(res => {
+				 if (res.data.success) {
+					 this.unDispatchCount = res.data.result
+				 }
+			 })
 			 getClientById(e.target.value).then((res) => {
 				 if (res.data.success) {
 					this.dataIndex.contactIndex = null;

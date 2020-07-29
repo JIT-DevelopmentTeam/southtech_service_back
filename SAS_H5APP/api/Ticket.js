@@ -92,6 +92,14 @@ export function getClientById(params) {
 	})
 }
 
+/* 根据客户查询未派工单数量 */
+export function queryUnDispatchTicket(clientId) {
+	return http({
+		url: '/mobile/workOrder/queryUnDispatchTicket?clientId=' + clientId,
+		method: 'get'
+	})
+}
+
 /* 根据id获取汇报历史记录 */
 export function getReportById(params) {
 	return http({
