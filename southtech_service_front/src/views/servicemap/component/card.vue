@@ -143,11 +143,11 @@
   .card {
     border: 1px solid rgb(233, 233, 233);
     width: 300px;
-    height: 300px;
+    height: 365px;
   }
 
   .content {
-    height: 250px;
+    height: 314px;
     overflow: auto;
   }
 </style>

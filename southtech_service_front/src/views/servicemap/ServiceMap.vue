@@ -134,6 +134,7 @@
 
   #components-layout-demo-basic > .ant-layout:last-child {
     margin: 0;
+    height: 730px;
   }
 
   #components-layout-demo-basic .ant-layout-sider .ant-card .ant-card-body {
