@@ -174,20 +174,30 @@
       </a-table>
     </div>
 
-    <a-tabs defaultActiveKey="1">
-      <a-tab-pane tab="工单进度" key="1">
-        <work-order-progress-page :mainId="selectedMainId" />
-      </a-tab-pane>
-      <a-tab-pane tab="汇报记录" key="2" forceRender>
-        <progress-report-list :mainId="selectedMainId" />
-      </a-tab-pane>
-      <a-tab-pane tab="回访记录" key="3">
-        <service-visits-list-page :mainId="selectedMainId"/>
-      </a-tab-pane>
-      <a-tab-pane tab="服务评价" key="4" forceRender>
-        <service-commentery-list :mainId="selectedMainId" />
-      </a-tab-pane>
-    </a-tabs>
+    <a-drawer
+      placement="right"
+      :visible="visible"
+      :mask="false"
+      width="1200"
+      @close="onClose"
+    >
+      <a-tabs defaultActiveKey="1">
+        <a-tab-pane tab="工单进度" key="1">
+          <work-order-progress-page :mainId="selectedMainId" />
+        </a-tab-pane>
+        <a-tab-pane tab="汇报记录" key="2" forceRender>
+          <progress-report-list :mainId="selectedMainId" />
+        </a-tab-pane>
+        <a-tab-pane tab="回访记录" key="3">
+          <service-visits-list-page :mainId="selectedMainId"/>
+        </a-tab-pane>
+        <a-tab-pane tab="服务评价" key="4" forceRender>
+          <service-commentery-list :mainId="selectedMainId" />
+        </a-tab-pane>
+      </a-tabs>
+    </a-drawer>
+
+
 
     <workOrder-modal ref="modalForm" @ok="modalFormOk"></workOrder-modal>
     <DisPatchModal ref="dispatchModalForm" @ok="modalFormOk"></DisPatchModal>
@@ -521,7 +531,8 @@ export default {
       },
       selectedMainId: '',
       selectedMainStatus: null,
-      workOrder: {}
+      workOrder: {},
+      visible: false
     }
   },
   computed: {
@@ -610,6 +621,8 @@ export default {
       this.selectedMainId = ''
     },
     onSelectChange(selectedRowKeys, selectionRows) {
+      console.log("点击一行")
+      this.visible = true
       this.selectedMainId = selectedRowKeys[0]
       if (selectionRows[0]) {
         this.selectedMainStatus = selectionRows[0].status
@@ -620,8 +633,11 @@ export default {
       if (this.selectionRows.length === 1) {
         let row = this.selectionRows[0]
         this.workOrder = row
-        this.$refs.ServiceVisitsList.loadData();
+        // this.$refs.ServiceVisitsList.loadData();
       }
+    },
+    onClose() {
+      this.visible = false
     },
     rowClassName(record) {
       let status = record.status*1;
