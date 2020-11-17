@@ -115,7 +115,7 @@
 </template>
 
 <script>
-import { httpAction } from '@/api/manage'
+import { getAction, httpAction } from '@/api/manage'
 import pick from 'lodash.pick'
 import { validateDuplicateValue } from '@/utils/util'
 import JDate from '@/components/jeecg/JDate'
@@ -124,6 +124,7 @@ import JDictSelectTag from '@/components/dict/JDictSelectTag'
 import JSearchSelectTag from '@/components/dict/JSearchSelectTag'
 import JEditor from '@/components/jeecg/JEditor'
 // import ServiceViitsList from '../ServiceVisitsList'
+import store from '@/store/'
 
 export default {
   name: 'ServiceVisitsModal',
@@ -185,30 +186,37 @@ export default {
       // this.$refs.ServiceViitsList.LoadData()
     },
     edit(record) {
+      console.log(store.getters.userInfo.username)
       this.form.resetFields()
       this.model = Object.assign({}, record)
       this.model.workOrderId = this.workOrder.id
       console.log(this.workOrder);
       this.model.workOrderNum = this.workOrder.number;
+      this.model.visitPeople = store.getters.userInfo.username
       console.log(this.model.workOrderNum)
       this.model.customer = this.workOrder.clientId
-      this.visible = true
-      this.$nextTick(() => {
-        this.form.setFieldsValue(
-          pick(
-            this.model,
-            'visitPeople',
-            'visitTime',
-            'customer',
-            'respondents',
-            'isCompleted',
-            'score',
-            'visitWay',
-            'contact',
-            'opinion',
-            'workOrderId'
+      getAction('/client/client/getContactById', {id: this.workOrder.contactId}).then(res => {
+        console.log(res)
+        this.model.respondents = res.result.name
+        this.model.contact = res.result.mobilePhone
+        this.visible = true
+        this.$nextTick(() => {
+          this.form.setFieldsValue(
+            pick(
+              this.model,
+              'visitPeople',
+              'visitTime',
+              'customer',
+              'respondents',
+              'isCompleted',
+              'score',
+              'visitWay',
+              'contact',
+              'opinion',
+              'workOrderId'
+            )
           )
-        )
+        })
       })
     },
     close() {

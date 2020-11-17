@@ -1,35 +1,27 @@
 package org.jeecg.modules.system.controller;
 
-import java.io.IOException;
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.dingtalk.api.DefaultDingTalkClient;
 import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.OapiDepartmentListRequest;
 import com.dingtalk.api.request.OapiUserGetRequest;
-import com.dingtalk.api.request.OapiUserListbypageRequest;
 import com.dingtalk.api.request.OapiUserSimplelistRequest;
 import com.dingtalk.api.response.OapiDepartmentListResponse;
 import com.dingtalk.api.response.OapiUserGetResponse;
-import com.dingtalk.api.response.OapiUserListbypageResponse;
 import com.dingtalk.api.response.OapiUserSimplelistResponse;
 import com.taobao.api.ApiException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.util.JwtUtil;
 import org.jeecg.common.system.vo.LoginUser;
-import org.jeecg.common.util.*;
+import org.jeecg.common.util.PasswordUtil;
+import org.jeecg.common.util.RedisUtil;
+import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.dingtalk.accesstoken.util.DingTalkAccessTokenUtils;
 import org.jeecg.modules.dingtalk.constant.DingTalkConstant;
 import org.jeecg.modules.system.entity.SysDepart;
@@ -39,7 +31,6 @@ import org.jeecg.modules.system.model.SysDepartTreeModel;
 import org.jeecg.modules.system.service.ISysDepartService;
 import org.jeecg.modules.system.service.ISysUserDepartService;
 import org.jeecg.modules.system.service.ISysUserService;
-import org.jeecg.modules.system.util.FindsDepartsChildrenUtil;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -47,20 +38,16 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * <p>
@@ -385,11 +372,12 @@ public class SysDepartController {
             if (departmentList.isEmpty()) {
                 return Result.error("同步失败,企业应用暂无部门数据!");
             } else {
-                // 清除部门
+                /*// 清除部门
                 QueryWrapper<SysDepart> departQueryWrapper = new QueryWrapper<>();
                 departQueryWrapper.notIn("id","southtech");
                 List<SysDepart> departList = sysDepartService.list(departQueryWrapper);
                 if (!departList.isEmpty()) {
+                    System.out.println("-------->> clear department");
                     List<String> deleteIdsList = new ArrayList<>();
                     for (SysDepart depart : departList) {
                         deleteIdsList.add(depart.getId());
@@ -401,94 +389,113 @@ public class SysDepartController {
                 userQueryWrapper.notIn("username","admin");
                 List<SysUser> delectUserList = sysUserService.list(userQueryWrapper);
                 if (!delectUserList.isEmpty()) {
+                    System.out.println("-------->> clear user");
                     StringBuffer delectIds = new StringBuffer();
                     for (SysUser delectUser : delectUserList) {
                         delectIds.append(delectUser.getId()+",");
                     }
                     delectIds = delectIds.deleteCharAt(delectIds.length()-1);
-                    sysUserService.deleteBatchUsers(delectIds.toString());
+                    sysUserService.deleteBatch(delectIds.toString());
                 }
                 // 清除部门关系
                 sysUserDepartService.deleteAll();
-            }
-            if ("1".equals(departmentList.get(0).getId().toString())) {
-                departmentList.remove(0);
-            }
-            for (OapiDepartmentListResponse.Department department : departmentList) {
-                SysDepart depart = new SysDepart();
-                depart.setId(department.getId().toString());
-                depart.setDepartName(department.getName());
-                if (department.getParentid() == 1) {
-                    depart.setParentId("southtech");
-                    depart.setOrgType("1");
-                } else {
-                    depart.setParentId(department.getParentid().toString());
-                    depart.setOrgType("2");
+            }*/
+                if ("1".equals(departmentList.get(0).getId().toString())) {
+                    departmentList.remove(0);
                 }
-                depart.setOrgCode(depart.getId());
-                depart.setOrgCategory("1");
-                depart.setStatus(CommonConstant.STATUS_1);
-                depart.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
-                sysDepartService.save(depart);
-                // 同步当前部门用户
-                DingTalkClient userClient = new DefaultDingTalkClient(DingTalkConstant.USER_SIMPLELIST_URL);
-                OapiUserSimplelistRequest request = new OapiUserSimplelistRequest();
-                request.setDepartmentId(department.getId());
-                request.setOffset(0L);
-                request.setSize(100L);
-                request.setHttpMethod("GET");
-                OapiUserSimplelistResponse userResponse = userClient.execute(request, accessToken);
-                List<OapiUserSimplelistResponse.Userlist> userList = userResponse.getUserlist();
-                for (OapiUserSimplelistResponse.Userlist dingTalkUser : userList) {
-                    DingTalkClient userDetailClient = new DefaultDingTalkClient(DingTalkConstant.USER_DETAIL_URL);
-                    OapiUserGetRequest userDetailRequest = new OapiUserGetRequest();
-                    userDetailRequest.setUserid(dingTalkUser.getUserid());
-                    userDetailRequest.setHttpMethod("GET");
-                    OapiUserGetResponse userDetailResponse = userDetailClient.execute(userDetailRequest, accessToken);
-                    // 获取是否部门主管信息同步
-                    Map<Integer, Boolean> departMap = JSONObject.parseObject(userDetailResponse.getIsLeaderInDepts(),HashMap.class);
-                    Map<String,Integer> departsMap = new HashMap<>();
-                    for (Integer departId : departMap.keySet()) {
-                        if (departMap.get(departId)) {
-                            departsMap.put(departId.toString(),1);
+                for (OapiDepartmentListResponse.Department department : departmentList) {
+                    SysDepart deptRes = null;
+                    SysDepart editDept = sysDepartService.getById(department.getId());
+                    if (oConvertUtils.isEmpty(editDept)) {
+                        SysDepart depart = new SysDepart();
+                        depart.setId(department.getId().toString());
+                        depart.setDepartName(department.getName());
+                        if (department.getParentid() == 1) {
+                            depart.setParentId("southtech");
+                            depart.setOrgType("1");
                         } else {
-                            departsMap.put(departId.toString(),0);
+                            depart.setParentId(department.getParentid().toString());
+                            depart.setOrgType("2");
                         }
-                    }
-                    SysUser editUser = sysUserService.getByEnterpriseId(userDetailResponse.getUserid());
-                    if (oConvertUtils.isEmpty(editUser)) {
-                        if (!StringUtils.isEmpty(userDetailResponse.getJobnumber())) {
-                            SysUser addUser = new SysUser();
-                            addUser.setUsername(userDetailResponse.getJobnumber());
-                            addUser.setWorkNo(userDetailResponse.getJobnumber());
-                            addUser.setRealname(userDetailResponse.getName());
-                            addUser.setEnterpriseId(userDetailResponse.getUserid());
-                            addUser.setSex(0);
-                            String salt = oConvertUtils.randomGen(8);
-                            addUser.setSalt(salt);
-                            String passwordEncode = PasswordUtil.encrypt(addUser.getUsername(), "123456", salt);
-                            addUser.setPassword(passwordEncode);
-                            addUser.setEmail(userDetailResponse.getEmail());
-                            addUser.setPhone(userDetailResponse.getMobile());
-                            addUser.setOrgCode(depart.getOrgCode());
-                            addUser.setStatus(Integer.parseInt(CommonConstant.STATUS_1));
-                            addUser.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
-                            addUser.setPost(userDetailResponse.getPosition());
-                            addUser.setActivitiSync(CommonConstant.ACT_SYNC_1);
-                            sysUserService.save(addUser);
-                            sysUserService.addUserWithDepart(addUser,departsMap);
-                        }
+                        depart.setOrgCode(depart.getId());
+                        depart.setOrgCategory("1");
+                        depart.setStatus(CommonConstant.STATUS_1);
+                        depart.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
+                        sysDepartService.save(depart);
+                        deptRes = depart;
                     } else {
-                        editUser.setRealname(userDetailResponse.getName());
-                        editUser.setEmail(userDetailResponse.getEmail());
-                        editUser.setPhone(userDetailResponse.getMobile());
-                        editUser.setOrgCode(depart.getOrgCode());
-                        editUser.setStatus(Integer.parseInt(CommonConstant.STATUS_1));
-                        editUser.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
-                        editUser.setPost(userDetailResponse.getPosition());
-                        editUser.setActivitiSync(CommonConstant.ACT_SYNC_1);
-                        sysUserService.updateByEnterpriseId(editUser);
-                        sysUserService.editUserWithDepart(editUser,departsMap);
+                        editDept.setDepartName(department.getName());
+                        if (department.getParentid() == 1) {
+                            editDept.setParentId("southtech");
+                            editDept.setOrgType("1");
+                        } else {
+                            editDept.setParentId(department.getParentid().toString());
+                            editDept.setOrgType("2");
+                        }
+                        sysDepartService.updateById(editDept);
+                        deptRes = editDept;
+                    }
+
+                    // 同步当前部门用户
+                    DingTalkClient userClient = new DefaultDingTalkClient(DingTalkConstant.USER_SIMPLELIST_URL);
+                    OapiUserSimplelistRequest request = new OapiUserSimplelistRequest();
+                    request.setDepartmentId(department.getId());
+                    request.setOffset(0L);
+                    request.setSize(100L);
+                    request.setHttpMethod("GET");
+                    OapiUserSimplelistResponse userResponse = userClient.execute(request, accessToken);
+                    List<OapiUserSimplelistResponse.Userlist> userList = userResponse.getUserlist();
+                    for (OapiUserSimplelistResponse.Userlist dingTalkUser : userList) {
+                        DingTalkClient userDetailClient = new DefaultDingTalkClient(DingTalkConstant.USER_DETAIL_URL);
+                        OapiUserGetRequest userDetailRequest = new OapiUserGetRequest();
+                        userDetailRequest.setUserid(dingTalkUser.getUserid());
+                        userDetailRequest.setHttpMethod("GET");
+                        OapiUserGetResponse userDetailResponse = userDetailClient.execute(userDetailRequest, accessToken);
+                        // 获取是否部门主管信息同步
+                        Map<Integer, Boolean> departMap = JSONObject.parseObject(userDetailResponse.getIsLeaderInDepts(), HashMap.class);
+                        Map<String, Integer> departsMap = new HashMap<>();
+                        for (Integer departId : departMap.keySet()) {
+                            if (departMap.get(departId)) {
+                                departsMap.put(departId.toString(), 1);
+                            } else {
+                                departsMap.put(departId.toString(), 0);
+                            }
+                        }
+                        SysUser editUser = sysUserService.getByEnterpriseId(userDetailResponse.getUserid());
+                        if (oConvertUtils.isEmpty(editUser)) {
+                            if (!StringUtils.isEmpty(userDetailResponse.getJobnumber())) {
+                                SysUser addUser = new SysUser();
+                                addUser.setUsername(userDetailResponse.getJobnumber());
+                                addUser.setWorkNo(userDetailResponse.getJobnumber());
+                                addUser.setRealname(userDetailResponse.getName());
+                                addUser.setEnterpriseId(userDetailResponse.getUserid());
+                                addUser.setSex(0);
+                                String salt = oConvertUtils.randomGen(8);
+                                addUser.setSalt(salt);
+                                String passwordEncode = PasswordUtil.encrypt(addUser.getUsername(), "123456", salt);
+                                addUser.setPassword(passwordEncode);
+                                addUser.setEmail(userDetailResponse.getEmail());
+                                addUser.setPhone(userDetailResponse.getMobile());
+                                addUser.setOrgCode(deptRes.getOrgCode());
+                                addUser.setStatus(Integer.parseInt(CommonConstant.STATUS_1));
+                                addUser.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
+                                addUser.setPost(userDetailResponse.getPosition());
+                                addUser.setActivitiSync(CommonConstant.ACT_SYNC_1);
+                                sysUserService.save(addUser);
+                                sysUserService.addUserWithDepart(addUser, departsMap);
+                            }
+                        } else {
+                            editUser.setRealname(userDetailResponse.getName());
+                            editUser.setEmail(userDetailResponse.getEmail());
+                            editUser.setPhone(userDetailResponse.getMobile());
+                            editUser.setOrgCode(deptRes.getOrgCode());
+                            editUser.setStatus(Integer.parseInt(CommonConstant.STATUS_1));
+                            editUser.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
+                            editUser.setPost(userDetailResponse.getPosition());
+                            editUser.setActivitiSync(CommonConstant.ACT_SYNC_1);
+                            sysUserService.updateByEnterpriseId(editUser);
+                            sysUserService.editUserWithDepart(editUser, departsMap);
+                        }
                     }
                 }
             }

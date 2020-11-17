@@ -40,7 +40,7 @@
 					this.pageNo = 1;
 					let obj = {
 						userId: this.$store.getters['getUserId'],
-						status: this.current+2+"",
+						status: this.current+3+"",
 						pageNo: this.pageNo,
 						pageSize: this.pageSize
 					}
@@ -57,7 +57,7 @@
 					this.pageNo += 1;
 					let obj = {
 						userId: this.$store.getters['getUserId'],
-						status: this.current+2+"",
+						status: this.current+3+"",
 						pageNo: this.pageNo,
 						pageSize: this.pageSize
 					}
@@ -97,7 +97,7 @@
 		created() {
 			let obj = {
 				userId: this.$store.getters['getUserId'],
-				status: this.current+2+"",
+				status: this.current+3+"",
 				pageNo: this.pageNo,
 				pageSize: this.pageSize
 			}

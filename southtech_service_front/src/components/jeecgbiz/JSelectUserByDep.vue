@@ -4,7 +4,7 @@
       v-model="userNames"
       placeholder="请先选择用户"
       disabled
-      style="width: 76.6% !important"></a-input-search>
+      style="width: 68.3% !important"></a-input-search>
     <a-button slot="enterButton" :disabled="disabled" @click="onSearchDepUser">选择用户</a-button>
     <j-select-user-by-dep-modal ref="selectModal" :modal-width="modalWidth" :multi="multi" @ok="selectOK" :user-ids="value" @initComp="initComp"/>
   </div>

@@ -557,7 +557,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                 ServiceReport serviceReport = new ServiceReport();
                 serviceReport.setNumber(i+1);
                 serviceReport.setClientName(client.getName());
-                serviceReport.setFurnace(deviceNumber.getName());
+                serviceReport.setFurnace(deviceNumber != null ? deviceNumber.getName() : "");
                 serviceReport.setFeedbackQuestion(workOrderDetail.getDescription());
                 // 问题类型 ?
                 serviceReport.setQuestionType("");
@@ -565,8 +565,10 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                     faultLocationText = faultLocationText.deleteCharAt(faultLocationText.length()-1);
                     serviceReport.setFaultLocation(faultLocationText.toString());
                 }
-                if (oConvertUtils.isNotEmpty(deviceNumber.getQgp())) {
-                    serviceReport.setIsQgp(System.currentTimeMillis() <= deviceNumber.getQgp().getTime() ? "是" : "否");
+                if (deviceNumber != null) {
+                    if (oConvertUtils.isNotEmpty(deviceNumber.getQgp())) {
+                        serviceReport.setIsQgp(System.currentTimeMillis() <= deviceNumber.getQgp().getTime() ? "是" : "否");
+                    }
                 }
                 // 是否收费 ?
                 serviceReport.setIsCharge("");
