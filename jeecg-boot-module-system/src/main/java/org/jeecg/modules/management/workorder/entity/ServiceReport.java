@@ -39,6 +39,10 @@ public class ServiceReport {
     @Excel(name = "炉型",width = 15, needMerge = true)
     @ApiModelProperty(value = "炉型")
     private String furnace;
+    /**报障客服*/
+    @Excel(name = "报障客服",width = 15, needMerge = true)
+    @ApiModelProperty(value = "报障客服")
+    private String customerReport;
     /**反馈问题*/
     @Excel(name = "反馈问题",width = 30, needMerge = true)
     @ApiModelProperty(value = "反馈问题")
@@ -95,6 +99,10 @@ public class ServiceReport {
     @ExcelCollection(name = "汇报记录")
     @ApiModelProperty(value = "汇报记录")
     private List<ExportReportDTO> progressReportList;
+    /**回访客服*/
+    @Excel(name = "回访客服",width = 15, needMerge = true)
+    @ApiModelProperty(value = "回访客服")
+    private String customerVisit;
 
 
 }

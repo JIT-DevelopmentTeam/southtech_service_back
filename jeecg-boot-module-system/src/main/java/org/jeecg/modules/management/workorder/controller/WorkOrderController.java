@@ -29,6 +29,8 @@ import org.jeecg.modules.management.client.service.IClientService;
 import org.jeecg.modules.management.client.service.IDeviceNumberService;
 import org.jeecg.modules.management.progressreport.service.IProgressReportService;
 import org.jeecg.modules.management.progressreport.vo.ExportReportDTO;
+import org.jeecg.modules.management.servicevisits.entity.ServiceVisits;
+import org.jeecg.modules.management.servicevisits.service.IServiceVisitsService;
 import org.jeecg.modules.management.stage.service.IStageService;
 import org.jeecg.modules.management.workorder.entity.*;
 import org.jeecg.modules.management.workorder.service.*;
@@ -115,6 +117,9 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
 
      @Autowired
      private IProgressReportService progressReportService;
+
+     @Autowired
+     private IServiceVisitsService serviceVisitsService;
 
 
 	/*---------------------------------主表处理-begin-------------------------------------*/
@@ -515,9 +520,9 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
         ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
         String title = "维修记录报表";
         List<ServiceReport> exportList = new ArrayList<>();
+        // 获取所有维修工单
         QueryWrapper<WorkOrder> workOrderQueryWrapper = new QueryWrapper<>();
         workOrderQueryWrapper.eq("type","1");
-        // 获取所有维修工单
         List<WorkOrder> workOrderList = workOrderService.list(workOrderQueryWrapper);
         List<String> workOrderIdsList = new ArrayList<>();
         // 将父级工单存入Map,以便优化无必要的循环调用父级数据接口
@@ -547,8 +552,15 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
             for (int i = 0; i < workOrderDetailList.size(); i++) {
                 WorkOrderDetail workOrderDetail = workOrderDetailList.get(i);
                 Client client = clientService.getById(workOrderMap.get(workOrderDetail.getWorkOrderId()).getClientId());
+                // 报障客服
+                SysUser customerUser = sysUserService.getUserByName(workOrderMap.get(workOrderDetail.getWorkOrderId()).getCustomerServiceName());
                 DeviceNumber deviceNumber = deviceNumberService.getById(workOrderDetail.getDeviceNumber());
                 List<ExportReportDTO> progressReports = progressReportService.getByWorkOrderDetailId(workOrderDetail.getId());
+                // 回访客服
+                QueryWrapper<ServiceVisits> serviceVisitsQueryWrapper = new QueryWrapper<>();
+                serviceVisitsQueryWrapper.eq("work_order_id", workOrderMap.get(workOrderDetail.getWorkOrderId()).getId());
+                List<ServiceVisits> serviceVisits = serviceVisitsService.list(serviceVisitsQueryWrapper);
+                SysUser visitUser = sysUserService.getUserByName(serviceVisits.size() > 0 ? serviceVisits.get(0).getVisitPeople() : "");
                 String[] faultLocationValues = workOrderDetail.getFaultLocation().split(",");
                 StringBuffer faultLocationText = new StringBuffer();
                 for (String faultLocationValue : faultLocationValues) {
@@ -558,6 +570,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                 serviceReport.setNumber(i+1);
                 serviceReport.setClientName(client.getName());
                 serviceReport.setFurnace(deviceNumber != null ? deviceNumber.getName() : "");
+                serviceReport.setCustomerReport(customerUser != null ? customerUser.getRealname() : "");
                 serviceReport.setFeedbackQuestion(workOrderDetail.getDescription());
                 // 问题类型 ?
                 serviceReport.setQuestionType("");
@@ -603,6 +616,7 @@ public class WorkOrderController extends JeecgController<WorkOrder, IWorkOrderSe
                 // 客户对服务人员工作是否满意 ?
                 serviceReport.setStaffEvaluation("");
                 serviceReport.setProgressReportList(progressReports);
+                serviceReport.setCustomerVisit(visitUser != null ? visitUser.getRealname() : "");
                 exportList.add(serviceReport);
             }
         }
